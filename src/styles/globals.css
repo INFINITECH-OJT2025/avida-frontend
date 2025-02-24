@@ -1,0 +1,42 @@
+@import 'lightbox2/dist/css/lightbox.min.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.canvas-grid {
+  background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
+                    linear-gradient(to bottom, #ddd 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+/* Custom Global Styles */
+body {
+  @apply bg-gray-100 text-darkText;
+}
+
+.sidebar {
+  @apply bg-primary text-white w-64 h-screen fixed p-6;
+}
+
+.sidebar a {
+  @apply flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-red-800 transition;
+}
+
+.header {
+  @apply bg-white shadow-md flex justify-between items-center p-4 fixed w-full;
+}
+
+.card {
+  @apply p-6 bg-white shadow-md rounded-lg flex items-center space-x-4;
+}
+
+.card-icon {
+  @apply text-red-600;
+}
+
+.dropdown {
+  @apply absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg;
+}
+
+.dropdown li {
+  @apply px-4 py-2 hover:bg-gray-100 cursor-pointer;
+}
