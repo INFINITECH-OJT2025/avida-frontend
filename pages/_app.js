@@ -8,7 +8,8 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 export default function MyApp({ Component, pageProps }) {
-  const useAdminLayout = Component.useAdminLayout || false;
+  const isAdminPage = Component.useAdminLayout || false;
+  const useHeaderFooter = Component.useHeaderFooter || false;
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -27,11 +28,13 @@ export default function MyApp({ Component, pageProps }) {
 
   return (
     <DndProvider backend={HTML5Backend}>
-      {useAdminLayout ? (
+      {isAdminPage ? (
+        // ✅ Admin Layout (No Header & Footer)
         <AdminLayout>
           <Component {...pageProps} />
         </AdminLayout>
       ) : (
+        // ✅ Page Component decides if Header & Footer should be included
         <Component {...pageProps} />
       )}
     </DndProvider>

@@ -19,6 +19,7 @@ import { Navigation } from "swiper/modules";
 // ✅ Load NewsForm dynamically (prevent SSR issues)
 const NewsForm = dynamic(() => import("@/components/news/create"), { ssr: false });
 
+
 // ✅ Import Lightbox2 styles globally
 import "lightbox2/dist/css/lightbox.min.css";
 
@@ -55,7 +56,7 @@ export default function NewsPage() {
         return;
       }
 
-      const response = await axios.get("http://localhost:8000/api/news", {
+      const response = await axios.get("http://localhost:3000/api/news", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -105,7 +106,6 @@ export default function NewsPage() {
               <TableRow>
                 <TableCell className="font-semibold">Title</TableCell>
                 <TableCell className="font-semibold">Category</TableCell>
-                <TableCell className="font-semibold">Status</TableCell>
                 <TableCell className="font-semibold">Content</TableCell>
                 <TableCell className="font-semibold">Images</TableCell>
                 <TableCell className="font-semibold">Date</TableCell>
@@ -113,76 +113,69 @@ export default function NewsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {news
-                .filter((item) =>
-                  item.title.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.title}</TableCell>
-                    <TableCell>{item.category}</TableCell>
-                    <TableCell>{item.status}</TableCell>
-                    <TableCell>{item.content}</TableCell>
+  {news
+    .filter((item) =>
+      item.title.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .map((item) => (
+      <TableRow key={item.id}>
+        <TableCell>{item.title}</TableCell>
+        <TableCell>{item.category}</TableCell>
+        <TableCell>{item.content.substring(0, 20)}...</TableCell>
 
-                    <TableCell className="relative w-40 text-center"> {/* ✅ Define a fixed width */}
-                    {item.images && item.images !== "null" ? (
-    <div className="relative flex items-center justify-center w-full overflow-hidden"> {/* ✅ Centers images */}
-      <Swiper
-        modules={[Navigation]}
-        navigation={{
-          nextEl: `.next-${item.id}`,
-          prevEl: `.prev-${item.id}`,
-        }}
-        slidesPerView={1.5} // ✅ Slight stacking effect
-        spaceBetween={-15} // ✅ Overlap effect
-        centeredSlides={true} // ✅ Centers images in slider
-        className="w-32" // ✅ Ensures images stay centered inside the cell
-      >
-        {JSON.parse(item.images).map((img, index) => (
-          <SwiperSlide key={index}>
-            <a
-              href={`http://localhost:8000/storage/${img}`}
-              data-lightbox={`news-gallery-${item.id}`}
-              data-title={`Image ${index + 1}`}
-            >
-              <img
-                src={`http://localhost:8000/storage/${img}`}
-                alt={`News Image ${index + 1}`}
-                className="w-24 h-24 object-cover rounded-lg shadow-md border border-gray-300"
-              />
-            </a>
-          </SwiperSlide>
-        ))}
-      </Swiper>
+        {/* ✅ Fix Image Parsing Issue */}
+        <TableCell className="relative w-40 text-center">
+          {item.images && item.images !== "null" ? (
+            <div className="relative flex items-center justify-center w-full overflow-hidden">
+              <Swiper
+                modules={[Navigation]}
+                navigation={{
+                  nextEl: `.next-${item.id}`,
+                  prevEl: `.prev-${item.id}`,
+                }}
+                slidesPerView={1.5}
+                spaceBetween={-15}
+                centeredSlides={true}
+                className="w-32"
+              >
+                {/* ✅ Fix: Ensure `images` is an array before mapping */}
+                {(Array.isArray(item.images) ? item.images : JSON.parse(item.images)).map(
+                  (img, index) => (
+                    <SwiperSlide key={index}>
+                      <a
+                        href={`http://localhost:8000/storage/${img}`}
+                        data-lightbox={`news-gallery-${item.id}`}
+                        data-title={`Image ${index + 1}`}
+                      >
+                        <img
+                          src={`http://localhost:8000/storage/${img}`}
+                          alt={`News Image ${index + 1}`}
+                          className="w-24 h-24 object-cover rounded-lg shadow-md border border-gray-300"
+                        />
+                      </a>
+                    </SwiperSlide>
+                  )
+                )}
+              </Swiper>
+            </div>
+          ) : (
+            <span className="text-gray-500">No Images</span>
+          )}
+        </TableCell>
 
-      {/* ✅ Adjusted Navigation Buttons: Now properly positioned inside the table cell */}
-      <button
-        className={`prev-${item.id} absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-600 text-white p-2 rounded-full shadow-md`}
-      >
-        &#10094;
-      </button>
-      <button
-        className={`next-${item.id} absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-600 text-white p-2 rounded-full shadow-md`}
-      >
-        &#10095;
-      </button>
-    </div>
-  ) : (
-    <span className="text-gray-500">No Images</span>
-  )}
-</TableCell>
-                    <TableCell>{item.created_at?.split("T")[0] || "N/A"}</TableCell>
-                    <TableCell className="flex space-x-2">
-                      <Button variant="ghost" size="icon" onClick={() => openModal(item)}>
-                        <Pencil className="w-4 h-4 text-gray-600" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => console.log("Delete")}>
-                        <Trash2 className="w-4 h-4 text-red-600" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
+        <TableCell>{item.created_at?.split("T")[0] || "N/A"}</TableCell>
+        <TableCell className="flex space-x-2">
+          <Button variant="ghost" size="icon" onClick={() => openModal(item)}>
+            <Pencil className="w-4 h-4 text-gray-600" />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => console.log("Delete")}>
+            <Trash2 className="w-4 h-4 text-red-600" />
+          </Button>
+        </TableCell>
+      </TableRow>
+    ))}
+</TableBody>
+
           </Table>
         </div>
       </div>

@@ -1,4 +1,3 @@
-import UserLayout from '@/components/layout/UserLayout';
 import { useState, useEffect } from "react"; 
 import LoanGraph from "./loangraph";
 import LoanTable from "./loantable";
@@ -61,7 +60,7 @@ export default function LoanCalculator() {
   };
 
   return (
-    <UserLayout>
+  
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
       <h2 className="text-2xl font-semibold text-center mb-4">🏡 Loan Calculator</h2>
 
@@ -194,6 +193,6 @@ export default function LoanCalculator() {
         extraPayment={0}
         downPayment={downPayment}
       />
-    </div></UserLayout>
+    </div>
   );
 }

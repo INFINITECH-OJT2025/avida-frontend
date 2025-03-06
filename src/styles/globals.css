@@ -3,6 +3,26 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Reset margin and padding for full-width header */
+html, body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 50; /* Ensures it's above other content */
+}
+@layer utilities {
+  .clip-custom {
+    clip-path: polygon(0% 100%, 50% 50%, 100% 100%, 100% 0%, 0% 0%);
+  }
+}
+
+
 .canvas-grid {
   background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
                     linear-gradient(to bottom, #ddd 1px, transparent 1px);

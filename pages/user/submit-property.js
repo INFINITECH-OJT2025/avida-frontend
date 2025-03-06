@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Header from "@/components/Header"; // ✅ Import Header
 
 export default function SubmitProperty() {
     const [form, setForm] = useState({
@@ -17,10 +18,77 @@ export default function SubmitProperty() {
         parking: "",
         property_status: "",
         features_amenities: [],
-        images: [],
+        panolens_images: [],
+        lightbox2_media: [],
     });
 
     const [errors, setErrors] = useState({});
+    const [previewMedia, setPreviewMedia] = useState({ panolens: [], lightbox2: [] });
+
+    // ✅ Function to check file types
+    const isVideo = (file) => /\.(mp4|mov|avi|mkv)$/i.test(file.name);
+    const isImage = (file) => /\.(jpg|jpeg|png|gif|webp)$/i.test(file.name);
+    const is360Image = (file) => isImage(file) && file.name.toLowerCase().includes("360");
+
+    const handlePanolensUpload = (e) => {
+        const files = Array.from(e.target.files).filter(is360Image);
+
+        if (files.length === 0) {
+            alert("Please upload valid 360° image files.");
+            return;
+        }
+
+        setForm(prevForm => ({
+            ...prevForm,
+            panolens_images: [...prevForm.panolens_images, ...files],
+        }));
+
+        const previews = files.map(file => ({
+            name: file.name,
+            type: "360",
+            url: URL.createObjectURL(file),
+        }));
+
+        setPreviewMedia(prevMedia => ({
+            ...prevMedia,
+            panolens: [...prevMedia.panolens, ...previews],
+        }));
+    };
+
+    const handleLightboxUpload = (e) => {
+        const files = Array.from(e.target.files).filter(file => isImage(file) || isVideo(file));
+
+        if (files.length === 0) {
+            alert("Please upload valid image or video files.");
+            return;
+        }
+
+        setForm(prevForm => ({
+            ...prevForm,
+            lightbox2_media: [...prevForm.lightbox2_media, ...files],
+        }));
+
+        const previews = files.map(file => ({
+            name: file.name,
+            type: isVideo(file) ? "video" : "image",
+            url: URL.createObjectURL(file),
+        }));
+
+        setPreviewMedia(prevMedia => ({
+            ...prevMedia,
+            lightbox2: [...prevMedia.lightbox2, ...previews],
+        }));
+    };
+
+// ✅ Function to format the price
+const formatNumber = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("en-PH", {
+        style: "decimal",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(parseFloat(value));
+};
 
     const amenitiesList = [
         "Pool Area",
@@ -42,35 +110,43 @@ export default function SubmitProperty() {
     const userTypes = ["Owner", "Agent", "Broker"];
     const validateInput = (name, value) => {
         let errorMsg = "";
-
-        if (name === "first_name" || name === "last_name") {
-            if (!value.trim()) errorMsg = "This field is required.";
-        }
-
-        if (name === "email") {
+    
+        if (!value.trim()) {
+            errorMsg = "This field is required.";
+        } else if (name === "email") {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!value.trim()) errorMsg = "Email is required.";
-            else if (!emailRegex.test(value)) errorMsg = "Enter a valid email address.";
-        }
-
-        if (name === "phone_number") {
+            if (!emailRegex.test(value)) errorMsg = "Enter a valid email address.";
+        } else if (name === "phone_number") {
             const isValid = /^(09\d{9}|\+639\d{9})$/.test(value);
-            if (!value.trim()) errorMsg = "Phone number is required.";
-            else if (!isValid) errorMsg = "Use 09XXXXXXXXX or +639XXXXXXXXX format.";
+            if (!isValid) errorMsg = "Use 09XXXXXXXXX or +639XXXXXXXXX format.";
         }
-
-        if (["unit_type", "unit_status", "parking", "property_status"].includes(name)) {
-            if (!value) errorMsg = "Please select an option.";
-        }
-
+    
         setErrors((prev) => ({ ...prev, [name]: errorMsg }));
     };
+    
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setForm({ ...form, [name]: value });
         validateInput(name, value);
+    
+        if (name === "price") {
+            const rawValue = value.replace(/,/g, "").replace(/[^0-9.]/g, "");
+            setForm((prev) => ({ ...prev, [name]: rawValue }));
+        } else {
+            setForm((prev) => ({ ...prev, [name]: value }));
+        }
     };
-
+    
+const handleBlur = (e) => {
+    const { name, value } = e.target;
+    if (name === "price" && value) {
+        // Format price with commas on blur
+        const formattedValue = parseFloat(value).toLocaleString("en-PH", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+        setForm({ ...form, [name]: formattedValue });
+    }
+};
     const handleCheckboxChange = (amenity) => {
         setForm((prevForm) => {
             const isSelected = prevForm.features_amenities.includes(amenity);
@@ -83,62 +159,110 @@ export default function SubmitProperty() {
         });
     };
 
+    // ✅ Handle file uploads
     const handleFileChange = (e) => {
-        setForm({ ...form, images: e.target.files });
-    };
+    const files = Array.from(e.target.files);
+    const validFiles = files.filter(file => isImage(file) || isVideo(file) || is360Image(file));
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        let validationErrors = {};
+    if (validFiles.length === 0) {
+        alert("Please upload valid image, video, or 360° files.");
+        return;
+    }
 
-        // Validate required fields before submission
-        Object.keys(form).forEach((key) => {
-            if (!form[key] || (Array.isArray(form[key]) && form[key].length === 0)) {
-                validationErrors[key] = "This field is required.";
-            }
+    setForm(prevForm => ({
+        ...prevForm,
+        images: [...prevForm.images, ...validFiles],
+    }));
+
+    const previews = validFiles.map(file => ({
+        name: file.name,
+        type: isVideo(file) ? "video" : is360Image(file) ? "360" : "image",
+        url: URL.createObjectURL(file),
+    }));
+
+    setPreviewMedia(prevMedia => [...prevMedia, ...previews]);
+};
+
+const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let validationErrors = {};
+    Object.keys(form).forEach((key) => {
+        if (!form[key] || (Array.isArray(form[key]) && form[key].length === 0)) {
+            validationErrors[key] = "This field is required.";
+        }
+    });
+
+    setErrors(validationErrors);
+    if (Object.keys(validationErrors).length > 0) return;
+
+    const formData = new FormData();
+
+    for (const key in form) {
+        if (key === "panolens_images" || key === "lightbox2_media") {
+            form[key].forEach(file => formData.append(`${key}[]`, file));
+        } else if (key === "features_amenities") {
+            formData.append(key, JSON.stringify(form[key]));
+        } else if (key === "price") {
+            // ✅ Convert price to a numeric value before submitting
+            formData.append(key, parseFloat(form[key].replace(/,/g, "")));
+        } else {
+            formData.append(key, form[key]);
+        }
+    }
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/submit-property", {
+            method: "POST",
+            body: formData,
+            headers: {
+                Accept: "application/json",
+            },
         });
 
-        setErrors(validationErrors);
-        if (Object.keys(validationErrors).length > 0) return;
+        const data = await response.json();
+        if (response.ok) {
+            alert("Property submitted successfully!");
+        } else {
+            console.error("Error:", data);
+            alert("Error submitting property: " + (data.error || "Unknown error"));
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Something went wrong.");
+    }
+};
 
-        const formData = new FormData();
-        for (const key in form) {
-            if (key === "images") {
-                for (let i = 0; i < form.images.length; i++) {
-                    formData.append("images[]", form.images[i]);
-                }
-            } else if (key === "features_amenities") {
-                formData.append(key, JSON.stringify(form[key])); // Fix JSON format
-            } else {
-                formData.append(key, form[key]);
-            }
-        }
-    
-        try {
-            const response = await fetch("http://127.0.0.1:8000/api/submit-property", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    Accept: "application/json",
-                },
-            });
-    
-            const data = await response.json();
-            if (response.ok) {
-                alert("Property submitted successfully!");
-            } else {
-                console.error("Error:", data);
-                alert("Error submitting property: " + (data.error || "Unknown error"));
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            alert("Something went wrong.");
-        }
-    };
-    
+const handlePriceChange = (e) => {
+    let value = e.target.value.replace(/,/g, ""); // Remove existing commas
+    value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal
+
+    // Prevent multiple decimals
+    const parts = value.split(".");
+    if (parts.length > 2) {
+        value = parts[0] + "." + parts.slice(1).join("");
+    }
+
+    setForm((prev) => ({ ...prev, price: value }));
+};
+
+const handlePriceBlur = (e) => {
+    let value = e.target.value;
+    if (!value) return;
+
+    // Convert to float and format with commas
+    const formattedValue = parseFloat(value).toLocaleString("en-PH", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    });
+
+    setForm((prev) => ({ ...prev, price: formattedValue }));
+};
+
+   
     return (
-        <div className="p-8 max-w-6xl mx-auto bg-white rounded-lg shadow-lg">
-
+        <div className="p-20 max-w-7xl mx-auto bg-white rounded-lg shadow-xl">
+            <Header />
             {/* Banner Section */}
             <div className="bg-[#990e15] text-white py-10 px-6 rounded-lg text-center shadow-md">
                 <h1 className="text-4xl font-bold">Submit Your Property</h1>
@@ -214,9 +338,19 @@ export default function SubmitProperty() {
                             <input type="text" name="location" placeholder="eg. Quiapo, Manila, Metro Manila" required onChange={handleChange} className="p-2 border rounded w-full" />
                         </div>
                         <div>
-                            <label className="text-[#990e15]">Property Price</label>
-                            <input type="number" name="price" placeholder="eg. 0.00" required onChange={handleChange} className="p-2 border rounded w-full" />
-                        </div>
+    <label className="text-[#990e15]">Property Price</label>
+    <input 
+        type="text" 
+        name="price" 
+        value={form.price} 
+        onChange={handlePriceChange} 
+        onBlur={handlePriceBlur} 
+        placeholder="Enter price (e.g., 1,000,000.00)" 
+        className="p-2 border rounded w-full"
+    />
+    {errors.price && <p className="text-red-600 text-sm">{errors.price}</p>}
+</div>
+
                         <div>
                             <label className="text-[#990e15]">Square Meter</label>
                             <input type="number" name="square_meter" placeholder="eg. 0.00" required onChange={handleChange} className="p-2 border rounded w-full" />
@@ -256,12 +390,46 @@ export default function SubmitProperty() {
                     </div></div>
 
 
-                {/* Image Upload */}
-                <div>
-                    <h3 className="text-2xl font-semibold text-[#990e15]">Property Images</h3>
-                    <hr className="border-[#990e15] my-3" />
-                    <input type="file" multiple accept="image/*" onChange={handleFileChange} className="p-2 border rounded w-full" />
+                    <div>
+                        <label className="text-[#990e15]">Upload Panorama Images (Optional)</label>
+                        <input type="file" multiple accept="image/*" onChange={handlePanolensUpload} className="p-2 border rounded w-full" />
+                    </div>
+
+                    {/* ✅ Upload Normal Images & Videos for Lightbox2 */}
+                    <div>
+                        <label className="text-[#990e15]">Upload Images & Videos</label>
+                        <input type="file" required multiple accept="image/*, video/*" onChange={handleLightboxUpload} className="p-2 border rounded w-full" />
+                    </div>
+
+                {/* ✅ Preview Uploaded Media */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+                    {/* Preview 360° Images */}
+                    {previewMedia.panolens.length > 0 && (
+                        <div>
+                            <h4 className="text-lg font-semibold text-[#990e15]">Panorama Images (Optional)</h4>
+                            {previewMedia.panolens.map((media, index) => (
+                                <iframe key={index} src={media.url} className="w-full h-40 rounded-lg shadow-md" allowFullScreen></iframe>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Preview Lightbox2 Images & Videos */}
+                    {previewMedia.lightbox2.length > 0 && (
+                        <div>
+                            <h4 className="text-lg font-semibold text-[#990e15]">Images & Videos</h4>
+                            {previewMedia.lightbox2.map((media, index) => (
+                                <div key={index} className="relative">
+                                    {media.type === "image" ? (
+                                        <img src={media.url} alt={`Preview ${index}`} className="w-full h-40 object-cover rounded-lg shadow-md" />
+                                    ) : (
+                                        <video src={media.url} controls className="w-full h-40 object-cover rounded-lg shadow-md" />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
+
 
                 <button type="submit" className="bg-[#990e15] text-white p-3 rounded w-full text-lg font-semibold shadow-md">
                     Submit Property

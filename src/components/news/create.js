@@ -133,9 +133,10 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
         <label className="block text-sm font-medium text-gray-700">Category</label>
         <select name="category" className="border p-2 rounded w-full" value={formData.category} onChange={handleChange} required>
           <option value="">Select Category</option>
-          <option value="news">News</option>
-          <option value="announcement">Announcement</option>
-          <option value="update">Update</option>
+          <option value="News">News</option>
+          <option value="Announcement">Announcement</option>
+          <option value="Update">Update</option>
+          <option value="Blog">Blog</option>
         </select>
       </div>
 
