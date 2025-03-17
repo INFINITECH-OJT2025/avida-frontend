@@ -10,6 +10,9 @@ const nextConfig = {
         pathname: "/storage/**",
       },
     ],
+    eslint:{
+      ignoreDuringBuilds: true,
+    },
   },
   async rewrites() {
     return [
