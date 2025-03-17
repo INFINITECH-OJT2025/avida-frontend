@@ -1,33 +1,42 @@
-Dashboard.useAdminLayout = true; 
-import DashboardStats from "@/components/admin/DashboardStats";
-import ProfileDropdown from "@/components/admin/ProfileDropdown";
-import { Moon, Bell, Home, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchDashboardStats } from "../../src/utils/api";
+import KPICard from "../../src/components/admin/cards/KPICard";
+import PropertyChart from "../../src/components/admin/charts/PropertyChart";
+import InquiryChart from "../../src/components/admin/charts/InquiryChart";
+import JobApplicationChart from "../../src/components/admin/charts/JobApplicationChart";
+import WebsiteTrafficChart from "../../src/components/admin/charts/WebsiteTrafficChart";
+import { FaHome, FaEnvelope, FaUsers, FaChartLine } from "react-icons/fa";
+import AdminLayout from "../../src/components/layout/AdminLayout";
 
 export default function Dashboard() {
-    <header className="header">
-  <input
-    type="text"
-    placeholder="Search..."
-    className="w-1/3 px-4 py-2 border rounded-lg focus:ring focus:ring-gray-300"
-  />
-  <div className="flex items-center space-x-4">
-    <button><Moon size={20} /></button>
-    <button className="relative">
-      <Bell size={20} />
-      <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">3</span>
-    </button>
-    <ProfileDropdown />
-  </div>
-</header>
+  const [stats, setStats] = useState({});
 
-    return (
-        
-        <div className="flex">
-          <div className="flex-1 ml-24 mr-24">
-            <main className="p-6 bg-gray-100 min-h-screen">
-              {/* <DashboardStats /> */}
-            </main>
-          </div>
+  useEffect(() => {
+    fetchDashboardStats().then(setStats);
+  }, []);
+
+  return (
+    <AdminLayout>
+      <div className="p-6 ml-64">
+        {/* Ensure sidebar does not block content */}
+        <h1 className="text-2xl font-bold text-[#990e15]">Admin Dashboard</h1>
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+          <KPICard title="Total Properties" value={stats.total_properties || 0} icon={<FaHome />} color="#990e15" />
+          <KPICard title="Total Inquiries" value={stats.total_inquiries || 0} icon={<FaEnvelope />} color="#b3241c" />
+          <KPICard title="Total Applications" value={stats.total_applications || 0} icon={<FaUsers />} color="#cc4b47" />
+          <KPICard title="Total Appointments" value={stats.total_appointments || 0} icon={<FaChartLine />} color="#e06663" />
         </div>
-      );
+
+        {/* Graphs Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <PropertyChart />
+          <InquiryChart />
+          <JobApplicationChart />
+          <WebsiteTrafficChart />
+        </div>
+      </div>
+    </AdminLayout>
+  );
 }

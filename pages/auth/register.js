@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { registerUser } from "../../utils/auth";
+import { registerUser } from "../../src/utils/auth";
 
 export default function Register() {
   const [name, setName] = useState("");

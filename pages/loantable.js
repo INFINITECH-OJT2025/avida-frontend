@@ -85,11 +85,12 @@ const LoanTable = ({ loanAmount, interestRate, loanTerm, loanTermType, downPayme
   }, [generateSchedule]);
 
   return (
-    <div className="mt-6 p-4 bg-white shadow-lg rounded-md">
+<div className="mt-6 p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 shadow-lg rounded-md">
+
       <h3 className="text-lg font-semibold text-center">📅 Loan Amortization Schedule</h3>
 
       {/* Loan Summary */}
-      <div className="grid grid-cols-2 gap-4 bg-green-100 p-4 rounded-md">
+      <div className="grid grid-cols-2 gap-4 bg-green-100 p-4 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200">
         <p><strong>Scheduled Payment:</strong> {loanSummary.scheduledPayment}</p>
         <p><strong>Scheduled Payments:</strong> {loanSummary.scheduledPayments} months</p>
         <p><strong>Actual Payments:</strong> {loanSummary.actualPayments}</p>
@@ -98,7 +99,8 @@ const LoanTable = ({ loanAmount, interestRate, loanTerm, loanTermType, downPayme
       </div>
 
       {/* Table */}
-      <table className="w-full border-collapse mt-3 text-sm">
+      <table className="w-full border-collapse mt-3 text-sm dark:bg-gray-800 dark:text-white">
+
         <thead>
           <tr className="bg-gray-200 text-gray-700">
             {["Month", "Beginning Balance", "Scheduled Payment", "Total Payment", "Principal", "Interest", "Ending Balance", "Cumulative Interest"].map((header) => (

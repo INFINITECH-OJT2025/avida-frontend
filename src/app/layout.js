@@ -1,3 +1,4 @@
+<meta name="apple-mobile-web-app-title" content="Avida Land PWA" />
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { getUser, isTokenExpired } from "@/utils/auth"; // Import both functions
+import { getUser, isTokenExpired } from "../src/utils/auth"; // Import both functions
 
 const withAuth = (WrappedComponent) => {
   return (props) => {

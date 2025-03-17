@@ -1,4 +1,4 @@
-import { logoutUser } from "../../utils/auth";
+import { logoutUser } from "../utils/auth";
 
 export default function Navbar() {
   return (

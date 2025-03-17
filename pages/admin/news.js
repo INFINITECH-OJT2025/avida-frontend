@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Table, TableHead, TableBody, TableRow, TableCell } from "@/components/ui/table";
+import { Input } from "../../src/components/ui/input";
+import { Button } from "../../src/components/ui/button";
+import { Table, TableHead, TableBody, TableRow, TableCell } from "../../src/components/ui/table";
 import { Pencil, Trash2, Plus, X } from "lucide-react";
 import dynamic from "next/dynamic";
 
 // ✅ Import AdminLayout
-import AdminLayout from "@/components/layout/AdminLayout";
+import AdminLayout from "../../src/components/layout/AdminLayout";
 
 // ✅ Import SwiperJS for image slider
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -17,7 +17,7 @@ import "swiper/css/navigation";
 import { Navigation } from "swiper/modules";
 
 // ✅ Load NewsForm dynamically (prevent SSR issues)
-const NewsForm = dynamic(() => import("@/components/news/create"), { ssr: false });
+const NewsForm = dynamic(() => import("../../src/components/admin/news/create"), { ssr: false });
 
 
 // ✅ Import Lightbox2 styles globally
@@ -29,7 +29,9 @@ export default function NewsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedNews, setSelectedNews] = useState(null);
   const router = useRouter();
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+  
   useEffect(() => {
     fetchNews();
 
@@ -55,16 +57,22 @@ export default function NewsPage() {
         console.error("Unauthorized! Please login.");
         return;
       }
-
+  
       const response = await axios.get("http://localhost:3000/api/news", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
-      setNews(response.data);
+  
+      const formattedNews = response.data.map((item) => ({
+        ...item,
+        images: typeof item.images === "string" ? JSON.parse(item.images) : item.images || [],
+      }));
+  
+      setNews(formattedNews);
     } catch (error) {
       console.error("Error fetching news:", error.response?.data || error.message);
     }
   };
+  
 
   const openModal = (newsItem = null) => {
     setSelectedNews(newsItem);
@@ -80,7 +88,7 @@ export default function NewsPage() {
   return (
     <AdminLayout>
       {/* ✅ Ensure proper spacing with `ml-64` to prevent overlap with sidebar */}
-      <div className="ml-64 min-h-screen px-6 py-10 bg-gray-100">
+      <div className="ml-64 min-h-screen px-6 py-10 ">
         {/* ✅ Header Section */}
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">News & Announcements</h1>
@@ -113,68 +121,58 @@ export default function NewsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-  {news
-    .filter((item) =>
-      item.title.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .map((item) => (
-      <TableRow key={item.id}>
-        <TableCell>{item.title}</TableCell>
-        <TableCell>{item.category}</TableCell>
-        <TableCell>{item.content.substring(0, 20)}...</TableCell>
+              {news
+                .filter((item) =>
+                  item.title.toLowerCase().includes(searchQuery.toLowerCase())
+                )
+                .map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell>{item.title}</TableCell>
+                    <TableCell>{item.category}</TableCell>
+                    <TableCell>{item.content.substring(0, 20)}...</TableCell>
 
-        {/* ✅ Fix Image Parsing Issue */}
-        <TableCell className="relative w-40 text-center">
-          {item.images && item.images !== "null" ? (
-            <div className="relative flex items-center justify-center w-full overflow-hidden">
-              <Swiper
-                modules={[Navigation]}
-                navigation={{
-                  nextEl: `.next-${item.id}`,
-                  prevEl: `.prev-${item.id}`,
-                }}
-                slidesPerView={1.5}
-                spaceBetween={-15}
-                centeredSlides={true}
-                className="w-32"
-              >
-                {/* ✅ Fix: Ensure `images` is an array before mapping */}
-                {(Array.isArray(item.images) ? item.images : JSON.parse(item.images)).map(
-                  (img, index) => (
-                    <SwiperSlide key={index}>
-                      <a
-                        href={`http://localhost:8000/storage/${img}`}
-                        data-lightbox={`news-gallery-${item.id}`}
-                        data-title={`Image ${index + 1}`}
-                      >
-                        <img
-                          src={`http://localhost:8000/storage/${img}`}
-                          alt={`News Image ${index + 1}`}
-                          className="w-24 h-24 object-cover rounded-lg shadow-md border border-gray-300"
-                        />
-                      </a>
-                    </SwiperSlide>
-                  )
-                )}
-              </Swiper>
-            </div>
-          ) : (
-            <span className="text-gray-500">No Images</span>
-          )}
-        </TableCell>
+                    {/* ✅ Fix Image Parsing Issue */}
+                    <TableCell className="relative w-40 text-center">
+  {Array.isArray(item.images) && item.images.length > 0 ? (
+    <Swiper
+      modules={[Navigation]}
+      navigation
+      slidesPerView={1}
+      spaceBetween={5}
+      centeredSlides={true}
+      className="w-32 h-32"
+    >
+      {item.images.map((img, index) => (
+        <SwiperSlide key={index}>
+          <a href={img} data-lightbox={`news-gallery-${item.id}`} data-title={`Image ${index + 1}`}>
+            <img
+              src={img}
+              alt={`News Image ${index + 1}`}
+              className="w-24 h-24 object-cover rounded-lg shadow-md border border-gray-300"
+              onError={(e) => (e.target.src = "/fallback-image.jpg")}
+            />
+          </a>
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  ) : (
+    <span className="text-gray-500">No Images</span>
+  )}
+</TableCell>
 
-        <TableCell>{item.created_at?.split("T")[0] || "N/A"}</TableCell>
-        <TableCell className="flex space-x-2">
-          <Button variant="ghost" size="icon" onClick={() => openModal(item)}>
-            <Pencil className="w-4 h-4 text-gray-600" />
-          </Button>
-          <Button variant="ghost" size="icon" onClick={() => console.log("Delete")}>
-            <Trash2 className="w-4 h-4 text-red-600" />
-          </Button>
-        </TableCell>
-      </TableRow>
-    ))}
-</TableBody>
+
+                    <TableCell>{item.created_at?.split("T")[0] || "N/A"}</TableCell>
+                    <TableCell className="flex space-x-2">
+                      <Button variant="ghost" size="icon" onClick={() => openModal(item)}>
+                        <Pencil className="w-4 h-4 text-gray-600" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => console.log("Delete")}>
+                        <Trash2 className="w-4 h-4 text-red-600" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
 
           </Table>
         </div>
@@ -182,31 +180,31 @@ export default function NewsPage() {
 
       {/* ✅ MODAL FOR NEWS FORM */}
       {isModalOpen && (
-  <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
-    <div className="bg-white w-[700px] h-[550px] max-w-full p-6 rounded-lg shadow-lg relative overflow-hidden">
-      
-      {/* Scrollable Content */}
-      <div className="overflow-y-auto h-full pr-4">
-      
-        {/* Close Button */}
-        <button
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-          onClick={closeModalAndRefresh}
-        >
-          <X className="w-6 h-6" />
-        </button>
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 p-4">
+          <div className="bg-white w-[700px] h-[550px] max-w-full p-6 rounded-lg shadow-lg relative overflow-hidden">
 
-        {/* Modal Header */}
-        <h2 className="text-xl font-bold mb-4">{selectedNews ? "Edit News" : "Add News"}</h2>
+            {/* Scrollable Content */}
+            <div className="overflow-y-auto h-full pr-4">
 
-        {/* ✅ Render NewsForm Component */}
-        <NewsForm closeModal={closeModalAndRefresh} selectedNews={selectedNews} />
+              {/* Close Button */}
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+                onClick={closeModalAndRefresh}
+              >
+                <X className="w-6 h-6" />
+              </button>
 
-      </div>
+              {/* Modal Header */}
+              <h2 className="text-xl font-bold mb-4">{selectedNews ? "Edit News" : "Add News"}</h2>
 
-    </div>
-  </div>
-)}
+              {/* ✅ Render NewsForm Component */}
+              <NewsForm closeModal={closeModalAndRefresh} selectedNews={selectedNews} />
+
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </AdminLayout>
   );

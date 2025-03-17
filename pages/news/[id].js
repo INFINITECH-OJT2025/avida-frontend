@@ -7,8 +7,8 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { Navigation, Pagination } from "swiper/modules";
 import { CalendarDays, Clock, ArrowRight } from 'lucide-react';
-import Header from "@/components/Header";
-
+import Header from "../../src/components/Header";
+import Footer from "../../src/components/Footer";
 export default function NewsDetails({ post }) {
   const router = useRouter();
 
@@ -24,7 +24,7 @@ export default function NewsDetails({ post }) {
 
   return (
     <>
-    <Header />
+      <Header />
       {/* Hero Section with Gradient Overlay */}
       <section className="relative w-full h-[500px] flex items-center justify-center bg-gray-900">
         <div
@@ -56,7 +56,7 @@ export default function NewsDetails({ post }) {
       {/* Content Wrapper */}
       <div className="max-w-4xl mx-auto p-6 md:p-10">
         <div className="bg-white shadow-2xl rounded-lg p-8 -mt-24 md:-mt-32 z-10 relative">
-          
+
           {/* Image Gallery */}
           {post.images && post.images.length > 0 && (
             <Swiper
@@ -98,42 +98,42 @@ export default function NewsDetails({ post }) {
           )}
         </div>
       </div>
-
+      <Footer />
     </>
   );
 }
 
 // Generate all available news article pages
 export async function getStaticPaths() {
-    const res = await fetch("http://127.0.0.1:8000/api/news");
-    const posts = await res.json();
-  
-    const paths = posts.map((post) => ({
-      params: { id: post.id.toString() },
-    }));
-  
-    return { paths, fallback: true };
-  }
-  
-  // Fetch a single news post
-  export async function getStaticProps({ params }) {
-    try {
-      const res = await fetch(`http://127.0.0.1:8000/api/news/${params.id}`);
-  
-      if (!res.ok) {
-        throw new Error(`HTTP Error: ${res.status}`);
-      }
-  
-      const post = await res.json();
-  
-      return {
-        props: { post },
-        revalidate: 10, // Re-generate every 10 seconds
-      };
-    } catch (error) {
-      console.error("Error fetching news:", error.message);
-      return {
-        notFound: true, // Show 404 page if API fails
-      };
+  const res = await fetch("http://127.0.0.1:8000/api/news");
+  const posts = await res.json();
+
+  const paths = posts.map((post) => ({
+    params: { id: post.id.toString() },
+  }));
+
+  return { paths, fallback: true };
+}
+
+// Fetch a single news post
+export async function getStaticProps({ params }) {
+  try {
+    const res = await fetch(`http://127.0.0.1:8000/api/news/${params.id}`);
+
+    if (!res.ok) {
+      throw new Error(`HTTP Error: ${res.status}`);
     }
+
+    const post = await res.json();
+
+    return {
+      props: { post },
+      revalidate: 10, // Re-generate every 10 seconds
+    };
+  } catch (error) {
+    console.error("Error fetching news:", error.message);
+    return {
+      notFound: true, // Show 404 page if API fails
+    };
   }
+}

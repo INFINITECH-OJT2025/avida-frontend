@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react"; 
+import { useState, useEffect } from "react";
 import LoanGraph from "./loangraph";
 import LoanTable from "./loantable";
-
+import Header from "../src/components/Header"; // ✅ Import Header
+import Footer from "../src/components/Footer";
 
 export default function LoanCalculator() {
 
-  
+
   const [loanAmount, setLoanAmount] = useState("");
   const [interestRate, setInterestRate] = useState("");
-  const [loanTermYears, setLoanTermYears] = useState(""); 
-  const [loanTermMonths, setLoanTermMonths] = useState("0"); 
+  const [loanTermYears, setLoanTermYears] = useState("");
+  const [loanTermMonths, setLoanTermMonths] = useState("0");
   const [downPayment, setDownPayment] = useState("");
   const [discount, setDiscount] = useState("");
   const [propertyTax, setPropertyTax] = useState("");
@@ -60,139 +61,144 @@ export default function LoanCalculator() {
   };
 
   return (
-  
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-      <h2 className="text-2xl font-semibold text-center mb-4">🏡 Loan Calculator</h2>
 
-      <div className="grid grid-cols-2 gap-4">
-        {/* ✅ Loan Amount */}
-        <div>
-          <label className="block text-gray-700">Loan Amount (Php)</label>
-          <input
-            type="text"
-            value={formatNumber(loanAmount)}
-            onChange={(e) => setLoanAmount(parseNumberInput(e.target.value))}
-            className="w-full p-2 border rounded-md"
-          />
+    <div className=" top-0 left-0 w-full z-10 bg-white dark:bg-gray-900">
+      <Header />
+
+      <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md mt-10">
+        <h2 className="text-2xl font-semibold text-center mb-4">🏡 Loan Calculator</h2>
+
+        <div className="grid grid-cols-2 gap-4">
+          {/* ✅ Loan Amount */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Loan Amount (Php)</label>
+            <input
+              type="text"
+              value={formatNumber(loanAmount)}
+              onChange={(e) => setLoanAmount(parseNumberInput(e.target.value))}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+
+          {/* ✅ Interest Rate */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Interest Rate (%)</label>
+            <input
+              type="text"
+              value={interestRate}
+              onChange={(e) => setInterestRate(parseNumberInput(e.target.value))}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+
+          {/* ✅ Loan Term - Years */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Loan Term (Years)</label>
+            <select
+              value={loanTermYears}
+              onChange={(e) => setLoanTermYears(e.target.value)}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              {[...Array(26).keys()].map((year) => (
+                <option key={year} value={year}>
+                  {year} {year === 1 ? "Year" : "Years"}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* ✅ Loan Term - Months */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Loan Term (Months)</label>
+            <select
+              value={loanTermMonths}
+              onChange={(e) => setLoanTermMonths(e.target.value)}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            >
+              {[...Array(12).keys()].map((month) => (
+                <option key={month} value={month}>
+                  {month} {month === 1 ? "Month" : "Months"}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* ✅ Down Payment */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Down Payment (Php)</label>
+            <input
+              type="text"
+              value={formatNumber(downPayment)}
+              onChange={(e) => setDownPayment(parseNumberInput(e.target.value))}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+          </div>
+
+          {/* ✅ Discount */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Discount (%)</label>
+            <input
+              type="text"
+              value={discount}
+              onChange={(e) => setDiscount(parseNumberInput(e.target.value))}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Enter discount percentage (e.g., 20 for 20%)"
+            />
+          </div>
+
+          {/* ✅ Property Tax */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Property Tax (%)</label>
+            <input
+              type="text"
+              value={propertyTax}
+              onChange={(e) => setPropertyTax(parseNumberInput(e.target.value))}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Default: 1.2%"
+            />
+          </div>
+
+          {/* ✅ Home Insurance */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">Home Insurance (Php/Year)</label>
+            <input
+              type="text"
+              value={formatNumber(insurance)}
+              onChange={(e) => setInsurance(parseNumberInput(e.target.value))}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Optional"
+            />
+          </div>
+
+          {/* ✅ HOA Fees */}
+          <div>
+            <label className="block text-gray-700 dark:text-gray-300">HOA Fees (Php/Month)</label>
+            <input
+              type="text"
+              value={formatNumber(hoaFees)}
+              onChange={(e) => setHoaFees(parseNumberInput(e.target.value))}
+              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              placeholder="Optional"
+            />
+          </div>
         </div>
 
-        {/* ✅ Interest Rate */}
-        <div>
-          <label className="block text-gray-700">Interest Rate (%)</label>
-          <input
-            type="text"
-            value={interestRate}
-            onChange={(e) => setInterestRate(parseNumberInput(e.target.value))}
-            className="w-full p-2 border rounded-md"
-          />
+        <div className="mt-6 text-center">
+          <h3 className="text-lg font-medium">Estimated Monthly Payment:</h3>
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">Php {formatNumber(monthlyPayment)}</p>
         </div>
 
-        {/* ✅ Loan Term - Years */}
-        <div>
-          <label className="block text-gray-700">Loan Term (Years)</label>
-          <select
-            value={loanTermYears}
-            onChange={(e) => setLoanTermYears(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
-            {[...Array(26).keys()].map((year) => (
-              <option key={year} value={year}>
-                {year} {year === 1 ? "Year" : "Years"}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* ✅ Loan Term - Months */}
-        <div>
-          <label className="block text-gray-700">Loan Term (Months)</label>
-          <select
-            value={loanTermMonths}
-            onChange={(e) => setLoanTermMonths(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
-            {[...Array(12).keys()].map((month) => (
-              <option key={month} value={month}>
-                {month} {month === 1 ? "Month" : "Months"}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* ✅ Down Payment */}
-        <div>
-          <label className="block text-gray-700">Down Payment (Php)</label>
-          <input
-            type="text"
-            value={formatNumber(downPayment)}
-            onChange={(e) => setDownPayment(parseNumberInput(e.target.value))}
-            className="w-full p-2 border rounded-md"
-          />
-        </div>
-
-        {/* ✅ Discount */}
-        <div>
-          <label className="block text-gray-700">Discount (%)</label>
-          <input
-            type="text"
-            value={discount}
-            onChange={(e) => setDiscount(parseNumberInput(e.target.value))}
-            className="w-full p-2 border rounded-md"
-            placeholder="Enter discount percentage (e.g., 20 for 20%)"
-          />
-        </div>
-
-        {/* ✅ Property Tax */}
-        <div>
-          <label className="block text-gray-700">Property Tax (%)</label>
-          <input
-            type="text"
-            value={propertyTax}
-            onChange={(e) => setPropertyTax(parseNumberInput(e.target.value))}
-            className="w-full p-2 border rounded-md"
-            placeholder="Default: 1.2%"
-          />
-        </div>
-
-        {/* ✅ Home Insurance */}
-        <div>
-          <label className="block text-gray-700">Home Insurance (Php/Year)</label>
-          <input
-            type="text"
-            value={formatNumber(insurance)}
-            onChange={(e) => setInsurance(parseNumberInput(e.target.value))}
-            className="w-full p-2 border rounded-md"
-            placeholder="Optional"
-          />
-        </div>
-
-        {/* ✅ HOA Fees */}
-        <div>
-          <label className="block text-gray-700">HOA Fees (Php/Month)</label>
-          <input
-            type="text"
-            value={formatNumber(hoaFees)}
-            onChange={(e) => setHoaFees(parseNumberInput(e.target.value))}
-            className="w-full p-2 border rounded-md"
-            placeholder="Optional"
-          />
-        </div>
+        <LoanGraph monthlyPayment={monthlyPayment} />
+        <LoanTable
+          loanAmount={loanAmount}
+          interestRate={interestRate}
+          loanTerm={loanTermYears * 12 + Number(loanTermMonths)}
+          loanTermType="months"
+          extraPayment={0}
+          downPayment={downPayment}
+        />
       </div>
-
-      <div className="mt-6 text-center">
-        <h3 className="text-lg font-medium">Estimated Monthly Payment:</h3>
-        <p className="text-2xl font-bold text-blue-600">Php {formatNumber(monthlyPayment)}</p>
-      </div>
-
-      <LoanGraph monthlyPayment={monthlyPayment} />
-      <LoanTable
-        loanAmount={loanAmount}
-        interestRate={interestRate}
-        loanTerm={loanTermYears * 12 + Number(loanTermMonths)}
-        loanTermType="months"
-        extraPayment={0}
-        downPayment={downPayment}
-      />
+      <Footer />
     </div>
   );
 }

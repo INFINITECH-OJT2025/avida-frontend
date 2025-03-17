@@ -1,45 +1,120 @@
-import { Home, Building, Calculator, Briefcase, FileText, Mail, Settings, User, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Home, Building, Briefcase, FileText, FilePen, Mail, Settings, User, LogOut, ChevronDown, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
+  const [inquiriesOpen, setInquiriesOpen] = useState(false);
+  const [jobsOpen, setJobsOpen] = useState(false);
+  const [adminSettingsOpen, setSettingsOpen] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const storedDarkMode = localStorage.getItem("darkMode") === "true";
+    setDarkMode(storedDarkMode);
+    if (storedDarkMode) {
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     router.push("/auth/login");
   };
 
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem("darkMode", newDarkMode);
+    document.documentElement.classList.toggle("dark", newDarkMode);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
-      <aside className="h-full w-64 min-w-[250px] bg-[#990e15] text-white fixed top-0 left-0 shadow-lg">
-        <div className="p-6">
-          <h2 className="text-2xl font-bold mb-6">Admin Panel</h2>
+      <aside className="h-full w-56 bg-[#990e15] text-white fixed top-0 left-0 shadow-lg flex flex-col justify-between">
+        <div className="p-5">
+          <h2 className="text-xl font-bold mb-4">Admin Panel</h2>
           <nav>
             <ul className="space-y-4">
-              <li><Link href="/admin/dashboard" className="flex items-center space-x-2"><Home size={18} /> <span>Dashboard</span></Link></li>
-              <li><Link href="/admin/properties" className="flex items-center space-x-2"><Building size={18} /> <span>Properties</span></Link></li>
-              <li><Link href="/admin/loan-planner" className="flex items-center space-x-2"><Calculator size={18} /> <span>Loan & Room Planner</span></Link></li>
-              <li><Link href="/admin/services" className="flex items-center space-x-2"><Briefcase size={18} /> <span>Services & Careers</span></Link></li>
-              <li><Link href="/admin/news" className="flex items-center space-x-2"><FileText size={18} /> <span>News & Announcements</span></Link></li>
-              <li><Link href="/admin/inquiries" className="flex items-center space-x-2"><Mail size={18} /> <span>Contact & Inquiries</span></Link></li>
-              <li><Link href="/admin/settings" className="flex items-center space-x-2"><Settings size={18} /> <span>Admin Settings</span></Link></li>
+              <li><Link href="/admin/dashboard" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><Home size={18} /> <span>Dashboard</span></Link></li>
+              <li><Link href="/admin/properties" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><Building size={18} /> <span>Properties</span></Link></li>
+              <li><Link href="/admin/services" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><Briefcase size={18} /> <span>Services</span></Link></li>
+              <li><Link href="/admin/news" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><FileText size={18} /> <span>News</span></Link></li>
+
+              {/* Job Listings Dropdown */}
+              <li>
+                <button
+                  onClick={() => setJobsOpen(!jobsOpen)}
+                  className="flex items-center justify-between w-full p-2 rounded-md hover:bg-red-700 focus:outline-none"
+                >
+                  <div className="flex items-center space-x-2">
+                    <FilePen size={18} />
+                    <span>Job Listings</span>
+                  </div>
+                  <ChevronDown size={18} className={`transition-transform ${jobsOpen ? "rotate-180" : ""}`} />
+                </button>
+                {jobsOpen && (
+                  <ul className="ml-5 space-y-2">
+                    <li><Link href="/admin/jobs" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">Job Listings</Link></li>
+                    <li><Link href="/admin/job-applications" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">Job Applicants</Link></li>
+                    <li><Link href="/admin/appointment" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">Appointments</Link></li>
+                  </ul>
+                )}
+              </li>
+
+              {/* Contact & Inquiries Dropdown */}
+              <li>
+                <button
+                  onClick={() => setInquiriesOpen(!inquiriesOpen)}
+                  className="flex items-center justify-between w-full p-2 rounded-md hover:bg-red-700 focus:outline-none"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Mail size={18} />
+                    <span>Inquiries</span>
+                  </div>
+                  <ChevronDown size={18} className={`transition-transform ${inquiriesOpen ? "rotate-180" : ""}`} />
+                </button>
+                {inquiriesOpen && (
+                  <ul className="ml-5 space-y-2">
+                    <li><Link href="/admin/inquiries" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">All Inquiries</Link></li>
+                    <li><Link href="/admin/contacts" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">Contacts</Link></li>
+                  </ul>
+                )}
+              </li>
             </ul>
           </nav>
+        </div>
 
-          {/* Bottom Section */}
-          <div className="absolute bottom-6 left-6">
-            <Link href="/admin/profile" className="flex items-center space-x-2"><User size={18} /> <span>Profile</span></Link>
-            <button onClick={handleLogout} className="flex items-center space-x-2 text-left w-full mt-4">
-              <LogOut size={18} /> <span>Logout</span>
-            </button>
-          </div>
+        {/* Bottom Section - Fixed Alignment */}
+        <div className="p-5">
+          <button
+            onClick={toggleDarkMode}
+            className="flex items-center justify-between w-full p-2 rounded-md bg-gray-700 text-white hover:bg-gray-600 transition mb-4"
+          >
+            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            <span className="ml-2">{darkMode ? "Light Mode" : "Dark Mode"}</span>
+          </button>
+          <Link href="/admin/profile" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md mb-4">
+            <User size={18} /> <span>Profile</span>
+          </Link>
+
+          {/* Dark Mode Toggle - Spaced Properly */}
+          
+
+          {/* Logout Button */}
+          <button
+            onClick={handleLogout}
+            className="flex items-center space-x-2 text-left w-full hover:bg-red-700 p-2 rounded-md"
+          >
+            <LogOut size={18} /> <span>Logout</span>
+          </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="w-full lg:ml-64 p-6">
+      <main className="w-full lg:ml-56 p-8 bg-gray-50 dark:bg-gray-800 dark:text-white transition-colors">
         {children}
       </main>
     </div>

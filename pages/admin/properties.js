@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import "lightbox2/dist/css/lightbox.min.css";
-import AdminLayout from '@/components/layout/AdminLayout';
+import AdminLayout from '../../src/components/layout/AdminLayout';
 import Image from "next/image";
 
 // ✅ Helper function to format price
@@ -29,7 +29,7 @@ export function MediaDisplay({ viewProperty }) {
             {viewProperty.media && viewProperty.media.length > 0 ? (
                 viewProperty.media.map((mediaItem, index) => (
                     mediaItem.type === "video" ? (
-                        <video 
+                        <video
                             key={index}
                             src={mediaItem.url}
                             className="w-full h-56 object-cover rounded-lg"
@@ -54,7 +54,7 @@ export function MediaDisplay({ viewProperty }) {
                     ) : null
                 ))
             ) : (
-                <Image 
+                <Image
                     src="/default-property.jpg"
                     alt="No media available"
                     width={600}
@@ -136,8 +136,8 @@ export default function AdminProperties() {
 
     return (
         <AdminLayout>
-            <div className="p-8 max-w-5xl ml-auto mr-10 bg-white rounded-lg shadow-lg">
-                <h2 className="text-3xl font-bold text-[#990e15] mb-6">Property Management</h2>
+            <div className="p-8 max-w-7xl ml-auto  mr-10 bg-white rounded-lg shadow-lg">
+                <h2 className="text-5xl font-bold text-[#990e15] mb-6">Property Management</h2>
 
                 {loading ? (
                     <p className="text-gray-600">Loading properties...</p>
@@ -194,7 +194,23 @@ export default function AdminProperties() {
                                 ))}
                             </tbody>
                         </table>
-
+                        <div className="flex justify-between items-center mt-4">
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                                disabled={currentPage === 1}
+                                className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50"
+                            >
+                                Previous
+                            </button>
+                            <span>Page {currentPage} of {totalPages}</span>
+                            <button
+                                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                                disabled={currentPage === totalPages}
+                                className="bg-gray-300 px-4 py-2 rounded disabled:opacity-50"
+                            >
+                                Next
+                            </button>
+                        </div>
                         {viewProperty && (
                             <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                                 <div className="bg-white p-6 rounded-lg w-3/4 shadow-lg max-h-[80vh] overflow-y-auto">
@@ -209,9 +225,9 @@ export default function AdminProperties() {
                                     <p><strong>Floor Number:</strong> {viewProperty.floor_number || "N/A"}</p>
                                     <p><strong>Property Status:</strong> {viewProperty.property_status || "N/A"}</p>
                                     <p><strong>Features and Amenities:</strong> {viewProperty.feature_amenities || "N/A"}</p>
-                                    
+
                                     <MediaDisplay viewProperty={viewProperty} />
-                                    
+
                                 </div>
                             </div>
                         )}

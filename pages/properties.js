@@ -1,6 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import Header from "@/components/Header"; // ✅ Import Header
+import UsePageSEO from "../src/hooks/useSEO";
+import Header from "../src/components/Header";
+import Footer from "../src/components/Footer";
+import Image from "next/image";
+
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState([]);
@@ -15,11 +19,12 @@ export default function PropertiesPage() {
   });
 
   const router = useRouter();
+  const API_BASE_URL = "http://127.0.0.1:8000"; // ✅ API Base URL
 
   // ✅ Fetch Approved Properties
   const fetchProperties = useCallback(async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/properties");
+      const res = await fetch(`${API_BASE_URL}/api/properties`);
       if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
 
       const data = await res.json();
@@ -27,7 +32,9 @@ export default function PropertiesPage() {
 
       const formattedProperties = data.map((property) => ({
         ...property,
-        images: typeof property.images === "string" ? JSON.parse(property.images) : property.images || [],
+        images: property.media.map((media) =>
+          media.url.startsWith("http") ? media.url : `${API_BASE_URL}${media.url}`
+        ),
       }));
 
       setProperties(formattedProperties);
@@ -53,7 +60,7 @@ export default function PropertiesPage() {
         property.price.toString().includes(updatedFilters.searchTerm) ||
         property.unit_type.toLowerCase().includes(updatedFilters.searchTerm)
     );
-  
+
     if (updatedFilters.priceRange !== "all") {
       const [min, max] = updatedFilters.priceRange.split("-").map(Number);
       filtered = filtered.filter((property) => property.price >= min && property.price <= max);
@@ -64,46 +71,43 @@ export default function PropertiesPage() {
     if (updatedFilters.unitType !== "all") {
       filtered = filtered.filter((property) => property.unit_type === updatedFilters.unitType);
     }
-  
+
     setFilteredProperties(filtered);
   };
-  
 
-  // ✅ Handle Input Changes Without Instant Filteringconst handleFilterChange = (type, value) => {
-    const handleFilterChange = (type, value) => {
-      setFilters((prevFilters) => {
-        const updatedFilters = { ...prevFilters, [type]: value };
-        applyFilters(updatedFilters);  // ✅ Apply filters immediately
-        return updatedFilters;
-      });
-    };
-    
-
+  const handleFilterChange = (type, value) => {
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters, [type]: value };
+      applyFilters(updatedFilters);
+      return updatedFilters;
+    });
+  };
 
   if (loading) return <p className="text-center text-gray-600 mt-10">Loading properties...</p>;
   if (error) return <p className="text-center text-red-600 mt-10">{error}</p>;
 
   return (
-    
-    <div className="bg-gray-100 min-h-screen">
-<Header />
+    <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
+            <UsePageSEO/>
+      <Header />
+
       {/* Hero Section */}
-      <div className="relative bg-[#990e15] text-white py-16 text-center">
+      <div className="relative bg-[#990e15] text-white py-20 text-center">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-5xl font-extrabold">FIND YOUR DREAM PROPERTY</h1>
           <p className="text-lg text-gray-200 mt-3">Search by name, location, price, and more.</p>
 
-          {/* 🔹 Search Bar + Search Button */}
+          {/* 🔹 Search Bar */}
           <div className="mt-6 flex justify-center gap-2">
             <input
               type="text"
               placeholder="Search properties..."
-              className="p-3 w-full sm:w-1/2 border rounded-lg text-gray-700"
+              className="p-3 w-full sm:w-1/2 border rounded-lg text-gray-700 dark:bg-gray-800 dark:text-white"
               value={filters.searchTerm}
               onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
             />
             <button
-              onClick={applyFilters}
+              onClick={() => applyFilters(filters)}
               className="bg-[#990e15] text-white px-6 py-3 rounded-lg font-bold"
             >
               Search
@@ -111,10 +115,11 @@ export default function PropertiesPage() {
           </div>
         </div>
       </div>
-
-      {/* 🔹 Filter Bar */}
-      <div className="bg-white shadow-md py-4 px-6 flex flex-wrap justify-center gap-4 border-b">
-        <select className="p-3 border rounded-lg" onChange={(e) => handleFilterChange("priceRange", e.target.value)}>
+      {/* 🔹 Filter Bar (Fixed for Dark Mode) */}
+      <div className="bg-white dark:bg-gray-800 shadow-md py-4 px-6 flex flex-wrap justify-center gap-4 border-b dark:border-gray-600">
+        <select className="p-3 border rounded-lg bg-white dark:bg-gray-700 dark:text-white"
+          onChange={(e) => handleFilterChange("priceRange", e.target.value)}
+        >
           <option value="all">All Prices</option>
           <option value="0-5000000">₱0 - ₱5M</option>
           <option value="5000001-10000000">₱5M - ₱10M</option>
@@ -129,12 +134,18 @@ export default function PropertiesPage() {
           <option value="90000001-100000000">₱90M - ₱100M</option>
           <option value="100000001-500000000">₱100M - ₱500M</option>
         </select>
-        <select className="p-3 border rounded-lg" onChange={(e) => handleFilterChange("propertyStatus", e.target.value)}>
+
+        <select className="p-3 border rounded-lg bg-white dark:bg-gray-700 dark:text-white"
+          onChange={(e) => handleFilterChange("propertyStatus", e.target.value)}
+        >
           <option value="all">All Status</option>
           <option value="For Sale">For Sale</option>
           <option value="For Rent">For Rent</option>
         </select>
-        <select className="p-3 border rounded-lg" onChange={(e) => handleFilterChange("unit_type", e.target.value)}>
+
+        <select className="p-3 border rounded-lg bg-white dark:bg-gray-700 dark:text-white"
+          onChange={(e) => handleFilterChange("unitType", e.target.value)}
+        >
           <option value="all">All Unit Types</option>
           <option value="Studio Room">Studio Room</option>
           <option value="1BR">1-Bedroom</option>
@@ -145,99 +156,84 @@ export default function PropertiesPage() {
         </select>
       </div>
 
-      {/* Property Grid */}
+      {/* 🔹 Property Grid */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         <h2 className="text-3xl font-bold text-[#990e15] text-center">Available Properties</h2>
-        <p className="text-center text-gray-600 mt-2">
+        <p className="text-center text-gray-600 dark:text-gray-300 mt-2">
           Browse through our collection of premium real estate listings.
         </p>
+        <div className="flex justify-end my-4">
+          <button
+            onClick={() => router.push("/property/property-comparison")}
+            className="bg-[#990e15] text-white px-6 py-3 rounded-lg font-bold hover:bg-[#990e15] transition"
+          >
+            Compare Properties
+          </button>
+        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-6">
           {filteredProperties.length > 0 ? (
             filteredProperties.map((property) => (
               <div
                 key={property.id}
-                className="relative bg-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-xl transition transform hover:scale-105"
+                className="relative bg-white dark:bg-gray-800 dark:text-white rounded-lg shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition transform hover:scale-105 w-full max-w-[350px]"
                 onClick={() => router.push(`/property/${property.id}`)}
               >
-                {/* Property Media (Image or Video) */}
-                <div className="relative">
-                  {/* ✅ Check if images exist and format the correct URL */}
-                  {property.images.length > 0 && isVideo(property.images[0]) ? (
-                    <video
-                      src={`http://127.0.0.1:8000/storage/${property.images[0]}`} // ✅ Correct Storage URL
-                      className="w-full h-56 object-cover"
-                      controls
-                      loop
-                      muted
-                      onMouseOver={(e) => e.target.play()} // ✅ Auto-play on hover
-                      onMouseOut={(e) => e.target.pause()}
+                {/* ✅ Property Image Handling */}
+                <div className="relative h-39">
+                  {property.images && property.images.length > 0 && property.images[0] ? (
+                    <Image
+                      src={property.images[0]}
+                      alt={property.property_name || "Property Image"}
+                      width={350}
+                      height={300}
+                      layout="responsive"
+                      objectFit="cover"
+                      className="rounded-t-lg"
                     />
                   ) : (
-                    <img
-                      src={property.images.length > 0 ? `http://127.0.0.1:8000/storage/${property.images[0]}` : "/default-property.jpg"}
-                      alt={property.property_name}
-                      className="w-full h-56 object-cover"
-                    />
-
+                    <div className="w-full h-40 bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300">
+                      No Image Available
+                    </div>
                   )}
-
-
-                  {/* Overlay for "For Sale" / "For Rent" */}
-                  <span
-                    className={`absolute top-3 left-3 px-3 py-1 text-xs font-bold uppercase rounded-full ${property.property_status === "For Sale"
-                      ? "bg-[#990e15] text-white"
-                      : "bg-blue-500 text-white"
-                      }`}
-                  >
-                    {property.property_status}
-                  </span>
                 </div>
 
-                {/* Property Info */}
-                <div className="p-4">
-                  <h2 className="text-xl font-bold text-[#990e15] truncate">
+                {/* ✅ Property Status Badge */}
+                <span
+                  className={`absolute top-2 left-2 px-3 py-1 text-xs font-bold uppercase rounded-md ${property.property_status === "For Sale"
+                      ? "bg-[#990e15] text-white"
+                      : "bg-blue-500 text-white"
+                    }`}
+                >
+                  {property.property_status}
+                </span>
+
+                {/* ✅ Property Info */}
+                <div className="p-3">
+                  <h2 className="text-base font-bold text-[#990e15] truncate">
                     {property.unit_type} | {property.property_name}
                   </h2>
-                  <p className="text-gray-600 truncate">{property.location}</p>
-                  <p className="text-lg font-semibold text-gray-900 mt-2">
-                    ₱{property.price.toLocaleString()}
+                  <p className="text-xs text-gray-600 dark:text-gray-300 truncate">{property.location}</p>
+                  <p className="text-lg font-semibold text-gray-900 dark:text-white mt-1">
+                    {new Intl.NumberFormat("en-PH", {
+                      style: "currency",
+                      currency: "PHP",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(property.price)}
                   </p>
 
-                  {/* Tags */}
-                  <div className="flex flex-wrap mt-2 gap-2">
-                    <span className="px-3 py-1 text-xs font-semibold bg-[#990e15] text-white rounded-full">
-                      {property.unit_status}
-                    </span>
-                    <span className="px-3 py-1 text-xs font-semibold bg-gray-200 text-gray-800 rounded-full">
-                      {property.floor_number} Floor
-                    </span>
-                    <span className="px-3 py-1 text-xs font-semibold bg-gray-200 text-gray-800 rounded-full">
-                      {property.square_meter} sqm
-                    </span>
-                  </div>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-center text-gray-600 col-span-3">
+            <p className="text-center text-gray-600 dark:text-gray-300 col-span-3">
               No properties found matching your search.
             </p>
           )}
         </div>
       </div>
-
-      {/* CTA Section */}
-      <div className="bg-[#990e15] text-white text-center py-12">
-        <h2 className="text-3xl font-bold">Interested in listing your property?</h2>
-        <p className="text-lg text-gray-200 mt-2">Join thousands of property owners who trust us.</p>
-        <button
-          onClick={() => router.push("/submit-property")}
-          className="mt-4 px-6 py-3 bg-white text-[#990e15] font-semibold rounded-lg"
-        >
-          List Your Property
-        </button>
-      </div>
+      <Footer />
     </div>
   );
 }

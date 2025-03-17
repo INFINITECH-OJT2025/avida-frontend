@@ -1,62 +1,277 @@
-@import 'lightbox2/dist/css/lightbox.min.css';
+@import "react-quill/dist/quill.snow.css";
+@import "lightbox2/dist/css/lightbox.min.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Reset margin and padding for full-width header */
-html, body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 50; /* Ensures it's above other content */
-}
-@layer utilities {
-  .clip-custom {
-    clip-path: polygon(0% 100%, 50% 50%, 100% 100%, 100% 0%, 0% 0%);
-  }
+/* ✅ Light Mode (Default) */
+:root {
+  --primary: #990e15;
+  --background: white;
+  --text: black;
+  --card: white;
 }
 
-
-.canvas-grid {
-  background-image: linear-gradient(to right, #ddd 1px, transparent 1px),
-                    linear-gradient(to bottom, #ddd 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-/* Custom Global Styles */
-body {
-  @apply bg-gray-100 text-darkText;
+/* ✅ Dark Mode */
+.dark {
+  --primary: #990e15;
+  --background: #121212;
+  --text: white;
+  --card: #222222;
 }
 
-.sidebar {
-  @apply bg-primary text-white w-64 h-screen fixed p-6;
+/* ✅ Global Utility Classes */
+.bg-primary {
+  background-color: var(--primary);
+}
+.text-primary {
+  color: var(--primary);
+}
+.bg-background {
+  background-color: var(--background);
+}
+.text-text {
+  color: var(--text);
+}
+.bg-card {
+  background-color: var(--card);
 }
 
-.sidebar a {
-  @apply flex items-center space-x-2 py-2 px-4 rounded-lg hover:bg-red-800 transition;
+/* ✅ Navigation Styling */
+.nav-link {
+  @apply px-3 py-2 transition-all text-black dark:text-white hover:text-[#990e15] dark:hover:text-[#ff6666];
+}
+.active-link {
+  @apply text-[#990e15] font-bold border-b-2 border-[#990e15] dark:border-[#ff6666];
 }
 
+/* ✅ Dropdown Menu */
+.dropdown-menu {
+  @apply absolute left-0 mt-2 w-44 bg-white dark:bg-gray-800 border shadow-md rounded-md z-50 transition-all;
+}
+.dropdown-item {
+  @apply block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700;
+}
+.dropdown-active {
+  @apply bg-gray-200 dark:bg-gray-700 text-[#990e15] dark:text-[#ff6666];
+}
+
+.header-container {
+  @apply flex items-center justify-between w-full px-6 py-4;
+}
 .header {
-  @apply bg-white shadow-md flex justify-between items-center p-4 fixed w-full;
+  @apply bg-white dark:bg-gray-900 transition-colors duration-300;
 }
 
-.card {
-  @apply p-6 bg-white shadow-md rounded-lg flex items-center space-x-4;
+/* ✅ Ensure Dark Mode applies to the full page */
+body {
+  @apply bg-white text-gray-900 transition-colors duration-300;
 }
 
-.card-icon {
-  @apply text-red-600;
+.dark body {
+  @apply bg-gray-900 text-white;
 }
 
-.dropdown {
-  @apply absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg;
+/* ✅ Dark Mode Support for Inputs, Select, and Textarea */
+.input-field {
+  @apply w-full p-2 border rounded-lg text-sm bg-white dark:bg-gray-800 text-black dark:text-white focus:ring-[#990e15] focus:border-[#990e15];
 }
 
-.dropdown li {
-  @apply px-4 py-2 hover:bg-gray-100 cursor-pointer;
+.submit-btn {
+  @apply bg-[#990e15] text-white px-4 py-2 rounded-lg w-full hover:bg-red-800 text-sm transition-all;
 }
+
+/* ✅ Dark Mode Support */
+.dark .bg-gray-100 {
+  background-color: #121212; /* Dark background */
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db; /* Light text for readability */
+}
+
+/* ✅ Dark Mode for Filters */
+.dark .filter-bar {
+  background-color: #1a1a1a;
+  border-bottom: 1px solid #333;
+}
+.dark .input-field {
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+}
+.dark select.input-field {
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+/* ✅ Dark Mode for Property Cards */
+.dark .property-card {
+  background-color: #1a1a1a;
+  color: #fff;
+  border: 1px solid #333;
+}
+
+/* ✅ Dark Mode for Buttons */
+.dark button {
+  background-color: #990e15;
+  color: white;
+}
+.dark button:hover {
+  background-color: #b71c1c;
+}
+
+/* ✅ Dark Mode for Hero Section */
+.dark .hero-section {
+  background-color: #990e15;
+}
+
+/* ✅ Fix Placeholder Colors in Dark Mode */
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #bbb;
+}
+
+
+/* ✅ Fix Select Dropdown Background in Dark Mode */
+select.input-field {
+  @apply bg-white dark:bg-gray-800 dark:text-white;
+}
+
+/* ✅ Fix Placeholder Color in Dark Mode */
+input::placeholder,
+textarea::placeholder {
+  @apply text-gray-500 dark:text-gray-300;
+}
+
+
+/* ✅ Dark Mode Toggle Button */
+.dark-toggle {
+  @apply ml-4 p-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full transition-all;
+}
+
+/* ✅ Dark Mode for About Us Page */
+.dark .bg-gray-100 {
+  background-color: #121212;
+}
+
+.dark .text-gray-900 {
+  color: #ffffff;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+/* ✅ Dark Mode for Sections */
+.dark .about-section {
+  background-color: #1a1a1a;
+  color: white;
+}
+/* ✅ Dark Mode for Service Page */
+.dark .bg-gray-50 {
+  background-color: #121212;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .text-gray-900 {
+  color: white;
+}
+
+.dark .service-card {
+  background-color: #1a1a1a;
+  color: white;
+  border: 1px solid #333;
+}
+/* ✅ Hero Section Gradient Fix */
+.dark .bg-gradient-to-b {
+  background: linear-gradient(to bottom, #1a1a1a, #990e15);
+}
+
+/* Dark mode gradient fix for hero sections */
+.dark .bg-gradient-to-r {
+  background: linear-gradient(to right, #1a1a1a, #990e15);
+}
+/* ✅ Dark Mode for Contact Form */
+.dark .bg-white {
+  background-color: #1a1a1a;
+}
+
+.dark .text-gray-600 {
+  color: #d1d5db;
+}
+
+.dark .border {
+  border-color: #333;
+}
+
+/* ✅ Dark Mode for Input Fields */
+.input-field {
+  @apply w-full p-2 border rounded-lg text-sm bg-white dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:ring-[#990e15] focus:border-[#990e15];
+}
+
+/* ✅ Dark Mode for Buttons */
+.submit-btn {
+  @apply bg-[#990e15] text-white px-4 py-2 rounded-lg w-full hover:bg-red-800 text-sm transition-all;
+}
+
+.dark .submit-btn {
+  background-color: #990e15;
+}
+
+.dark .submit-btn:hover {
+  background-color: #b71c1c;
+}
+
+/* ✅ Dark Mode for Form Tabs */
+.dark .border-b {
+  border-color: #333;
+}
+
+.dark .text-gray-300 {
+  color: #d1d5db;
+}
+
+
+.nav-item {
+  @apply block px-6 py-3 text-gray-900 dark:text-white transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700;
+}
+
+.nav-active {
+  @apply bg-gray-300 dark:bg-gray-700 text-[#990e15] font-semibold;
+}
+
+.dropdown-mobile {
+  @apply pl-6 space-y-1 bg-gray-100 dark:bg-gray-800 rounded-md mt-1 transition-all duration-200;
+}
+
+.dropdown-item {
+  @apply block px-4 py-2 text-gray-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700;
+}
+
+.dropdown-active {
+  @apply bg-gray-400 dark:bg-gray-600 text-[#990e15] font-semibold;
+}
+.nav-item {
+  @apply block px-6 py-3 text-gray-900 dark:text-white transition-colors duration-200 hover:bg-gray-200 dark:hover:bg-gray-700;
+}
+
+.nav-active {
+  @apply bg-gray-300 dark:bg-gray-700 text-[#990e15] font-semibold;
+}
+
+.dropdown-mobile {
+  @apply pl-6 space-y-1 bg-gray-100 dark:bg-gray-800 rounded-md mt-1 transition-all duration-200;
+}
+
+.dropdown-item {
+  @apply block px-4 py-2 text-gray-800 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700;
+}
+
+.dropdown-active {
+  @apply bg-gray-400 dark:bg-gray-600 text-[#990e15] font-semibold;
+}
+

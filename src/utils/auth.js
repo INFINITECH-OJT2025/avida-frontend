@@ -107,10 +107,14 @@ export const getUser = async () => {
 
 
 // 🟢 Logout User
-export const logoutUser = () => {
-    localStorage.removeItem("token"); // Remove JWT token
-    window.location.href = "/auth/login"; // Redirect to login page
-};
+export const logoutUser = async () => {
+    try {
+      await API.post('/logout');
+      localStorage.removeItem('jwt'); // ✅ Clear token
+    } catch (error) {
+      throw error;
+    }
+  };
 
 // 🟢 Decode JWT Token to check expiration
 export const isTokenExpired = (token) => {

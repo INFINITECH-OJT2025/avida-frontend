@@ -1,6 +1,8 @@
+{/* <meta name="apple-mobile-web-app-title" content="Avida Land PWA" /> */}
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,6 +26,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Head>
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-title" content="Avida" />
+        <meta name="theme-color" content="#990e15" />
+        <link rel="icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/web-app-manifest-192x192.png" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/web-app-manifest-512x512.png" />
+      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

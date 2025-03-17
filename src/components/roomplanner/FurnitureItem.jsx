@@ -1,4 +1,4 @@
-// FurnitureItem.jsx
+// src\components\roomplanner\FurnitureItem.jsx
 import { useDrag } from 'react-dnd';
 
 export default function FurnitureItem({ item }) {

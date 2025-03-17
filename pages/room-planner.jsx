@@ -1,13 +1,27 @@
-import { useState, useRef } from 'react';
-import FurniturePalette from '@/components/RoomPlanner/FurniturePalette';
-import Canvas from '@/components/RoomPlanner/Canvas';
-import useExportImage from '@/hooks/useExportImage';
+// pages\room-planner.jsx
+import { useState, useRef, useEffect } from 'react';
+import FurniturePalette from '../components/roomplanner/FurniturePalette';
+import Canvas from '../components/roomplanner/Canvas';
+import RoomTools from '../components/roomplanner/RoomTools';
+import RoomActions from '../components/roomplanner/RoomActions';
+import useExportImage from '../hooks/useExportImage';
+import useUndoRedo from '../hooks/useUndoRedo';
 import SEO from '../utils/seo';
 
 export default function RoomPlannerPage() {
   const [furniture, setFurniture] = useState([]);
+  const [roomDimensions, setRoomDimensions] = useState({ width: 10, height: 10 });
+  const [scale, setScale] = useState(1);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [isPreview, setIsPreview] = useState(false);
+  const [showLabels, setShowLabels] = useState(true);
   const canvasRef = useRef(null);
   const { exportAsImage } = useExportImage();
+  const { undo, redo, addState, canUndo, canRedo, set } = useUndoRedo(furniture, setFurniture);
+
+  useEffect(() => {
+    set(furniture);
+  }, [furniture]);
 
   const categorizedItems = [
     {
@@ -39,43 +53,42 @@ export default function RoomPlannerPage() {
       ],
     },
   ];
-  
-
-  const handleExport = () => {
-    if (canvasRef.current) {
-      exportAsImage(canvasRef.current, 'my-room-layout.png');
-    }
-  };
 
   return (
     <>
       <SEO title="Room Planner" description="Interactive room planner" />
-  
-      <div className="flex flex-col">
-        {/* Top toolbar buttons clearly displayed */}
-        <div className="flex gap-2 bg-blue-500 p-2">
-          <button className="px-4 py-2 bg-white rounded">New</button>
-          <button className="px-4 py-2 bg-white rounded">Add Room</button>
-          <button className="px-4 py-2 bg-white rounded">Zoom In</button>
-          <button className="px-4 py-2 bg-white rounded">Zoom Out</button>
-          <button onClick={handleExport} className="px-4 py-2 bg-white rounded">
-            Export & Download
-          </button>
-        </div>
-  
-        {/* Main workspace */}
-        <div className="flex gap-4 p-4">
-          <aside className="w-[300px] h-[600px] overflow-y-auto border">
-            <FurniturePalette categorizedItems={categorizedItems} />
-          </aside>
-  
-          <div ref={canvasRef} className="flex-1 border border-gray-400">
-            <Canvas furniture={furniture} setFurniture={setFurniture} />
-          </div>
+      <RoomTools
+        setScale={setScale}
+        setIsPreview={setIsPreview}
+        isPreview={isPreview}
+        setShowLabels={setShowLabels}
+        exportAsImage={exportAsImage}
+        undo={undo} redo={redo}
+        canUndo={canUndo} canRedo={canRedo}
+        roomDimensions={roomDimensions}
+        setRoomDimensions={setRoomDimensions}
+      />
+
+      <div className="flex gap-4 p-4">
+        <aside className="w-[300px] h-[600px] overflow-y-auto border">
+          <FurniturePalette categorizedItems={categorizedItems} />
+        </aside>
+
+        <div ref={canvasRef} className="flex-1 border border-gray-400 overflow-auto relative">
+          <Canvas
+            furniture={furniture}
+            setFurniture={setFurniture}
+            roomDimensions={roomDimensions}
+            scale={scale}
+            selectedItems={selectedItems}
+            setSelectedItems={setSelectedItems}
+            isPreview={isPreview}
+            showLabels={showLabels}
+          />
         </div>
       </div>
+
+      <RoomActions setFurniture={setFurniture} />
     </>
   );
-  
-  
 }

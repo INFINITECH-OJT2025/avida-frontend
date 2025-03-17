@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { Input } from "@/components/ui/input";
-import Textarea from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
+import { Input } from "../../../../src/components/ui/input";
+import Textarea from "../../../../src/components/ui/textarea";
+import { Button } from "../../../../src/components/ui/button";
 import axios from "axios";
 import "lightbox2/dist/css/lightbox.min.css";
 
@@ -25,21 +25,31 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
         category: selectedNews?.category || "",
         content: selectedNews?.content || "",
         status: selectedNews?.status || "draft",
-        images: [], // ✅ Store new images only
+        images: [], // ✅ Reset to only store new uploads
       });
 
-      if (selectedNews.images) {
-        try {
-          // ✅ Parse JSON images and prepend API storage path
-          const existingImages = JSON.parse(selectedNews.images).map((img) => ({
-            src: `http://localhost:8000/storage/${img}`,
-            title: img,
-            isExisting: true, // ✅ Mark existing images
-          }));
-          setImagePreviews(existingImages);
-        } catch (error) {
-          console.error("Error parsing images:", error);
+      if (selectedNews?.images) {
+        let existingImages = [];
+
+        if (typeof selectedNews.images === "string") {
+          try {
+            // ✅ Parse images only if it's a JSON string
+            existingImages = JSON.parse(selectedNews.images);
+          } catch (error) {
+            console.error("Error parsing images:", error);
+            existingImages = [];
+          }
+        } else if (Array.isArray(selectedNews.images)) {
+          existingImages = selectedNews.images;
         }
+
+        setImagePreviews(
+          existingImages.map((img) => ({
+            src: img.startsWith("http") ? img : `http://localhost:8000/storage/${img}`,
+            title: img,
+            isExisting: true,
+          }))
+        );
       }
     }
   }, [selectedNews]);

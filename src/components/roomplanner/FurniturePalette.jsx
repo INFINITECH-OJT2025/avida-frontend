@@ -1,3 +1,4 @@
+// src\components\roomplanner\FurniturePalette.jsx
 import { useState } from 'react';
 import FurnitureItem from './FurnitureItem';
 

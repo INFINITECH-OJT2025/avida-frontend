@@ -1,7 +1,9 @@
-import '@/styles/globals.css';
+import '../src/styles/globals.css';
 import { useEffect } from 'react';
-import AdminLayout from '@/components/layout/AdminLayout';
+import AdminLayout from '../src/components/layout/AdminLayout';
 import 'lightbox2/dist/css/lightbox.min.css';
+<meta name="apple-mobile-web-app-title" content="Avida Land PWA" />
+import Head from "next/head";
 
 // React DnD imports
 import { DndProvider } from 'react-dnd';
@@ -27,7 +29,14 @@ export default function MyApp({ Component, pageProps }) {
   }, []);
 
   return (
+    
     <DndProvider backend={HTML5Backend}>
+      <Head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#990e15" />
+        <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png" />
+      </Head>
       {isAdminPage ? (
         // ✅ Admin Layout (No Header & Footer)
         <AdminLayout>

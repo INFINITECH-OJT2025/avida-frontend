@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
-import { loginUser } from "../../utils/auth";
+import { loginUser } from "../../src/utils/auth";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import "@/styles/globals.css";
 
