@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Head from "next/head";
-import HeroSection from "../../src/components/user/about/HeroSection";
-import CompanyOverview from "../../src/components/user/about/CompanyOverview";
-import MissionVision from "../../src/components/user/about/MissionVision";
-import OurStory from "../../src/components/user/about/OurStory";
-import WhyChooseUs from "../../src/components/user/about/WhyChooseUs";
-import Header from "../../src/components/Header";
+import HeroSection from "../src/components/user/about/HeroSection";
+import CompanyOverview from "../src/components/user/about/CompanyOverview";
+import MissionVision from "../src/components/user/about/MissionVision";
+import OurStory from "../src/components/user/about/OurStory";
+import WhyChooseUs from "../src/components/user/about/WhyChooseUs";
+import Header from "../src/components/Header";
 export default function AboutUsPage() {
     const [about, setAbout] = useState(null);
 
