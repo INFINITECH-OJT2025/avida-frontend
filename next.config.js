@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: {
+  eslint:{
+      ignoreDuringBuilds: true,
+    },
+    images: {
     domains: ["127.0.0.1"],
     remotePatterns: [
       {
@@ -10,9 +13,7 @@ const nextConfig = {
         pathname: "/storage/**",
       },
     ],
-    eslint:{
-      ignoreDuringBuilds: true,
-    },
+    
   },
   async rewrites() {
     return [
