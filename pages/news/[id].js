@@ -1,4 +1,4 @@
-import useSEO from "@/hooks/useSEO";
+import useSEO from "../../src/hooks/useSEO";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";

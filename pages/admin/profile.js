@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { getUser, updateProfile } from "../../src/utils/auth";
 import { User, Mail, Lock, Phone, MapPin, Camera, ArrowLeft } from "lucide-react";
-import "@/styles/globals.css";
+import "../../src/styles/globals.css";
 
 export default function ProfileSettings() {
   const [name, setName] = useState("");
