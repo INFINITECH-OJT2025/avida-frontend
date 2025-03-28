@@ -11,7 +11,7 @@ const SEOComponent = ({ dynamicData = {} }) => {
 
   const title = dynamicData.title || pageSEO.title || "Avida Land";
   const description = dynamicData.description || pageSEO.description || "Explore top real estate properties.";
-  const url = dynamicData.url || `http://localhost:3000${router.asPath}`;
+  const url = dynamicData.url || `https://avidaland.vercel.app${router.asPath}`;
   const image = dynamicData.image || pageSEO.image || "/default-property.jpg";
 
   return (

@@ -71,7 +71,7 @@ export default function LandingPage() {
         usePageSEO({
           title: "Avida Real Estate - Find Your Dream Home",
           description: "Discover the best real estate properties for sale and rent.",
-          url: "http://localhost:3000/",
+          url: "https://avidaland.vercel.app/",
           image: "/seo-default-image.jpg",
         })} */}
       <SEOComponent />
