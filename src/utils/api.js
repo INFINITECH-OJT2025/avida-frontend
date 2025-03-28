@@ -3,7 +3,7 @@ import axios from "axios";
 import { useToast } from "../context/ToastContext"; // adjust the relative path as needed
 
 // ✅ Load API Base URL from Environment Variables
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://infinitech-api3.site/api';
 
 const API = axios.create({
   baseURL: API_BASE_URL,

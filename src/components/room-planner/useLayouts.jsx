@@ -6,7 +6,7 @@ export default function useLayouts() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/layouts', {
+    axios.get('https://infinitech-api3.site/api/layouts', {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },

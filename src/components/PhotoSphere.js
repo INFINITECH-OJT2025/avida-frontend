@@ -16,7 +16,7 @@ export default function PhotoSphere({ imageUrl }) {
       // ✅ Ensure the image URL is fully qualified
       const validImageUrl = imageUrl.startsWith("http")
   ? imageUrl
-  : `http://127.0.0.1:8000/storage/${imageUrl.replace("storage/", "")}`;
+  : `https://infinitech-api3.site/storage/${imageUrl.replace("storage/", "")}`;
 
 console.log("✅ Final Image URL:", validImageUrl);
 
