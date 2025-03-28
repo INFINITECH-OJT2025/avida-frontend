@@ -2,7 +2,7 @@ import Head from "next/head";
 import Header from "../src/components/Header";
 import Footer from "../src/components/Footer"; 
 import ContactForm from "../src/components/user/services/contact-us";
-import SEOComponent from "../../src/hooks/useSEO";
+import SEOComponent from "../src/hooks/useSEO";
 
 export default function ContactUs() {
     return (

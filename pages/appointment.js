@@ -3,7 +3,7 @@ import axios from "axios";
 import { useToast } from "../src/context/ToastContext"; // ✅ Import Global Toast
 import useConfirmDialog from "../src/hooks/useConfirmDialog";
 import { callAPI } from "../src/utils/api"; // adjust the path as needed
-import SEOComponent from "../../src/hooks/useSEO";
+import SEOComponent from "../src/hooks/useSEO";
 
 export default function ContactForm() {
   const [activeTab, setActiveTab] = useState("appointment"); // Default to Appointment tab
