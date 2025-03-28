@@ -33,7 +33,7 @@ export default function PropertiesPage() {
       const formattedProperties = data.map((property) => ({
         ...property,
         images: property.media.map((media) =>
-          media.url.startsWith("http") ? media.url : `${API_BASE_URL}${media.url}`
+          media.url.startsWith("https") ? media.url : `${API_BASE_URL}${media.url}`
         ),
       }));
 

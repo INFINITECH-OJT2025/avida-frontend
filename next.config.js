@@ -16,7 +16,7 @@ const nextConfig = withPWA({
       {
         protocol: "https",
         hostname: "infinitech-api3.site",
-        port: "8000",
+        // port: "8000",
         pathname: "/storage/**",
       },
     ],
