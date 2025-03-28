@@ -11,11 +11,11 @@ const nextConfig = withPWA({
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ["127.0.0.1"],
+    domains: ["infinitech-api3.site"],
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "127.0.0.1",
+        protocol: "https",
+        hostname: "infinitech-api3.site",
         port: "8000",
         pathname: "/storage/**",
       },
