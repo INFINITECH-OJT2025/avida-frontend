@@ -25,11 +25,11 @@ const nextConfig = withPWA({
     return [
       {
         source: "/api/:path*",
-        destination: "http://127.0.0.1:8000/api/:path*", // ✅ Proxy Laravel API
+        destination: "https://infinitech-api3.site/api/:path*", // ✅ Proxy Laravel API
       },
       {
         source: "/storage/:path*",
-        destination: "http://127.0.0.1:8000/storage/:path*", // ✅ Proxy Laravel Storage
+        destination: "https://infinitech-api3.site/storage/:path*", // ✅ Proxy Laravel Storage
       },
     ];
   },

@@ -19,7 +19,7 @@ export default function PropertiesPage() {
   });
 
   const router = useRouter();
-  const API_BASE_URL = "http://127.0.0.1:8000"; // ✅ API Base URL
+  const API_BASE_URL = "https://infinitech-api3.site"; // ✅ API Base URL
 
   // ✅ Fetch Approved Properties
   const fetchProperties = useCallback(async () => {

@@ -2,7 +2,7 @@ export default async function handler(req, res) {
     const { path } = req.query;
 
     try {
-        const response = await fetch(`http://127.0.0.1:8000/storage/${path}`);
+        const response = await fetch(`https://infinitech-api3.site/storage/${path}`);
         if (!response.ok) {
             throw new Error("Failed to fetch the image");
         }
