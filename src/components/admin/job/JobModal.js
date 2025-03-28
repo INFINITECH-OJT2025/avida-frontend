@@ -29,12 +29,12 @@ const JobModal = ({ job, onClose }) => {
       <div ref={modalRef} className="bg-white p-5 rounded-xl shadow-lg w-full max-w-2xl relative border">
         
         {/* Close Button */}
-        {/* <button
-          onClick={onClose}
-          className="absolute top-6 right-3 text-gray-900 hover:text-red-500 text-6xl"
-        >
-          &times;
-        </button> */}
+        <button
+  onClick={onClose}
+  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-500 shadow-md flex items-center justify-center text-black hover:text-red-600 hover:scale-110 transition-all duration-200 z-50"
+>
+  <span className="text-2xl leading-none">&times;</span>
+</button>
 
         {/* Job Image (Click to Open in Lightbox) */}
         {job.image && (

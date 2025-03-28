@@ -1,22 +1,30 @@
+// pages/jobs/[id].js or wherever the JobDetail component is
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Head from "next/head";
 import JobApplicationForm from "../../src/components/admin/job/job-application-form";
 import Header from "../../src/components/Header";
 import Footer from "../../src/components/Footer";
-
+import { callAPI } from "../../src/utils/api"; // ✅ Import the utility
+import SEOComponent from "../../src/hooks/useSEO";
 const JobDetail = () => {
   const router = useRouter();
   const { id } = router.query;
   const [job, setJob] = useState(null);
 
   useEffect(() => {
-    if (id) {
-      fetch(`http://127.0.0.1:8000/api/jobs/${id}`)
-        .then((res) => res.json())
-        .then((data) => setJob(data))
-        .catch((err) => console.error("Error fetching job:", err));
-    }
+    const fetchJobDetails = async () => {
+      if (id) {
+        try {
+          const data = await callAPI("get", `/jobs/${id}`);
+          setJob(data);
+        } catch (err) {
+          console.error("Error fetching job details:", err);
+        }
+      }
+    };
+
+    fetchJobDetails();
   }, [id]);
 
   if (!job) {
@@ -41,22 +49,13 @@ const JobDetail = () => {
 
   return (
     <>
-      <Head>
-        <title>{job.title} - Career Opportunity</title>
-        <meta
-          name="description"
-          content={job.description?.substring(0, 150) || "Exciting career opportunity available. Apply now!"}
-        />
-      </Head>
+  <SEOComponent />
       <Header />
 
-      {/* Hero Image */}
       <div
         className="relative w-full h-80 bg-cover bg-center flex flex-col items-center justify-center text-white text-center px-6"
         style={{
           backgroundImage: job.image ? `url('http://127.0.0.1:8000/storage/${job.image}')` : "none",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
         }}
       >
         <div className="absolute inset-0 bg-[#990e15] opacity-85 dark:opacity-90" />
@@ -64,10 +63,7 @@ const JobDetail = () => {
         <p className="text-lg mt-2 relative z-10">{job.department}</p>
       </div>
 
-      {/* Job Details & Application Form Layout */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8 py-10 px-6 dark:bg-gray-900">
-
-        {/* Job Info (Left Side) */}
         <div className="lg:col-span-2 bg-white dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg p-6">
           <div className="border-b pb-4 mb-4 dark:border-gray-700">
             <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
@@ -101,11 +97,11 @@ const JobDetail = () => {
           </p>
         </div>
 
-        {/* Job Application Form (Right Side) */}
         <div className="bg-white dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg p-6">
           <JobApplicationForm jobId={id} />
         </div>
       </div>
+
       <Footer />
     </>
   );

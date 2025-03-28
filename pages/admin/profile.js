@@ -1,9 +1,11 @@
+// pages/admin/profile.js
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import { getUser, updateProfile } from "../../src/utils/auth";
-import { User, Mail, Lock, Phone, MapPin, Camera, ArrowLeft } from "lucide-react";
+import { fetchUser, updateProfile } from "../../src/utils/api";
+import { User, Mail, Lock, Phone, MapPin } from "lucide-react";
+import { useToast } from "../../src/context/ToastContext";
 import "../../src/styles/globals.css";
-
+import SEOComponent from "../../src/hooks/useSEO";
 export default function ProfileSettings() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -12,38 +14,36 @@ export default function ProfileSettings() {
   const [address, setAddress] = useState("");
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [previewPhoto, setPreviewPhoto] = useState(null);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isChanged, setIsChanged] = useState(false);
-  const router = useRouter();
-
-  // Store original values to detect changes
   const [originalValues, setOriginalValues] = useState({});
+  const router = useRouter();
+  const { showToast } = useToast();
 
-  // 🟢 Fetch user data on load
   useEffect(() => {
-    async function fetchUser() {
-      const userData = await getUser();
-      if (userData) {
-        setName(userData.name || "");
-        setEmail(userData.email || "");
-        setPhone(userData.phone_number || "");
-        setAddress(userData.address || "");
-        setPreviewPhoto(userData.profile_photo || "default-profile.svg");
-
-        // Store original values
-        setOriginalValues({
-          name: userData.name || "",
-          email: userData.email || "",
-          phone: userData.phone_number || "",
-          address: userData.address || "",
-        });
+    async function fetchProfile() {
+      try {
+        const userData = await fetchUser();
+        if (userData) {
+          setName(userData.name || "");
+          setEmail(userData.email || "");
+          setPhone(userData.phone_number || "");
+          setAddress(userData.address || "");
+          setPreviewPhoto(userData.profile_photo || "default-profile.svg");
+          setOriginalValues({
+            name: userData.name || "",
+            email: userData.email || "",
+            phone: userData.phone_number || "",
+            address: userData.address || "",
+          });
+        }
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+        showToast("Failed to load profile data", "error");
       }
     }
-    fetchUser();
+    fetchProfile();
   }, []);
 
-  // 🟢 Check if there are any changes
   useEffect(() => {
     setIsChanged(
       name !== originalValues.name ||
@@ -55,7 +55,6 @@ export default function ProfileSettings() {
     );
   }, [name, email, phone, address, password, profilePhoto, originalValues]);
 
-  // 🟢 Handle Profile Picture Upload
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -64,17 +63,12 @@ export default function ProfileSettings() {
     }
   };
 
-  // 🟢 Handle Cancel - Go back to the previous page
   const handleBack = () => {
-    router.back(); // Go to the previous page
+    router.back();
   };
 
-  // 🟢 Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
-
     if (!isChanged) return;
 
     const updatedFields = new FormData();
@@ -88,32 +82,25 @@ export default function ProfileSettings() {
 
     try {
       await updateProfile(updatedFields);
-      setSuccess("Profile updated successfully!");
-
-      // Update original values after saving
+      showToast("Profile updated successfully!", "success");
       setOriginalValues({ name, email, phone, address });
       setPassword("");
       setIsChanged(false);
-
-      // ✅ Redirect to dashboard after successful update
       setTimeout(() => {
         router.push("/admin/dashboard");
       }, 2000);
     } catch (err) {
-      setError(err.message || "Profile update failed");
+      showToast(err.message || "Profile update failed", "error");
     }
   };
 
   return (
     <div className="max-w-lg mx-auto mt-10 bg-white p-6 shadow-lg rounded-md">
+      <SEOComponent />
       <h2 className="text-2xl font-bold text-gray-900">Profile Settings</h2>
       <p className="text-gray-500 text-sm mb-4">Update your personal information</p>
 
-      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-      {success && <p className="text-green-500 text-sm mb-2">{success}</p>}
-
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Profile Picture Upload */}
         <div className="text-center">
           <label htmlFor="profile-photo" className="cursor-pointer">
             <img
@@ -132,7 +119,6 @@ export default function ProfileSettings() {
           <p className="text-sm text-gray-500 mt-2">Click to change profile picture</p>
         </div>
 
-        {/* Full Name */}
         <div>
           <label className="text-gray-700 font-medium text-sm">Full Name</label>
           <div className="relative">
@@ -147,7 +133,6 @@ export default function ProfileSettings() {
           </div>
         </div>
 
-        {/* Email */}
         <div>
           <label className="text-gray-700 font-medium text-sm">Email</label>
           <div className="relative">
@@ -162,7 +147,6 @@ export default function ProfileSettings() {
           </div>
         </div>
 
-        {/* Password */}
         <div>
           <label className="text-gray-700 font-medium text-sm">New Password</label>
           <div className="relative">
@@ -176,7 +160,6 @@ export default function ProfileSettings() {
           </div>
         </div>
 
-        {/* Phone Number */}
         <div>
           <label className="text-gray-700 font-medium text-sm">Phone Number</label>
           <div className="relative">
@@ -190,7 +173,6 @@ export default function ProfileSettings() {
           </div>
         </div>
 
-        {/* Address */}
         <div>
           <label className="text-gray-700 font-medium text-sm">Address</label>
           <div className="relative">
@@ -203,7 +185,6 @@ export default function ProfileSettings() {
           </div>
         </div>
 
-        {/* Buttons */}
         <div className="flex justify-between space-x-4 mt-4">
           <button
             type="button"

@@ -7,6 +7,8 @@ import MissionVision from "../src/components/user/about/MissionVision";
 import OurStory from "../src/components/user/about/OurStory";
 import WhyChooseUs from "../src/components/user/about/WhyChooseUs";
 import Header from "../src/components/Header";
+import Footer from "../src/components/Footer";
+import SEOComponent from "../src/hooks/useSEO";
 export default function AboutUsPage() {
     const [about, setAbout] = useState(null);
 
@@ -17,7 +19,7 @@ export default function AboutUsPage() {
     }, []);
 
     return (
-        <>
+        <>      <SEOComponent />
             <Header/>
 
             <div className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white"><Head>
@@ -43,6 +45,7 @@ export default function AboutUsPage() {
 
                 </div>
             </div>
+            <Footer />
         </>
     );
 }

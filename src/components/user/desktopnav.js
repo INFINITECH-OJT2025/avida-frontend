@@ -1,11 +1,12 @@
-import { useState, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-
+import { Download } from "lucide-react";
 const DesktopNav = () => {
     const router = useRouter();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const timeoutRef = useRef(null);
+    const [deferredPrompt, setDeferredPrompt] = useState(null);
 
     const isActive = (path) => router.pathname === path;
 
@@ -20,6 +21,34 @@ const DesktopNav = () => {
         }, 200);
     };
 
+  // ✅ Handle PWA Install Prompt
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (event) => {
+      event.preventDefault(); // Prevent auto-popup
+      setDeferredPrompt(event); // Store event to trigger manually
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    };
+  }, []);
+    // ✅ Function to Show Install Prompt
+    const installPWA = () => {
+        if (deferredPrompt) {
+          deferredPrompt.prompt();
+          deferredPrompt.userChoice.then((choiceResult) => {
+            if (choiceResult.outcome === "accepted") {
+              console.log("PWA installed successfully");
+            } else {
+              console.log("PWA installation declined");
+            }
+            setDeferredPrompt(null); // Reset prompt
+          });
+        }
+      };
+    
     return (
         <nav className="flex items-center gap-6">
             <Link href="/home" className={`nav-link ${isActive("/home") ? "active-link" : ""}`}>
@@ -40,6 +69,9 @@ const DesktopNav = () => {
             <Link href="/services" className={`nav-link ${isActive("/services") ? "active-link" : ""}`}>
                 Services
             </Link>
+            {/* <Link href="/room-planner" className={`nav-link ${isActive("/room-planner") ? "active-link" : ""}`}>
+                Room Planner
+            </Link> */}
             {/* Forms & Utilities Dropdown */}
             <div className="relative group" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
                 <button className={`nav-link flex items-center ${isActive("/user/submit-property") || isActive("/loancalculator") ? "active-link" : ""}`}>
@@ -60,6 +92,16 @@ const DesktopNav = () => {
                     </div>
                 )}
             </div>
+            {/* PWA Install Button */}
+      {/* {deferredPrompt && (
+        <button
+          onClick={installPWA}
+          className="ml-4 px-4 py-2 flex items-center bg-[#990e15] text-white rounded-lg shadow-md hover:bg-[#7f0c12] transition-all"
+        >
+          <Download size={20} className="mr-2" />
+          Install App
+        </button>
+      )} */}
         </nav>
     );
 };

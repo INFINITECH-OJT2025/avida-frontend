@@ -1,3 +1,4 @@
+// src\components\admin\ProfileDropdown.js
 import { useState } from "react";
 import { ChevronDown, User, Settings, LogOut } from "lucide-react";
 import { useRouter } from "next/router";

@@ -1,8 +1,13 @@
+// src\components\admin\job\EditJobForm.js
 import { useState, useEffect } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
+import { useToast } from "../../../context/ToastContext";
+import { callAPI } from "../../../utils/api"; // ✅ Unified API call
 
 const EditJobForm = ({ job, onClose, onJobUpdated }) => {
+  const { showToast } = useToast(); 
+
   const [formData, setFormData] = useState({
     title: "",
     department: "",
@@ -14,8 +19,8 @@ const EditJobForm = ({ job, onClose, onJobUpdated }) => {
     salary_max: "",
     application_deadline: "",
     status: "Unpublished",
-    image: null, // Keeps existing image reference
-    newImage: null, // Tracks new uploaded image
+    image: null,
+    newImage: null,
   });
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -33,73 +38,58 @@ const EditJobForm = ({ job, onClose, onJobUpdated }) => {
         salary_max: job.salary_max || "",
         application_deadline: job.application_deadline,
         status: job.status,
-        image: job.image || null, // Stores existing image
-        newImage: null, // Resets uploaded image
+        image: job.image || null,
+        newImage: null,
       });
     }
   }, [job]);
 
-  // Handle input field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle file selection
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    setFormData({ ...formData, newImage: file }); // Store new image only if selected
+    setFormData({ ...formData, newImage: file });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formDataObj = new FormData();
-
     formDataObj.append("_method", "PUT");
 
-    // Append only changed fields
     for (const key in formData) {
       if (key !== "image" && key !== "newImage" && formData[key] !== null && formData[key] !== "") {
         formDataObj.append(key, formData[key]);
       }
     }
 
-    // Append new image only if selected
     if (formData.newImage) {
       formDataObj.append("image", formData.newImage);
     }
 
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/jobs/${job.id}`, {
-        method: "POST",
-        body: formDataObj,
-        headers: {
-          "Accept": "application/json",
-        },
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to update job.");
-      }
-
-      alert("Job updated successfully!");
+      await callAPI("post", `/jobs/${job.id}`, formDataObj, true);
+      showToast("Job updated successfully!");
       onJobUpdated();
       onClose();
     } catch (error) {
-      alert("Error: " + error.message);
+      const msg = error?.response?.data?.message || error?.message || "Unable to update job";
+      const details = error?.response?.data?.details;
+      if (details) {
+        Object.values(details).forEach((err) => showToast(err[0]));
+      } else {
+        showToast("Error: " + msg);
+      }
     }
+    
   };
 
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50">
       <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-7xl relative border">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-xl"
-        >
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-xl">
           &times;
         </button>
 
@@ -116,7 +106,7 @@ const EditJobForm = ({ job, onClose, onJobUpdated }) => {
 
             <label className="text-sm font-semibold text-gray-700 mt-3">Job Description</label>
             <textarea name="description" required className="border p-2 w-full rounded-lg focus:border-[#990e15]" rows="3" value={formData.description} onChange={handleChange} />
-            
+
             <label className="text-sm font-semibold text-gray-700">Responsibilities</label>
             <textarea name="responsibilities" required className="border p-2 w-full rounded-lg focus:border-[#990e15]" rows="3" value={formData.responsibilities} onChange={handleChange} />
           </div>
@@ -155,7 +145,6 @@ const EditJobForm = ({ job, onClose, onJobUpdated }) => {
             <label className="text-sm font-semibold text-gray-700 mt-3">Upload New Image</label>
             <input type="file" name="image" accept="image/*" className="border p-2 w-full rounded-lg focus:border-[#990e15]" onChange={handleFileChange} />
 
-            {/* Lightbox Preview for Existing Image */}
             {formData.image && !formData.newImage && (
               <>
                 <img
@@ -171,7 +160,9 @@ const EditJobForm = ({ job, onClose, onJobUpdated }) => {
 
           {/* Submit Button */}
           <div className="col-span-3 flex justify-end mt-4">
-            <button type="submit" className="bg-[#990e15] text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">Update</button>
+            <button type="submit" className="bg-[#990e15] text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
+              Update
+            </button>
           </div>
         </form>
       </div>

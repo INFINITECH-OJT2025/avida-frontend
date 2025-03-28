@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import useSEO from "../../src/hooks/useSEO";
+import SEOComponent from "../../src/hooks/useSEO";
 import Header from "../../src/components/Header";
 import Footer from "../../src/components/Footer";
 import { XCircle, PlusCircle, X, Loader } from "lucide-react";
 import Image from "next/image";
-
+import { useToast } from "../../src/context/ToastContext";
+import { callAPI } from "../../src/utils/api"; // ✅ import your shared API handler
 
 export default function PropertyComparison() {
   const [properties, setProperties] = useState([]);
@@ -14,6 +15,7 @@ export default function PropertyComparison() {
   const [error, setError] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
   const router = useRouter();
+  const { toast, showToast } = useToast(); 
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -31,30 +33,31 @@ export default function PropertyComparison() {
   // ✅ Corrected Fetch Properties Function
   const fetchProperties = useCallback(async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/properties");
-      if (!res.ok) throw new Error(`Error ${res.status}: ${res.statusText}`);
-
-      let data = await res.json();
+      const data = await callAPI("get", "/properties");
       console.log("Fetched Properties Data:", data);
-
+  
       if (!data || !Array.isArray(data)) throw new Error("Invalid property data");
-
-      // ✅ Ensure media URLs are correctly formatted
+  
       const formattedProperties = data.map((property) => ({
         ...property,
         media: property.media.map((media) => ({
           ...media,
-          url: media.url.startsWith("http") ? media.url : `http://127.0.0.1:8000/storage/${media.url}`
+          url: media.url.startsWith("http")
+            ? media.url
+            : `${process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api", "")}/storage/${media.url}`
         })),
       }));
-
+  
       setProperties(formattedProperties);
     } catch (error) {
-      setError(error.message);
+      console.error("Failed to load properties:", error);
+      setError(error.message || "Failed to load properties.");
+      showToast("Failed to load properties. Please try again later.", "error");
     } finally {
       setLoading(false);
     }
   }, []);
+  
 
   useEffect(() => {
     fetchProperties();
@@ -67,7 +70,7 @@ export default function PropertyComparison() {
       } else if (prev.length < 4) {
         return [...prev, property];
       } else {
-        alert("You can only compare up to four properties at a time.");
+        showToast("You can only compare up to four properties at a time.");
         return prev;
       }
     });
@@ -80,12 +83,7 @@ export default function PropertyComparison() {
 
   return (
     <>
-      {useSEO({
-        title: "Compare Properties - Find the Best Deal | Avida Land",
-        description: "Compare up to four properties side by side and make an informed decision.",
-        url: "http://localhost:3000/property-comparison",
-      })}
-
+      <SEOComponent />
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 min-h-screen">
 
         <Header />
@@ -134,7 +132,10 @@ export default function PropertyComparison() {
                   <div className="p-4">
                     <h2 className="text-xl font-bold text-[#990e15] truncate">{property.unit_type} | {property.property_name}</h2>
                     <p className="text-gray-600 truncate">{property.location}</p>
-                    <p className="text-lg font-semibold text-gray-900 mt-2">₱{property.price.toLocaleString()}</p>
+                    <p className="text-lg font-bold mt-2">
+  ₱{parseFloat(property.price).toLocaleString("en-PH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+</p>
+
                   </div>
                 </div>
               ))}
@@ -230,7 +231,6 @@ export default function PropertyComparison() {
                     ))}
                   </tr>
 
-                  {/* ✅ Property Feature Comparison */}
                   {/* ✅ Property Feature Comparison */}
                   {["price", "location", "unit_status", "unit_type", "square_meter", "floor_number", "parking", "property_status", "features_amenities"].map((key, index) => (
                     <tr

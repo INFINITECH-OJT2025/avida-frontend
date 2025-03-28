@@ -27,8 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <Head>
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-title" content="Avida" />
         <meta name="theme-color" content="#990e15" />
         <link rel="icon" href="/favicon.ico" />

@@ -2,44 +2,50 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import InquiryForm from "./InquiriesForm";
 import Header from "../../src/components/Header";
-import Footer from "../../src/components/Footer"; 
-
+import Footer from "../../src/components/Footer";
+import { getSingleService } from "../../src/utils/api"; // ✅ NEW
+import SEOComponent from "../../src/hooks/useSEO";
 export default function ServiceDetailsPage() {
   const router = useRouter();
-  const { id } = router.query; // ✅ Get 'id' from URL
+  const { id } = router.query;
 
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!id) return; // ✅ Prevent fetching before ID is available
+    if (!id) return;
 
     const fetchServiceDetails = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/services/${id}`);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch service details");
-        }
-
-        const data = await response.json();
+        const data = await getSingleService(id); // ✅ Use callAPI
         setService(data);
       } catch (err) {
-        setError(err.message);
+        setError(err.response?.data?.message || "Failed to fetch service details");
       } finally {
         setLoading(false);
       }
     };
 
     fetchServiceDetails();
-  }, [id]); // ✅ Depend on 'id'
+  }, [id]);
 
   if (loading) return <p className="text-center text-gray-500">Loading...</p>;
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
-
+  if (!service) {
+    return (
+      <div>
+        <Header />
+        <div className="text-center py-24">
+          <h1 className="text-2xl text-gray-700">Service not found or is currently unavailable.</h1>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+  
   return (
-    <div>
+    <div>      <SEOComponent />
       <Header />
       <div className="container mx-auto px-6 py-12 flex flex-col lg:flex-row gap-10">
         {/* Left Side - Service Details */}
@@ -58,7 +64,10 @@ export default function ServiceDetailsPage() {
           <InquiryForm service={service.title} />
         </div>
       </div>
+      
+      
       <Footer />
     </div>
   );
+  
 }

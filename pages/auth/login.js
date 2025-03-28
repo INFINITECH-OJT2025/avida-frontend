@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { loginUser } from "../../src/utils/auth";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Mail, Eye, EyeOff } from "lucide-react";
+import { useToast } from "../../src/context/ToastContext";
 import "../../src/styles/globals.css";
-
+import SEOComponent from "../../src/hooks/useSEO";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -11,6 +12,19 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const { showToast } = useToast();
+
+  // ✅ Show toast based on email verification result
+  useEffect(() => {
+    const { verified } = router.query;
+    if (verified === "success") {
+      showToast("Email verified successfully. You may now log in.", "success");
+    } else if (verified === "already") {
+      showToast("Your email is already verified.", "info");
+    } else if (verified === "fail") {
+      showToast("Invalid or expired verification link.", "error");
+    }
+  }, [router.query]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,19 +32,17 @@ export default function Login() {
 
     try {
       await loginUser(email, password);
-      router.push("/admin/dashboard"); // Redirect after login
+      showToast("Login successful! Redirecting...", "success");
+      router.push("/admin/dashboard");
     } catch (err) {
-      setError("Invalid email or password");
+      showToast("Invalid email or password", "error");
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <SEOComponent />
       <div className="bg-white p-8 shadow-lg rounded-lg w-96 text-center border border-gray-200">
-        <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center">
-          <img src="/Avida_logo.svg" alt="Avida Logo" className="w-full h-full" />
-        </div>
-
         <h2 className="text-2xl font-bold text-gray-900">Admin Login</h2>
         <p className="text-gray-500 mb-6 text-sm">
           Enter your credentials to access the admin panel
@@ -67,7 +79,6 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
-              {/* Show/Hide Password Icon */}
               <button
                 type="button"
                 className="absolute right-3 top-3 text-gray-400"
@@ -86,13 +97,6 @@ export default function Login() {
             Log in
           </button>
         </form>
-
-        {/* Forgot Password */}
-        <p className="text-sm text-gray-500 mt-4">
-          <a href="/auth/forgot-password" className="text-[#990e15] hover:underline">
-            Forgot your password?
-          </a>
-        </p>
       </div>
     </div>
   );

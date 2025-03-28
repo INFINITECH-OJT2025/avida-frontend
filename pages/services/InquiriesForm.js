@@ -1,12 +1,12 @@
 import { useState } from "react";
-import axios from "axios";
-
+import { useToast } from "../../src/context/ToastContext";
+import { callAPI } from "../../src/utils/api"; // ✅ centralized API call
+import SEOComponent from "../../src/hooks/useSEO";
 export default function ContactForm() {
-  const [activeTab, setActiveTab] = useState("appointment"); // Default to Appointment tab
+  const [activeTab, setActiveTab] = useState("appointment");
   const [loading, setLoading] = useState(false);
-  const [responseMessage, setResponseMessage] = useState("");
+  const { showToast } = useToast();
 
-  // ✅ Appointment Form State
   const [appointmentData, setAppointmentData] = useState({
     first_name: "",
     last_name: "",
@@ -17,17 +17,15 @@ export default function ContactForm() {
     message: "",
   });
 
-  // ✅ Inquiry Form State
   const [inquiryData, setInquiryData] = useState({
     first_name: "",
     last_name: "",
     email: "",
-    phone_number: "",
+    phone: "",
     inquiry_type: "",
     message: "",
   });
 
-  // ✅ Handle Input Changes
   const handleChange = (e, formType) => {
     if (formType === "appointment") {
       setAppointmentData({ ...appointmentData, [e.target.name]: e.target.value });
@@ -36,23 +34,21 @@ export default function ContactForm() {
     }
   };
 
-  // ✅ Handle Form Submission
   const handleSubmit = async (e, formType) => {
     e.preventDefault();
     setLoading(true);
-    setResponseMessage("");
 
-    const endpoint =
-      formType === "appointment"
-        ? "http://127.0.0.1:8000/api/appointments"
-        : "http://127.0.0.1:8000/api/inquiries";
-
+    const endpoint = formType === "appointment" ? "/appointments" : "/inquiries";
     const payload = formType === "appointment" ? appointmentData : inquiryData;
 
     try {
-      await axios.post(endpoint, payload);
-      setResponseMessage(
-        formType === "appointment" ? "Appointment booked successfully!" : "Inquiry submitted successfully!"
+      await callAPI("post", endpoint, payload); // ✅ callAPI used here
+
+      showToast(
+        formType === "appointment"
+          ? "Appointment booked successfully!"
+          : "Inquiry submitted successfully!",
+        "success"
       );
 
       formType === "appointment"
@@ -74,61 +70,63 @@ export default function ContactForm() {
             message: "",
           });
     } catch (error) {
-      setResponseMessage("Something went wrong. Please try again.");
+      console.error("Submission error:", error);
+      showToast("Something went wrong. Please try again.", "error");
     }
 
     setLoading(false);
   };
 
   return (
+
     <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 shadow-lg rounded-lg">
-      {/* ✅ Tabs for Inquiry & Appointment */}
+      {/* ✅ Tabs */}    <SEOComponent />
       <div className="flex justify-between border-b pb-2 mb-4 dark:border-gray-600">
         <button
-          className={`w-1/2 text-center py-2 ${activeTab === "appointment" 
-            ? "text-[#990e15] font-bold border-b-2 border-[#990e15] dark:border-[#ff6666]" 
-            : "text-gray-600 dark:text-gray-300"}`}
+          className={`w-1/2 text-center py-2 ${
+            activeTab === "appointment"
+              ? "text-[#990e15] font-bold border-b-2 border-[#990e15] dark:border-[#ff6666]"
+              : "text-gray-600 dark:text-gray-300"
+          }`}
           onClick={() => setActiveTab("appointment")}
         >
           Appointment
         </button>
         <button
-          className={`w-1/2 text-center py-2 ${activeTab === "inquiry" 
-            ? "text-[#990e15] font-bold border-b-2 border-[#990e15] dark:border-[#ff6666]" 
-            : "text-gray-600 dark:text-gray-300"}`}
+          className={`w-1/2 text-center py-2 ${
+            activeTab === "inquiry"
+              ? "text-[#990e15] font-bold border-b-2 border-[#990e15] dark:border-[#ff6666]"
+              : "text-gray-600 dark:text-gray-300"
+          }`}
           onClick={() => setActiveTab("inquiry")}
         >
           Inquiry
         </button>
       </div>
 
-      {/* ✅ Response Message */}
-      {responseMessage && <p className="text-center text-green-600 dark:text-green-400">{responseMessage}</p>}
-
       {/* ✅ Appointment Form */}
       {activeTab === "appointment" && (
         <form onSubmit={(e) => handleSubmit(e, "appointment")} className="grid gap-3">
-          <input type="text" name="first_name" value={appointmentData.first_name} 
-            onChange={(e) => handleChange(e, "appointment")} placeholder="First Name"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="text" name="last_name" value={appointmentData.last_name} 
-            onChange={(e) => handleChange(e, "appointment")} placeholder="Last Name"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="email" name="email" value={appointmentData.email} 
-            onChange={(e) => handleChange(e, "appointment")} placeholder="Email"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="text" name="phone_number" value={appointmentData.phone_number} 
-            onChange={(e) => handleChange(e, "appointment")} placeholder="Phone Number"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="date" name="appointment_date" value={appointmentData.appointment_date} 
+          {["first_name", "last_name", "email", "phone_number", "appointment_date", "appointment_time"].map((field) => (
+            <input
+              key={field}
+              type={field.includes("date") ? "date" : field.includes("time") ? "time" : field.includes("email") ? "email" : "text"}
+              name={field}
+              value={appointmentData[field]}
+              onChange={(e) => handleChange(e, "appointment")}
+              placeholder={field.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
+              className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              required
+            />
+          ))}
+          <textarea
+            name="message"
+            value={appointmentData.message}
             onChange={(e) => handleChange(e, "appointment")}
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="time" name="appointment_time" value={appointmentData.appointment_time} 
-            onChange={(e) => handleChange(e, "appointment")}
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <textarea name="message" value={appointmentData.message} 
-            onChange={(e) => handleChange(e, "appointment")} placeholder="Leave us a message..."
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3"></textarea>
+            placeholder="Leave us a message..."
+            rows="3"
+            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          />
           <button type="submit" className="submit-btn dark:bg-[#990e15] dark:hover:bg-red-700">
             {loading ? "Booking..." : "Submit Appointment"}
           </button>
@@ -138,28 +136,37 @@ export default function ContactForm() {
       {/* ✅ Inquiry Form */}
       {activeTab === "inquiry" && (
         <form onSubmit={(e) => handleSubmit(e, "inquiry")} className="grid gap-3">
-          <input type="text" name="first_name" value={inquiryData.first_name} 
-            onChange={(e) => handleChange(e, "inquiry")} placeholder="First Name"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="text" name="last_name" value={inquiryData.last_name} 
-            onChange={(e) => handleChange(e, "inquiry")} placeholder="Last Name"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="email" name="email" value={inquiryData.email} 
-            onChange={(e) => handleChange(e, "inquiry")} placeholder="Email"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <input type="text" name="phone" value={inquiryData.phone} 
-            onChange={(e) => handleChange(e, "inquiry")} placeholder="Phone Number"
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" required />
-          <select name="inquiry_type" value={inquiryData.inquiry_type} 
+          {["first_name", "last_name", "email", "phone"].map((field) => (
+            <input
+              key={field}
+              type={field === "email" ? "email" : "text"}
+              name={field}
+              value={inquiryData[field]}
+              onChange={(e) => handleChange(e, "inquiry")}
+              placeholder={field.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
+              className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              required
+            />
+          ))}
+          <select
+            name="inquiry_type"
+            value={inquiryData.inquiry_type}
             onChange={(e) => handleChange(e, "inquiry")}
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            required
+          >
             <option value="">Select Inquiry Type</option>
             <option value="Sales">Sales Inquiry</option>
             <option value="Leasing">Leasing Inquiry</option>
           </select>
-          <textarea name="message" value={inquiryData.message} 
-            onChange={(e) => handleChange(e, "inquiry")} placeholder="Leave us a message..."
-            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white" rows="3"></textarea>
+          <textarea
+            name="message"
+            value={inquiryData.message}
+            onChange={(e) => handleChange(e, "inquiry")}
+            placeholder="Leave us a message..."
+            rows="3"
+            className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+          />
           <button type="submit" className="submit-btn dark:bg-[#990e15] dark:hover:bg-red-700">
             {loading ? "Sending..." : "Submit Inquiry"}
           </button>

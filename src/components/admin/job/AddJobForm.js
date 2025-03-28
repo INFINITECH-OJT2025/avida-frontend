@@ -1,6 +1,12 @@
+// src\components\admin\job\AddJobForm.js
 import { useState } from "react";
+import { useToast } from "../../../context/ToastContext";
+import { callAPI } from "../../../utils/api"; // ✅ Unified API call
 
 const AddJobForm = ({ onClose, onJobAdded }) => {
+  const { showToast } = useToast();
+
+
   const [formData, setFormData] = useState({
     title: "",
     department: "",
@@ -28,13 +34,11 @@ const AddJobForm = ({ onClose, onJobAdded }) => {
     e.preventDefault();
   
     const formDataObj = new FormData();
-    
-    // ✅ Ensure required fields are always sent
     formDataObj.append("title", formData.title);
-    formDataObj.append("department", formData.department || ""); // Optional
-    formDataObj.append("description", formData.description);
-    formDataObj.append("responsibilities", formData.responsibilities || "N/A"); // ✅ FIXED
-    formDataObj.append("qualifications", formData.qualifications || "N/A"); // Prevent null error
+    formDataObj.append("department", formData.department || "");
+    formDataObj.append("description", formData.description || "");
+    formDataObj.append("responsibilities", formData.responsibilities || "N/A");
+    formDataObj.append("qualifications", formData.qualifications || "N/A");
     formDataObj.append("job_type", formData.job_type);
     formDataObj.append("salary_min", formData.salary_min || 0);
     formDataObj.append("salary_max", formData.salary_max || 0);
@@ -46,36 +50,27 @@ const AddJobForm = ({ onClose, onJobAdded }) => {
     }
   
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/jobs", {
-        method: "POST",
-        body: formDataObj,
-      });
-  
-      const data = await response.json();
-  
-      if (!response.ok) {
-        console.error("Validation Errors:", data.details);
-        throw new Error(data.details ? JSON.stringify(data.details) : "Validation failed");
-      }
-  
-      alert("Job added successfully!");
-      onJobAdded();
-      onClose();
+      await callAPI("post", "/jobs", formDataObj, true); // ✅ important: use `true` for FormData
+      showToast("✅ Job added successfully!");
+      onJobAdded?.();
+      onClose?.();
     } catch (error) {
+      const errors = error?.response?.data?.errors;
       console.error("Error adding job:", error);
-      alert(`Error: ${error.message}`);
+  
+      if (errors) {
+        Object.values(errors).flat().forEach((msg) => toast.error(`❌ ${msg}`));
+      } else {
+        showToast(`❌ ${error.message || "An unknown error occurred."}`);
+      }
     }
   };
   
-  
+
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-2xl shadow-xl w-full max-w-3xl relative">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-xl"
-        >
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-600 hover:text-red-500 text-xl">
           &times;
         </button>
 
@@ -121,7 +116,7 @@ const AddJobForm = ({ onClose, onJobAdded }) => {
               <input type="file" name="image" accept="image/*" className="border p-2 w-full rounded-lg focus:border-[#990e15]" onChange={handleFileChange} />
 
               <label className="text-sm font-medium text-gray-700 mt-2">Job Description</label>
-              <textarea name="description"  className="border p-2 w-full rounded-lg focus:border-[#990e15]" rows="2" onChange={handleChange} />
+              <textarea name="description" className="border p-2 w-full rounded-lg focus:border-[#990e15]" rows="2" onChange={handleChange} />
 
               <label className="text-sm font-medium text-gray-700 mt-2">Responsibilities</label>
               <textarea name="responsibilities" className="border p-2 w-full rounded-lg focus:border-[#990e15]" rows="2" onChange={handleChange} />

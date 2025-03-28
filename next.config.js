@@ -1,9 +1,16 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  eslint:{
-      ignoreDuringBuilds: true,
-    },
-    images: {
+const withPWA = require("next-pwa")({
+  dest: "public", // Service worker will be stored in "public"
+  register: true, // Auto-register the service worker
+  skipWaiting: true, // Activate new service workers immediately
+});
+
+const nextConfig = withPWA({
+  reactStrictMode: true,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  images: {
     domains: ["127.0.0.1"],
     remotePatterns: [
       {
@@ -13,7 +20,6 @@ const nextConfig = {
         pathname: "/storage/**",
       },
     ],
-    
   },
   async rewrites() {
     return [
@@ -36,15 +42,6 @@ const nextConfig = {
       },
     ];
   },
-};
-const withPWA = require("next-pwa")({
-  dest: "public",  // Service worker will be stored in "public"
-  register: true,  // Auto-register the service worker
-  skipWaiting: true,  // Activate new service workers immediately
-});
-
-module.exports = withPWA({
-  reactStrictMode: true,
 });
 
 module.exports = nextConfig;

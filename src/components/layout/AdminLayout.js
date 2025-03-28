@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Home, Building, Briefcase, FileText, FilePen, Mail, Settings, User, LogOut, ChevronDown, Moon, Sun } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useToast } from "../../context/ToastContext";
 
 export default function AdminLayout({ children }) {
   const router = useRouter();
@@ -9,6 +10,8 @@ export default function AdminLayout({ children }) {
   const [jobsOpen, setJobsOpen] = useState(false);
   const [adminSettingsOpen, setSettingsOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const { showToast } = useToast();
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   useEffect(() => {
     const storedDarkMode = localStorage.getItem("darkMode") === "true";
@@ -16,6 +19,27 @@ export default function AdminLayout({ children }) {
     if (storedDarkMode) {
       document.documentElement.classList.add("dark");
     }
+    // Toast: warning about future expiration (e.g. in 30 mins)
+    const expirationTimer = setTimeout(() => {
+      showToast("Your session will expire soon. Please save your work.", "warning");
+    }, 1000 * 60 * 15); // 15 minutes (adjust to 30*60*1000 for 30 mins)
+
+    const handleLogout = () => {
+      localStorage.removeItem("jwt");
+      router.push("/admin/login");
+    };
+    // Event from API interceptor
+    const handleConfirmLogout = (e) => {
+      setShowLogoutConfirm(true);
+      showToast(e.detail || "Session expired. Please confirm logout.", "error");
+    };
+
+    window.addEventListener("confirmSessionLogout", handleConfirmLogout);
+
+    return () => {
+      clearTimeout(expirationTimer);
+      window.removeEventListener("confirmSessionLogout", handleConfirmLogout);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -83,6 +107,26 @@ export default function AdminLayout({ children }) {
                   </ul>
                 )}
               </li>
+
+              <li>
+                <button
+                  onClick={() => setSettingsOpen(!adminSettingsOpen)}
+                  className="flex items-center justify-between w-full p-2 rounded-md hover:bg-red-700 focus:outline-none"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Settings size={18} />
+                    <span>Settings</span>
+                  </div>
+                  <ChevronDown size={18} className={`transition-transform ${adminSettingsOpen ? "rotate-180" : ""}`} />
+                </button>
+                {adminSettingsOpen && (
+                  <ul className="ml-5 space-y-2">
+                    <li><Link href="/admin/about-us" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">About Us</Link></li>
+                    <li><Link href="/auth/register" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">Create Account</Link></li>
+                    {/* <li><Link href="/admin/appointment" className="block px-3 py-2 bg-red-800 rounded-md hover:bg-red-700">Appointments</Link></li> */}
+                  </ul>
+                )}
+              </li>
             </ul>
           </nav>
         </div>
@@ -101,7 +145,7 @@ export default function AdminLayout({ children }) {
           </Link>
 
           {/* Dark Mode Toggle - Spaced Properly */}
-          
+
 
           {/* Logout Button */}
           <button
@@ -116,6 +160,26 @@ export default function AdminLayout({ children }) {
       {/* Main Content */}
       <main className="w-full lg:ml-56 p-8 bg-gray-50 dark:bg-gray-800 dark:text-white transition-colors">
         {children}
+
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-5 rounded-md shadow-lg w-full max-w-sm mx-auto">
+              <h2 className="text-lg font-semibold text-gray-800 mb-2">Session Expired</h2>
+              <p className="text-sm text-gray-600 mb-5">
+                Your session has expired. Please log in again to continue.
+              </p>
+              <div className="flex justify-end">
+                <button
+                  onClick={handleLogout}
+                  className="bg-[#990e15] text-white px-4 py-2 rounded-md hover:bg-red-700"
+                >
+                  Log Out
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </main>
     </div>
   );

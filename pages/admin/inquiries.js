@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "../../src/components/layout/AdminLayout";
-
+import { getInquiries, getInquiryWithReplies, replyToInquiry, updateInquiryStatus} from "../../src/utils/api";
+import { useToast } from "../../src/context/ToastContext";
+import SEOComponent from "../../src/hooks/useSEO";
 export default function AdminInquiries() {
     const [inquiries, setInquiries] = useState([]);
     const [selectedInquiry, setSelectedInquiry] = useState(null);
@@ -8,6 +10,9 @@ export default function AdminInquiries() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [replyMessage, setReplyMessage] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const rowsPerPage = 5;
+    const { showToast } = useToast();
 
     useEffect(() => {
         fetchInquiries();
@@ -15,9 +20,7 @@ export default function AdminInquiries() {
 
     const fetchInquiries = async () => {
         try {
-            const response = await fetch("http://127.0.0.1:8000/api/admin/inquiries");
-            if (!response.ok) throw new Error("Failed to load inquiries.");
-            const data = await response.json();
+            const data = await getInquiries();
             setInquiries(data);
         } catch (error) {
             setError(error.message);
@@ -26,9 +29,7 @@ export default function AdminInquiries() {
 
     const viewInquiry = async (id) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/inquiries/${id}/with-replies`);
-            if (!response.ok) throw new Error("Failed to fetch inquiry details");
-            const data = await response.json();
+            const data = await getInquiryWithReplies(id);
             setSelectedInquiry(data);
         } catch (error) {
             setError(error.message);
@@ -47,14 +48,10 @@ export default function AdminInquiries() {
         }
         setLoading(true);
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/inquiries/${replyInquiry.id}/reply`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: replyMessage }),
-            });
-            if (!response.ok) throw new Error("Failed to send reply.");
+            await replyToInquiry(replyInquiry.id, { message: replyMessage });
             setReplyMessage("");
             fetchInquiries();
+            showToast("Reply sent successfully!", "success");
         } catch (error) {
             setError(error.message);
         }
@@ -63,45 +60,44 @@ export default function AdminInquiries() {
 
     const updateStatus = async (id, newStatus) => {
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/admin/inquiries/${id}/status`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status: newStatus }),
-            });
-            if (!response.ok) throw new Error("Failed to update status.");
+            await updateInquiryStatus(id, newStatus);
             fetchInquiries();
         } catch (error) {
             setError(error.message);
         }
     };
 
+    const totalPages = Math.ceil(inquiries.length / rowsPerPage);
+    const currentRows = inquiries.slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+    const changePage = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
+
     return (
-        <AdminLayout>
+        <AdminLayout><SEOComponent />
             <div className="p-6 ml-[270px]">
                 <h1 className="text-2xl font-bold mb-6 text-[#990e15]">Admin - Inquiries</h1>
                 {error && <p className="text-red-600">{error}</p>}
-
-                {/* ✅ Inquiry Table */}
                 <div className="overflow-x-auto bg-white shadow-md rounded-lg p-4">
-                    <table className="w-full border-collapse">
+                    <table className="w-full border-collapse text-sm">
                         <thead>
-                            <tr className="bg-[#990e15] text-white text-sm">
-                                <th className="p-2">Name</th>
-                                <th className="p-2">Type</th>
-                                <th className="p-2">Status</th>
-                                <th className="p-2">Actions</th>
+                            <tr className="bg-[#990e15] text-white text-left">
+                                <th className="p-3 w-[20%] text-center">Name</th>
+                                <th className="p-3 w-[10%] text-center">Type</th>
+                                <th className="p-3 w-[10%] text-center">Status</th>
+                                <th className="p-3 w-[10%] text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {inquiries.map((inquiry) => (
-                                <tr key={inquiry.id} className="border-b">
-                                    <td className="p-2">{inquiry.first_name} {inquiry.last_name}</td>
-                                    <td className="p-2 text-gray-600">{inquiry.inquiry_type}</td>
-                                    
-                                    {/* ✅ Status Dropdown */}
-                                    <td className="p-2">
+                            {currentRows.map((inquiry) => (
+                                <tr key={inquiry.id} className="border-b hover:bg-gray-100 transition">
+                                    <td className="p-3 text-center">{inquiry.first_name} {inquiry.last_name}</td>
+                                    <td className="p-3 text-gray-600 text-center">{inquiry.inquiry_type}</td>
+                                    <td className="p-3 text-center">
                                         <select
-                                            className="px-2 py-1 rounded text-xs border bg-gray-100"
+                                            className="px-3 py-1 rounded text-xs border bg-gray-100 w-[90%] text-center"
                                             value={inquiry.status}
                                             onChange={(e) => updateStatus(inquiry.id, e.target.value)}
                                         >
@@ -110,11 +106,9 @@ export default function AdminInquiries() {
                                             <option value="done">Done</option>
                                         </select>
                                     </td>
-
-                                    {/* ✅ Action Dropdown */}
-                                    <td className="p-2">
+                                    <td className="p-3 text-center w-[10%]">
                                         <select
-                                            className="px-2 py-1 rounded text-xs border bg-gray-100"
+                                            className="px-2 py-1 rounded text-xs border bg-gray-100 w-[90%]"
                                             onChange={(e) => {
                                                 if (e.target.value === "view") viewInquiry(inquiry.id);
                                                 if (e.target.value === "reply") openReplyModal(inquiry);
@@ -122,18 +116,35 @@ export default function AdminInquiries() {
                                             }}
                                         >
                                             <option value="" hidden>Choose Action</option>
-                                            <option value="view">View Inquiry</option>
+                                            <option value="view">View</option>
                                             <option value="reply">Reply</option>
-                                            <option value="done">Mark as Done</option>
+                                            <option value="done">Done</option>
                                         </select>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
+                    <div className="flex justify-between items-center mt-4 px-6">
+                        <button
+                            className={`px-4 py-2 rounded-md text-gray-600 bg-gray-200 ${currentPage === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+                            disabled={currentPage === 1}
+                            onClick={() => changePage(currentPage - 1)}
+                        >
+                            Previous
+                        </button>
+                        <span className="text-gray-700 font-medium">
+                            Page {currentPage} of {totalPages}
+                        </span>
+                        <button
+                            className={`px-4 py-2 rounded-md text-gray-600 bg-gray-200 ${currentPage === totalPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-300"}`}
+                            disabled={currentPage === totalPages}
+                            onClick={() => changePage(currentPage + 1)}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
-
-                {/* ✅ Inquiry Details Modal */}
                 {selectedInquiry && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                         <div className="bg-white p-4 rounded-lg shadow-lg w-[320px]">
@@ -145,8 +156,6 @@ export default function AdminInquiries() {
                         </div>
                     </div>
                 )}
-
-                {/* ✅ Reply Modal */}
                 {replyInquiry && (
                     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
                         <div className="bg-white p-4 rounded-lg shadow-lg w-[320px]">

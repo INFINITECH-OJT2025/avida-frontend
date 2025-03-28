@@ -7,7 +7,7 @@ import JobApplicationChart from "../../src/components/admin/charts/JobApplicatio
 import WebsiteTrafficChart from "../../src/components/admin/charts/WebsiteTrafficChart";
 import { FaHome, FaEnvelope, FaUsers, FaChartLine } from "react-icons/fa";
 import AdminLayout from "../../src/components/layout/AdminLayout";
-
+import SEOComponent from "../../src/hooks/useSEO";
 export default function Dashboard() {
   const [stats, setStats] = useState({});
 
@@ -16,7 +16,7 @@ export default function Dashboard() {
   }, []);
 
   return (
-    <AdminLayout>
+    <AdminLayout><SEOComponent />
       <div className="p-6 ml-64">
         {/* Ensure sidebar does not block content */}
         <h1 className="text-2xl font-bold text-[#990e15]">Admin Dashboard</h1>

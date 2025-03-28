@@ -3,6 +3,7 @@ import LoanGraph from "./loangraph";
 import LoanTable from "./loantable";
 import Header from "../src/components/Header"; // ✅ Import Header
 import Footer from "../src/components/Footer";
+import SEOComponent from "../src/hooks/useSEO";
 
 export default function LoanCalculator() {
 
@@ -63,6 +64,7 @@ export default function LoanCalculator() {
   return (
 
     <div className=" top-0 left-0 w-full z-10 bg-white dark:bg-gray-900">
+            <SEOComponent />
       <Header />
 
       <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md mt-10">

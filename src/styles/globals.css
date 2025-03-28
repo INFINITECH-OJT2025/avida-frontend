@@ -275,3 +275,32 @@ textarea::placeholder {
   @apply bg-gray-400 dark:bg-gray-600 text-[#990e15] font-semibold;
 }
 
+/* Base toast style */
+.Toastify__toast {
+  border-radius: 6px;
+  font-weight: 500;
+  color: #ffffff !important;
+}
+
+/* Success = lighter red */
+.Toastify__toast--success {
+  background-color: #b92b3a !important;
+}
+
+/* Error = dark red */
+.Toastify__toast--error {
+  background-color: #7d0b10 !important;
+}
+
+/* Info = brand red */
+.Toastify__toast--info {
+  background-color: #990e15 !important;
+}
+
+/* Warning = bright alert */
+.Toastify__toast--warning {
+  background-color: #c24646 !important;
+}
+.Toastify__toast-body > div > svg {
+  color: #fff !important;
+}

@@ -1,12 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { X, Menu, ChevronDown, Sun, Moon } from "lucide-react";
+import { X, Menu, ChevronDown, Sun, Moon, Download } from "lucide-react";
 
 const MobileNav = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isPwaInstalled, setIsPwaInstalled] = useState(false);
   const router = useRouter();
   const menuRef = useRef(null);
 
@@ -55,6 +57,32 @@ const MobileNav = () => {
     setDarkMode(!darkMode);
   };
 
+   // ✅ PWA Install Handling
+   useEffect(() => {
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsPwaInstalled(false);
+    });
+
+    window.addEventListener("appinstalled", () => {
+      setIsPwaInstalled(true);
+    });
+  }, []);
+
+  const installPWA = () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the PWA install");
+          setIsPwaInstalled(true);
+        }
+        setDeferredPrompt(null);
+      });
+    }
+  };
+
   return (
     <>
       {/* ✅ Mobile Header Bar */}
@@ -65,6 +93,16 @@ const MobileNav = () => {
         </Link>
 
         <div className="flex items-center space-x-4">
+          {/* ✅ PWA Install Button (Only if not installed) */}
+          {!isPwaInstalled && deferredPrompt && (
+            <button
+              onClick={installPWA}
+              className="p-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full transition-all"
+            >
+              <Download size={20} />
+            </button>
+          )}
+
           {/* ✅ Dark Mode Toggle */}
           <button
             onClick={toggleDarkMode}
@@ -110,6 +148,7 @@ const MobileNav = () => {
               { path: "/news", label: "News and Updates" },
               { path: "/careers", label: "Careers" },
               { path: "/services", label: "Services" },
+              { path: "/room-planner", label: "Room Planner" },
             ].map(({ path, label }) => (
               <Link
                 key={path}

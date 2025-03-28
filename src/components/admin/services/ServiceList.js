@@ -4,6 +4,8 @@ import "yet-another-react-lightbox/styles.css";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDown, X } from "lucide-react";
 import ServiceForm from "./ServiceForm"; 
+import { useToast } from "../../../context/ToastContext";
+import { callAPI } from "../../../utils/api";
 
 export default function ServiceList({ services, refreshServices }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -12,19 +14,35 @@ export default function ServiceList({ services, refreshServices }) {
   const [selectedService, setSelectedService] = useState(null);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
+  const { toast, showToast } = useToast(); 
 
   const handleDelete = async (id) => {
-    if (confirm("Are you sure you want to delete this service?")) {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/services/${id}`, {
-        method: "DELETE",
-      });
+    toast.info(
+      <div>
+        <p>Are you sure you want to delete this service?</p>
+        <div className="flex justify-end gap-3 mt-2">
+          <button
+            className="bg-red-600 text-white px-3 py-1 rounded"
+            onClick={() => confirmDelete(id)}
+          >
+            Yes
+          </button>
+          <button className="bg-gray-400 px-3 py-1 rounded" onClick={toast.dismiss}>
+            No
+          </button>
+        </div>
+      </div>,
+      { autoClose: false, closeOnClick: false }
+    );
+  };
 
-      if (response.ok) {
-        alert("Service deleted successfully!");
-        refreshServices();
-      } else {
-        alert("Failed to delete service.");
-      }
+  const confirmDelete = async (id) => {
+    try {
+      await callAPI("delete", `/admin/services/${id}`);
+      toast.success("Service deleted successfully!");
+      refreshServices();
+    } catch (error) {
+      toast.error("Failed to delete service.");
     }
   };
 

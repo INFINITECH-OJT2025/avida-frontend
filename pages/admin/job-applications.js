@@ -1,35 +1,40 @@
+// pages/admin/job-applications.js
 import { useEffect, useState } from "react";
-import JobApplicationsTable from "../../src/components/admin/job/JobApplicationsTable";
 import AdminLayout from "../../src/components/layout/AdminLayout";
+import JobApplicationsTable from "../../src/components/admin/job/JobApplicationsTable";
+import { getJobApplications } from "../../src/utils/api";
+import { useToast } from "../../src/context/ToastContext";
+import SEOComponent from "../../src/hooks/useSEO";
 const JobApplicationsAdmin = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { showToast } = useToast(); // ✅ Toast for errors
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/admin/job-applications")
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchApplications = async () => {
+      try {
+        const data = await getJobApplications();
         setApplications(data);
+      } catch (err) {
+        console.error("Failed to load applications:", err);
+        showToast("Failed to load job applications", "error");
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError("Failed to load applications");
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchApplications();
   }, []);
 
   if (loading) return <p className="text-center text-gray-500">Loading applications...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
 
   return (
-    <AdminLayout>
-    <div className="max-w-7xl mx-auto px-4 pl-40">
-      <div className="pl-20">
-      
-      <JobApplicationsTable applications={applications} setApplications={setApplications} />
+    <AdminLayout><SEOComponent />
+      <div className="max-w-7xl mx-auto px-4 pl-40">
+        <div className="pl-20">
+          <JobApplicationsTable applications={applications} setApplications={setApplications} />
+        </div>
       </div>
-    </div>
     </AdminLayout>
   );
 };

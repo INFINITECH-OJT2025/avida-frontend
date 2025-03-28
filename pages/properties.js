@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/router";
-import UsePageSEO from "../src/hooks/useSEO";
+import SEOComponent from "../src/hooks/useSEO";
 import Header from "../src/components/Header";
 import Footer from "../src/components/Footer";
 import Image from "next/image";
-
+import { Search } from "lucide-react"; // ✅ Import Search Icon
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState([]);
@@ -88,33 +88,29 @@ export default function PropertiesPage() {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 min-h-screen">
-            <UsePageSEO/>
+      <SEOComponent />
       <Header />
 
       {/* Hero Section */}
       <div className="relative bg-[#990e15] text-white py-20 text-center">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-5xl font-extrabold">FIND YOUR DREAM PROPERTY</h1>
-          <p className="text-lg text-gray-200 mt-3">Search by name, location, price, and more.</p>
+  <div className="max-w-5xl mx-auto">
+    <h1 className="text-5xl font-extrabold">FIND YOUR DREAM PROPERTY</h1>
+    <p className="text-lg text-gray-200 mt-3">Search by name, location, price, and more.</p>
 
-          {/* 🔹 Search Bar */}
-          <div className="mt-6 flex justify-center gap-2">
-            <input
-              type="text"
-              placeholder="Search properties..."
-              className="p-3 w-full sm:w-1/2 border rounded-lg text-gray-700 dark:bg-gray-800 dark:text-white"
-              value={filters.searchTerm}
-              onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
-            />
-            <button
-              onClick={() => applyFilters(filters)}
-              className="bg-[#990e15] text-white px-6 py-3 rounded-lg font-bold"
-            >
-              Search
-            </button>
-          </div>
-        </div>
-      </div>
+    {/* 🔹 Search Bar with Icon */}
+    <div className="mt-6 flex justify-center gap-2 relative w-full sm:w-1/2 mx-auto">
+      <input
+        type="text"
+        placeholder="Search properties..."
+        className="p-3 pl-4 pr-12 w-full border rounded-lg text-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-gray-300 outline-none"
+        value={filters.searchTerm}
+        onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
+      />
+      {/* 🔍 Search Icon */}
+      <Search className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+    </div>
+  </div>
+</div>
       {/* 🔹 Filter Bar (Fixed for Dark Mode) */}
       <div className="bg-white dark:bg-gray-800 shadow-md py-4 px-6 flex flex-wrap justify-center gap-4 border-b dark:border-gray-600">
         <select className="p-3 border rounded-lg bg-white dark:bg-gray-700 dark:text-white"
@@ -180,23 +176,25 @@ export default function PropertiesPage() {
                 onClick={() => router.push(`/property/${property.id}`)}
               >
                 {/* ✅ Property Image Handling */}
-                <div className="relative h-39">
-                  {property.images && property.images.length > 0 && property.images[0] ? (
-                    <Image
-                      src={property.images[0]}
-                      alt={property.property_name || "Property Image"}
-                      width={350}
-                      height={300}
-                      layout="responsive"
-                      objectFit="cover"
-                      className="rounded-t-lg"
-                    />
-                  ) : (
-                    <div className="w-full h-40 bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300">
-                      No Image Available
-                    </div>
-                  )}
-                </div>
+                <div className="relative w-full h-[220px] overflow-hidden">
+  {property.images && property.images.length > 0 && property.images[0] ? (
+    <Image
+  src={property.images[0]}
+  alt={property.property_name || "Property Image"}
+  width={350}
+  height={220}
+  className="w-full h-full object-cover rounded-t-lg"
+  priority
+  quality={85}
+/>
+
+  ) : (
+    <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300">
+      No Image Available
+    </div>
+  )}
+</div>
+
 
                 {/* ✅ Property Status Badge */}
                 <span

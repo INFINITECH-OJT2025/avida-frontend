@@ -1,4 +1,4 @@
-import useSEO from "../../src/hooks/useSEO";
+import SEOComponent from "../../src/hooks/useSEO";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -9,23 +9,19 @@ import { Navigation, Pagination } from "swiper/modules";
 import { CalendarDays, Clock, ArrowRight } from 'lucide-react';
 import Header from "../../src/components/Header";
 import Footer from "../../src/components/Footer";
+import { callAPI } from "../../src/utils/api"; // ✅ Reuse API call utility
+
 export default function NewsDetails({ post }) {
   const router = useRouter();
-
-  useSEO({
-    title: post ? `${post.title} - Avida News` : 'Avida News',
-    description: post ? post.content.substring(0, 20) : '',
-    url: post ? `http://localhost:3000/news/${post.id}` : 'http://localhost:3000/news',
-  });
-
   if (router.isFallback) return <p className="text-center text-gray-600 mt-10">Loading...</p>;
-
   if (!post) return <p className="text-center text-gray-600 mt-10">Post not found</p>;
 
   return (
     <>
+      <SEOComponent />
       <Header />
-      {/* Hero Section with Gradient Overlay */}
+
+      {/* Hero Section */}
       <section className="relative w-full h-[500px] flex items-center justify-center bg-gray-900">
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -53,7 +49,7 @@ export default function NewsDetails({ post }) {
         </div>
       </section>
 
-      {/* Content Wrapper */}
+      {/* Content Section */}
       <div className="max-w-4xl mx-auto p-6 md:p-10">
         <div className="bg-white shadow-2xl rounded-lg p-8 -mt-24 md:-mt-32 z-10 relative">
 
@@ -78,7 +74,7 @@ export default function NewsDetails({ post }) {
             </Swiper>
           )}
 
-          {/* News Content */}
+          {/* Content Body */}
           <div className="text-gray-800 text-lg leading-relaxed space-y-6">
             {post.content.split("\n\n").map((paragraph, index) => (
               <p key={index} className="first-letter:text-4xl first-letter:font-bold first-letter:text-[#990e15] first-letter:mr-1 first-letter:float-left">
@@ -98,42 +94,38 @@ export default function NewsDetails({ post }) {
           )}
         </div>
       </div>
+
       <Footer />
     </>
   );
 }
 
-// Generate all available news article pages
+// ✅ getStaticPaths using callAPI
 export async function getStaticPaths() {
-  const res = await fetch("http://127.0.0.1:8000/api/news");
-  const posts = await res.json();
-
-  const paths = posts.map((post) => ({
-    params: { id: post.id.toString() },
-  }));
-
-  return { paths, fallback: true };
+  try {
+    const posts = await callAPI("get", "/news");
+    const paths = posts.map((post) => ({
+      params: { id: post.id.toString() },
+    }));
+    return { paths, fallback: true };
+  } catch (error) {
+    console.error("Error loading static paths:", error.message);
+    return { paths: [], fallback: true };
+  }
 }
 
-// Fetch a single news post
+// ✅ getStaticProps using callAPI
 export async function getStaticProps({ params }) {
   try {
-    const res = await fetch(`http://127.0.0.1:8000/api/news/${params.id}`);
-
-    if (!res.ok) {
-      throw new Error(`HTTP Error: ${res.status}`);
-    }
-
-    const post = await res.json();
-
+    const post = await callAPI("get", `/news/${params.id}`);
     return {
       props: { post },
-      revalidate: 10, // Re-generate every 10 seconds
+      revalidate: 10,
     };
   } catch (error) {
-    console.error("Error fetching news:", error.message);
+    console.error("Error loading news detail:", error.message);
     return {
-      notFound: true, // Show 404 page if API fails
+      notFound: true,
     };
   }
 }
