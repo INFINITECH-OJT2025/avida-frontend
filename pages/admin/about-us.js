@@ -75,22 +75,22 @@ export default function AboutUsAdmin() {
         "prime_locations",
         "affordability_financing",
         "sustainability",
-        "awards"
+        "safety"
       ],
       Component: Features,
       sectionKey: "features"
     },
-    {
-      title: "Real Estate Services",
-      keys: [
-        "real_estate_services",
-        "property_types",
-        "investment_opportunities",
-        "customer_segments"
-      ],
-      Component: RealEstateServices,
-      sectionKey: "realEstateServices"
-    },
+    // {
+    //   title: "Real Estate Services",
+    //   keys: [
+    //     "real_estate_services",
+    //     "property_types",
+    //     "investment_opportunities",
+    //     "customer_segments"
+    //   ],
+    //   Component: RealEstateServices,
+    //   sectionKey: "realEstateServices"
+    // },
     {
       title: "Status Control",
       keys: ["status"],
