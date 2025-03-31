@@ -4,6 +4,7 @@ import usePageSEO from "../src/hooks/useSEO";
 import Header from "../src/components/Header";
 import Footer from "../src/components/Footer";
 import ContactInquiry from "../src/components/user/services/contact-us";
+import WhyChooseUs from "../src/components/user/about/WhyChooseUs";
 import { callAPI } from "../src/utils/api"; // ✅ Import API utility
 import SEOComponent from "../src/hooks/useSEO";
 
@@ -67,13 +68,6 @@ export default function LandingPage() {
 
   return (
     <div className="bg-gray-100 dark:bg-gray-900 transition-colors duration-300">
-      {/* {isHydrated &&
-        usePageSEO({
-          title: "Avida Real Estate - Find Your Dream Home",
-          description: "Discover the best real estate properties for sale and rent.",
-          url: "https://avidaland.vercel.app/",
-          image: "/seo-default-image.jpg",
-        })} */}
       <SEOComponent />
       <Header />
 
@@ -154,6 +148,8 @@ export default function LandingPage() {
           </button>
         </div>
       </section>
+{/* ✅ WHY CHOOSE US SECTION */}
+<WhyChooseUs about={{ sustainability: "We are the recognized leader and preferred provider of integrated, master-planned and sustainable communities for middle income Filipino families." }} />
 
       {/* ✅ CALL TO ACTION */}
       <section className="bg-[#990e15] text-white py-16 text-center">
