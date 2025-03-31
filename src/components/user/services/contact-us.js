@@ -8,6 +8,8 @@ import {
   FaPhone,
   FaEnvelope,
   FaMobile,
+  FaMapMarkerAlt,
+  FaBuilding
 } from "react-icons/fa";
 import { useToast } from "../../../context/ToastContext";
 import { fetchContacts, submitInquiry } from "../../../utils/api";
@@ -38,16 +40,35 @@ export default function ContactForm() {
     fetchContact();
   }, []);
 
+  const isValidEmail = (email) => {
+    // Strict email validation pattern
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    return emailRegex.test(email);
+  };
   const handleChange = (e) => {
     const { name, value } = e.target;
+  
     if (name === "phone") {
       const cleaned = value.replace(/[^0-9+]/g, "");
       setFormData({ ...formData, phone: cleaned });
       return;
     }
+  
+    if (name === "email") {
+      const trimmed = value.trim();
+      setFormData({ ...formData, email: trimmed });
+  
+      if (trimmed && !isValidEmail(trimmed)) {
+        showToast("Invalid email format. Please include '@' and a valid domain.", "error");
+      }
+      return;
+    }
+  
     setFormData({ ...formData, [name]: value });
   };
+  
 
+  
   const handleBlur = (e) => {
     const { name, value } = e.target;
     if (name === "phone") {
@@ -57,6 +78,13 @@ export default function ContactForm() {
         setFormData({ ...formData, phone: "" });
       }
     }
+
+    if (!isValidEmail(formData.email)) {
+      showToast("Please enter a valid email address before submitting.", "error");
+      setLoading(false);
+      return;
+    }
+    
   };
 
   const handleSubmit = async (e) => {
@@ -107,96 +135,101 @@ export default function ContactForm() {
     <div className="max-w-5xl w-full grid md:grid-cols-2 gap-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">
       {/* Left - Contact Info */}
       <div className="bg-[#990e15] text-white p-6 rounded-lg text-sm space-y-4">
-  <h2 className="text-2xl font-bold">Connect with us</h2>
-  <p>Our agents are here to assist you in finding the perfect home or property.</p>
+        <h2 className="text-2xl font-bold">Connect with us</h2>
+        <p>Our agents are here to assist you in finding the perfect home or property.</p>
 
-  {contacts.length > 0 && (
-    <div className="space-y-6">
-      {/* Office Address & Hotline */}
-      <div className="space-y-2">
-        {contacts[0].address && (
-          <div className="flex items-start gap-2">
-            <span className="text-lg">📍</span>
-            <p><strong>Office:</strong> {contacts[0].address}</p>
-          </div>
-        )}
-        {contacts[0].main_phone && (
-          <div className="flex items-center gap-2">
-            <FaPhone className="w-4 h-4 mt-0.5" />
-            <p><strong>Hotline:</strong> {contacts[0].main_phone}</p>
+        {contacts.length > 0 && (
+          <div className="space-y-6">
+            {/* Office Address & Hotline */}
+            <div className="space-y-3 pl-1"> {/* Adjust this to shift icons and text slightly left */}
+              {contacts[0].address && (
+                <div className="flex items-start gap-2">
+                  <FaMapMarkerAlt className="w-6 h-6 mt-0.5 min-w-[20px] text-center" />
+                  <p className="leading-relaxed">
+                    <strong className="inline-block pr-1">Office:</strong>
+                    {contacts[0].address}
+                  </p>
+                </div>
+              )}
+              {contacts[0].main_phone && (
+                <div className="flex items-start gap-2">
+                  <FaPhone className="w-4 h-4 mt-0.5 min-w-[20px] text-center" />
+                  <p><strong className="inline-block pr-1">Hotline:</strong> {contacts[0].main_phone}</p>
+                </div>
+              )}
+            </div>
+
+
+            {/* Other Concerns */}
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold">Other Concerns</h3>
+              {contacts[0].sales_phone && (
+                <div className="flex items-center gap-2">
+                  <FaMobile className="w-4 h-4" />
+                  <p><strong>Sales:</strong> {contacts[0].sales_phone}</p>
+                </div>
+              )}
+              {contacts[0].leasing_phone && (
+                <div className="flex items-center gap-2">
+                  <FaMobile className="w-4 h-4" />
+                  <p><strong>Leasing:</strong> {contacts[0].leasing_phone}</p>
+                </div>
+              )}
+              {contacts[0].employment_phone && (
+                <div className="flex items-center gap-2">
+                  <FaMobile className="w-4 h-4" />
+                  <p><strong>Employment:</strong> {contacts[0].employment_phone}</p>
+                </div>
+              )}
+              {contacts[0].customer_care_phone && (
+                <div className="flex items-center gap-2">
+                  <FaPhone className="w-4 h-4" />
+                  <p><strong>Customer Care:</strong> {contacts[0].customer_care_phone}</p>
+                </div>
+              )}
+              {contacts[0].email && (
+                <div className="flex items-center gap-2">
+                  <FaEnvelope className="w-4 h-4" />
+                  <p><strong>Email:</strong> {contacts[0].email}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Social Media Links */}
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Follow Us</h3>
+              <div className="flex items-center gap-4">
+                {contacts[0].facebook_link && (
+                  <a href={contacts[0].facebook_link} title="Facebook" target="_blank" rel="noopener noreferrer">
+                    <FaFacebook className="w-5 h-5 hover:text-gray-300 hover:scale-110 transition duration-200" />
+                  </a>
+                )}
+                {contacts[0].linkedin_link && (
+                  <a href={contacts[0].linkedin_link} title="LinkedIn" target="_blank" rel="noopener noreferrer">
+                    <FaLinkedin className="w-5 h-5 hover:text-gray-300 hover:scale-110 transition duration-200" />
+                  </a>
+                )}
+                {contacts[0].instagram_link && (
+                  <a href={contacts[0].instagram_link} title="Instagram" target="_blank" rel="noopener noreferrer">
+                    <FaInstagram className="w-5 h-5 hover:text-gray-300 hover:scale-110 transition duration-200" />
+                  </a>
+                )}
+                {contacts[0].youtube_link && (
+                  <a href={contacts[0].youtube_link} title="YouTube" target="_blank" rel="noopener noreferrer">
+                    <FaYoutube className="w-5 h-5 hover:text-gray-300 hover:scale-110 transition duration-200" />
+                  </a>
+                )}
+                {contacts[0].tiktok_link && (
+                  <a href={contacts[0].tiktok_link} title="TikTok" target="_blank" rel="noopener noreferrer">
+                    <FaTiktok className="w-5 h-5 hover:text-gray-300 hover:scale-110 transition duration-200" />
+                  </a>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Other Concerns */}
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Other Concerns</h3>
-        {contacts[0].sales_phone && (
-          <div className="flex items-center gap-2">
-            <FaMobile className="w-4 h-4" />
-            <p><strong>Sales:</strong> {contacts[0].sales_phone}</p>
-          </div>
-        )}
-        {contacts[0].leasing_phone && (
-          <div className="flex items-center gap-2">
-            <FaMobile className="w-4 h-4" />
-            <p><strong>Leasing:</strong> {contacts[0].leasing_phone}</p>
-          </div>
-        )}
-        {contacts[0].employment_phone && (
-          <div className="flex items-center gap-2">
-            <FaMobile className="w-4 h-4" />
-            <p><strong>Employment:</strong> {contacts[0].employment_phone}</p>
-          </div>
-        )}
-        {contacts[0].customer_care_phone && (
-          <div className="flex items-center gap-2">
-            <FaPhone className="w-4 h-4" />
-            <p><strong>Customer Care:</strong> {contacts[0].customer_care_phone}</p>
-          </div>
-        )}
-        {contacts[0].email && (
-          <div className="flex items-center gap-2">
-            <FaEnvelope className="w-4 h-4" />
-            <p><strong>Email:</strong> {contacts[0].email}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Social Media Links */}
-      <div>
-        <h3 className="text-lg font-semibold mb-2">Follow Us</h3>
-        <div className="flex items-center space-x-3">
-          {contacts[0].facebook_link && (
-            <a href={contacts[0].facebook_link} target="_blank" rel="noopener noreferrer">
-              <FaFacebook className="w-5 h-5 hover:text-gray-300 transition" />
-            </a>
-          )}
-          {contacts[0].linkedin_link && (
-            <a href={contacts[0].linkedin_link} target="_blank" rel="noopener noreferrer">
-              <FaLinkedin className="w-5 h-5 hover:text-gray-300 transition" />
-            </a>
-          )}
-          {contacts[0].instagram_link && (
-            <a href={contacts[0].instagram_link} target="_blank" rel="noopener noreferrer">
-              <FaInstagram className="w-5 h-5 hover:text-gray-300 transition" />
-            </a>
-          )}
-          {contacts[0].youtube_link && (
-            <a href={contacts[0].youtube_link} target="_blank" rel="noopener noreferrer">
-              <FaYoutube className="w-5 h-5 hover:text-gray-300 transition" />
-            </a>
-          )}
-          {contacts[0].tiktok_link && (
-            <a href={contacts[0].tiktok_link} target="_blank" rel="noopener noreferrer">
-              <FaTiktok className="w-5 h-5 hover:text-gray-300 transition" />
-            </a>
-          )}
-        </div>
-      </div>
-    </div>
-  )}
-</div>
 
 
       {/* Right - Inquiry Form */}
