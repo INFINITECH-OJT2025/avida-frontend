@@ -7,7 +7,7 @@ export default function Features({ form, handleChange }) {
   return (
     <div className="p-4 bg-gray-100 rounded-md">
       <h2 className="text-xl font-bold mb-4">Company Features</h2>
-      {["quality_innovation", "prime_locations", "affordability_financing", "sustainability"].map((field) => (
+      {["quality_innovation", "prime_locations", "affordability_financing", "sustainability", "safety",].map((field) => (
         <div key={field}>
           <label className="block text-gray-600 font-medium">{field.replace(/_/g, " ").toUpperCase()}</label>
           <textarea
