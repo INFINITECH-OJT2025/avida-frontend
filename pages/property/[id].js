@@ -5,7 +5,13 @@ import Header from "../../src/components/Header";
 import Footer from "../../src/components/Footer";
 import MainMediaDisplay from "../../src/components/user/properties/MainMediaDisplay";
 import Appointment from "../appointment";
-import { getSingleProperty } from "../../src/utils/api";
+// import { getSingleProperty } from "../../src/utils/api";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import { getSingleProperty, callAPI } from "../../src/utils/api";
 
 export default function PropertyPage() {
   const router = useRouter();
@@ -15,6 +21,7 @@ export default function PropertyPage() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isClient, setIsClient] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState(null);
 
   useEffect(() => {
     setIsClient(true);
@@ -26,21 +33,36 @@ export default function PropertyPage() {
     const fetchProperty = async () => {
       setLoading(true);
       try {
+        // ✅ Get current property by ID
         const data = await getSingleProperty(id);
         if (!data || Object.keys(data).length === 0) {
           throw new Error("Property not found.");
         }
 
         data.media = Array.isArray(data.media) ? data.media : [];
+
+        // ✅ Use callAPI to fetch all properties for recommendations
+        const all = await callAPI("get", "/properties");
+
+        const recommended = all
+          .filter((p) => p.id !== data.id && p.status === "approved")
+          .slice(0, 3); // Limit to 3 recommendations
+
+        data.recommended = recommended;
+
         setProperty(data);
+
+        // ✅ Set default preview image
+        if (data.media.length > 0) {
+          setSelectedMedia(data.media[0]);
+        }
       } catch (err) {
         setError(err.message || "Failed to fetch property details.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchProperty();
+    fetchProperty(); // ✅ CALL the function
   }, [id, isClient]);
 
   const formatCurrency = (amount) => {
@@ -56,9 +78,9 @@ export default function PropertyPage() {
   if (error) return <p className="text-center text-red-600 mt-10">{error}</p>;
 
   return (
-    
+
     <div className="dark:bg-gray-900">
-            <SEOComponent />
+      <SEOComponent />
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-20 bg-gray-100 dark:bg-gray-900">
@@ -69,32 +91,63 @@ export default function PropertyPage() {
             <p className="text-lg text-gray-500 mt-2">{property.location}</p>
 
             <div className="mt-6 grid grid-cols-1 gap-4">
-              <MainMediaDisplay media={property.media} propertyName={property.property_name} />
+              {/* Interactive Preview */}
+              <div className="w-full">
+                {/* Large Preview */}
+                <div className="w-full h-[400px] rounded-xl overflow-hidden shadow-md bg-black mb-4">
+                  {selectedMedia?.type === "video" ? (
+                    <video
+                      src={selectedMedia.url}
+                      controls
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <img
+                      src={selectedMedia.url}
+                      alt={`${property.property_name} Preview`}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {property.media.length > 1 ? (
-                  property.media.slice(1).map((media, index) =>
-                    media.type === "video" ? (
-                      <video
-                        key={index}
-                        src={media.url}
-                        controls
-                        className="w-full h-40 object-cover rounded-lg shadow-md"
-                      />
-                    ) : (
-                      <a key={index} href={media.url} data-lightbox="property-gallery">
-                        <img
-                          src={media.url}
-                          alt={`${property.property_name} Image ${index + 1}`}
-                          className="w-full h-40 object-cover rounded-lg shadow-md cursor-pointer"
-                        />
-                      </a>
-                    )
-                  )
-                ) : (
-                  <p className="text-gray-500 col-span-2">No additional media</p>
-                )}
+                {/* Thumbnail Swiper */}
+                <Swiper
+                  modules={[Navigation, Pagination]}
+                  spaceBetween={12}
+                  slidesPerView={3}
+                  navigation
+                  pagination={{ clickable: true }}
+                  className="rounded-md"
+                >
+                  {property.media.map((media, index) => (
+                    <SwiperSlide key={index}>
+                      <div
+                        onClick={() => setSelectedMedia(media)}
+                        className={`cursor-pointer rounded-md overflow-hidden border-2 ${selectedMedia.url === media.url
+                          ? "border-[#990e15]"
+                          : "border-transparent"
+                          }`}
+                      >
+                        {media.type === "video" ? (
+                          <video
+                            src={media.url}
+                            muted
+                            className="w-full h-[120px] object-cover"
+                          />
+                        ) : (
+                          <img
+                            src={media.url}
+                            alt={`Media ${index + 1}`}
+                            className="w-full h-[120px] object-cover"
+                          />
+                        )}
+                      </div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               </div>
+
+
             </div>
           </div>
 
@@ -130,22 +183,65 @@ export default function PropertyPage() {
               </div>
             </div>
 
-            <div className="mt-6 text-center bg-gray-100 p-5 rounded-lg shadow-md dark:bg-gray-700">
-              <h3 className="text-xl font-bold text-[#990e15]">Looking for More Options?</h3>
-              <p className="text-gray-600 dark:text-gray-300 mt-2">
-                Explore a wide range of premium properties suited for your lifestyle.
-                Find your dream home today!
-              </p>
-              <a
-                href="/properties"
-                className="mt-4 inline-block bg-[#990e15] text-white px-6 py-2 rounded-lg hover:bg-red-800 transition duration-300"
-              >
-                Explore More Properties
-              </a>
+
+          </div>
+        </div>
+
+
+        <div className="mt-6 text-center bg-gray-100 p-5 rounded-lg shadow-md dark:bg-gray-900">
+          <h2 className="text-3xl font-bold text-[#990e15]">Looking for More Options?</h2>
+          <p className="text-gray-600 dark:text-gray-300 mt-2">
+            Explore a wide range of premium properties suited for your lifestyle.
+            Find your dream home today!
+          </p>
+          {/* 🔽 RECOMMENDED PROPERTIES SECTION */}
+          <div className="max-w-7xl mx-auto px-6 pt-8 pb-20">
+            <h3 className="text-xl font-bold text-[#990e15] text-center mb-6">
+              Recommended Properties
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {property.recommended?.length > 0 ? (
+                property.recommended.map((rec) => (
+                  <div
+                    key={rec.id}
+                    className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+                    onClick={() => router.push(`/property/${rec.id}`)}
+                  >
+                    <div className="w-full h-[180px] overflow-hidden">
+                      <img
+                        src={
+                          rec.media?.length > 0
+                            ? rec.media[0].url
+                            : "/default-property.jpg"
+                        }
+                        alt={rec.property_name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-4">
+                      <h3 className="text-lg font-semibold text-[#990e15] truncate">
+                        {rec.unit_type} | {rec.property_name}
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
+                        {rec.location}
+                      </p>
+                      <p className="text-base font-bold text-gray-900 dark:text-white mt-1">
+                        {formatCurrency(rec.price)}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-600 dark:text-gray-300 col-span-3">
+                  No recommended properties available.
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
+
 
       <Footer />
     </div>
