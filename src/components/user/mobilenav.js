@@ -12,10 +12,8 @@ const MobileNav = () => {
   const router = useRouter();
   const menuRef = useRef(null);
 
-  // ✅ Check if a link is active
   const isActive = (path) => router.pathname === path;
 
-  // ✅ Close menu when clicking outside
   useEffect(() => {
     const handleOutsideClick = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
@@ -34,7 +32,6 @@ const MobileNav = () => {
     };
   }, [isMenuOpen]);
 
-  // ✅ Load Dark Mode preference from localStorage
   useEffect(() => {
     if (localStorage.getItem("theme") === "dark") {
       document.documentElement.classList.add("dark");
@@ -45,7 +42,6 @@ const MobileNav = () => {
     }
   }, []);
 
-  // ✅ Toggle Dark Mode
   const toggleDarkMode = () => {
     if (darkMode) {
       document.documentElement.classList.remove("dark");
@@ -57,8 +53,7 @@ const MobileNav = () => {
     setDarkMode(!darkMode);
   };
 
-   // ✅ PWA Install Handling
-   useEffect(() => {
+  useEffect(() => {
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
@@ -75,7 +70,6 @@ const MobileNav = () => {
       deferredPrompt.prompt();
       deferredPrompt.userChoice.then((choiceResult) => {
         if (choiceResult.outcome === "accepted") {
-          console.log("User accepted the PWA install");
           setIsPwaInstalled(true);
         }
         setDeferredPrompt(null);
@@ -85,62 +79,44 @@ const MobileNav = () => {
 
   return (
     <>
-      {/* ✅ Mobile Header Bar */}
+      {/* Header Bar */}
       <div className="fixed top-0 left-0 w-full bg-white dark:bg-gray-900 shadow-md flex items-center justify-between px-6 py-4 z-50">
-        {/* Logo */}
         <Link href="/home" className="text-xl font-bold text-[#990e15] dark:text-white">
           AvidaRealEstate
         </Link>
 
         <div className="flex items-center space-x-4">
-          {/* ✅ PWA Install Button (Only if not installed) */}
           {!isPwaInstalled && deferredPrompt && (
-            <button
-              onClick={installPWA}
-              className="p-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full transition-all"
-            >
+            <button onClick={installPWA} className="p-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
               <Download size={20} />
             </button>
           )}
-
-          {/* ✅ Dark Mode Toggle */}
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full transition-all"
-          >
+          <button onClick={toggleDarkMode} className="p-2 bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full">
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
-
-          {/* ✅ Hamburger Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(true)}
-            className="p-2 text-gray-900 dark:text-white"
-          >
+          <button onClick={() => setIsMenuOpen(true)} className="p-2 text-gray-900 dark:text-white">
             <Menu size={28} />
           </button>
         </div>
       </div>
 
-      {/* ✅ Mobile Navigation Drawer */}
+      {/* Slide-in Drawer */}
       {isMenuOpen && (
         <div
-          ref={menuRef}
-          className={`fixed top-0 left-0 w-72 h-full bg-white dark:bg-gray-900 shadow-lg transform ${
-            isMenuOpen ? "translate-x-0" : "-translate-x-full"
-          } transition-transform duration-300 ease-in-out z-50`}
-        >
-          {/* ✅ Close Button (Now Positioned to the Right) */}
-          <div className="flex justify-end p-4">
-            <button
-              onClick={() => setIsMenuOpen(false)}
-              className="text-gray-900 dark:text-white"
-            >
-              <X size={28} />
-            </button>
-          </div>
+        ref={menuRef}
+        className={`fixed top-0 right-0 w-72 h-full bg-white dark:bg-gray-900 shadow-lg transform transition-transform duration-300 ease-in-out z-50 ${
+          isMenuOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+      
+      <div className="flex justify-start p-4">
+  <button onClick={() => setIsMenuOpen(false)} className="text-gray-900 dark:text-white">
+    <X size={28} />
+  </button>
+</div>
 
-          {/* ✅ Navigation Links */}
-          <nav className="space-y-1">
+
+          <nav className="space-y-1 px-4">
             {[
               { path: "/home", label: "Home" },
               { path: "/properties", label: "Properties" },
@@ -148,49 +124,50 @@ const MobileNav = () => {
               { path: "/news", label: "News and Updates" },
               { path: "/careers", label: "Careers" },
               { path: "/services", label: "Services" },
-              { path: "/room-planner", label: "Room Planner" },
             ].map(({ path, label }) => (
               <Link
                 key={path}
                 href={path}
-                className={`nav-item ${isActive(path) ? "nav-active" : ""}`}
-                onClick={() => setIsMenuOpen(false)} // ✅ Close menu when clicking
+                onClick={() => setIsMenuOpen(false)}
+                className={`nav-item block py-2 px-4 rounded-md text-sm font-medium ${
+                  isActive(path) ? "bg-[#990e15] text-white" : "text-gray-800 dark:text-gray-200"
+                }`}
               >
                 {label}
               </Link>
             ))}
 
-            {/* ✅ Forms & Utilities Dropdown */}
+            {/* Dropdown Section */}
             <div>
               <button
-                className={`nav-item flex justify-between items-center ${isActive("/user/submit-property") || isActive("/loancalculator") ? "nav-active" : ""}`}
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                className={`nav-item w-full flex justify-between items-center py-2 px-4 rounded-md text-sm font-medium ${
+                  isActive("/user/submit-property") || isActive("/loancalculator") || isActive("/contact-us")
+                    ? "bg-[#990e15] text-white"
+                    : "text-gray-800 dark:text-gray-200"
+                }`}
               >
                 Forms & Utilities <ChevronDown size={18} />
               </button>
+
               {isDropdownOpen && (
-                <div className="dropdown-mobile">
-                  <Link
-                    href="/user/submit-property"
-                    className={`dropdown-item ${isActive("/user/submit-property") ? "dropdown-active" : ""}`}
-                    onClick={() => setIsMenuOpen(false)} // ✅ Close menu on click
-                  >
-                    Submit Property
-                  </Link>
-                  <Link
-                    href="/loancalculator"
-                    className={`dropdown-item ${isActive("/loancalculator") ? "dropdown-active" : ""}`}
-                    onClick={() => setIsMenuOpen(false)} // ✅ Close menu on click
-                  >
-                    Loan Calculator
-                  </Link>
-                  <Link
-                    href="/contact-us"
-                    className={`dropdown-item ${isActive("/contact-us") ? "dropdown-active" : ""}`}
-                    onClick={() => setIsMenuOpen(false)} // ✅ Close menu on click
-                  >
-                    Contact Us
-                  </Link>
+                <div className="pl-4 mt-2 space-y-1">
+                  {[
+                    { path: "/user/submit-property", label: "Submit Property" },
+                    { path: "/loancalculator", label: "Loan Calculator" },
+                    { path: "/contact-us", label: "Contact Us" },
+                  ].map(({ path, label }) => (
+                    <Link
+                      key={path}
+                      href={path}
+                      onClick={() => setIsMenuOpen(false)}
+                      className={`block py-1 px-3 text-sm rounded-md ${
+                        isActive(path) ? "bg-[#990e15] text-white" : "text-gray-700 dark:text-gray-300"
+                      }`}
+                    >
+                      {label}
+                    </Link>
+                  ))}
                 </div>
               )}
             </div>

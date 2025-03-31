@@ -92,16 +92,6 @@ const DesktopNav = () => {
                     </div>
                 )}
             </div>
-            {/* PWA Install Button */}
-      {/* {deferredPrompt && (
-        <button
-          onClick={installPWA}
-          className="ml-4 px-4 py-2 flex items-center bg-[#990e15] text-white rounded-lg shadow-md hover:bg-[#7f0c12] transition-all"
-        >
-          <Download size={20} className="mr-2" />
-          Install App
-        </button>
-      )} */}
         </nav>
     );
 };
