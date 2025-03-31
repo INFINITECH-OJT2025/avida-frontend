@@ -7,6 +7,7 @@ export default function WhyChooseUs({ about }) {
                 {about?.prime_locations} <br />
                 {about?.affordability_financing} <br />
                 {about?.sustainability}
+                {about?.safety}
             </p>
         </div>
     );
