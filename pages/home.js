@@ -166,12 +166,11 @@ export default function LandingPage() {
       </section>
 
       {/* ✅ CONTACT INQUIRY */}
-      <section className="bg-gray-100 dark:bg-gray-900 py-16 px-2 max-w-7xl mx-auto">
-        <div className="flex flex-col items-center justify-center text-center space-y-8">
-          <h2 className="text-3xl md:text-4xl font-bold text-primary">Contact us</h2>
-          <ContactInquiry />
-        </div>
-      </section>
+      <section className="bg-gray-100 dark:bg-gray-900 py-16 px-4 max-w-5xl mx-auto">
+  <h2 className="text-3xl md:text-4xl font-bold text-primary text-center mb-8">Contact us</h2>
+  <ContactInquiry />
+</section>
+
 
       <Footer />
     </div>
