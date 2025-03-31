@@ -307,7 +307,7 @@ export default function SubmitProperty() {
 
     return (
         <div>      <SEOComponent />
-        <Header />
+            <Header />
             <div className="p-10 max-w-7xl mx-auto bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 rounded-lg shadow-xl">
 
 
@@ -323,10 +323,11 @@ export default function SubmitProperty() {
                 <form onSubmit={handleSubmit} className="space-y-8 mt-8">
 
                     {/* Personal Information */}
-                    <div>
+                    <div className="px-4 sm:px-6 md:px-10 lg:px-20 py-10 overflow-x-hidden">
+
                         <h3 className="text-2xl font-semibold text-[#990e15]">Personal Information</h3>
                         <hr className="border-[#990e15] my-3" />
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div>
                                 <label className="text-[#990e15]">First Name</label>
                                 <input type="text" name="first_name" placeholder="eg. Tanggol" required onChange={handleChange} className="p-2 border rounded w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
@@ -363,7 +364,8 @@ export default function SubmitProperty() {
                     <div>
                         <h3 className="text-2xl font-semibold text-[#990e15]">Property Information</h3>
                         <hr className="border-[#990e15] my-3" />
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
                             <div>
                                 <label className="text-[#990e15]">Property Name</label>
                                 <input type="text" name="property_name" placeholder="eg. Montenegro Resort" required onChange={handleChange} className="p-2 border rounded w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
@@ -429,7 +431,7 @@ export default function SubmitProperty() {
                     {/* Features & Amenities */}
                     <div><h3 className="text-2xl font-semibold text-[#990e15]">Features and Amenities</h3>
                         <hr className="border-[#990e15] my-3" />
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             {amenitiesList.map((amenity) => (
                                 <label key={amenity} className="flex items-center">
                                     <input type="checkbox" value={amenity} onChange={() => handleCheckboxChange(amenity)} className="mr-2" />
@@ -465,6 +467,7 @@ export default function SubmitProperty() {
                     {/* ✅ Preview Uploaded Media */}
                     <div className="w-full bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-md mt-4">
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+
                             {previewMedia.lightbox2.map((media, index) => (
                                 <div key={index} className="relative group">
                                     {/* ❌ Remove Button */}
@@ -505,9 +508,12 @@ export default function SubmitProperty() {
                     </div>
                     <button
                         type="submit"
-                        className="bg-[#990e15] text-white p-3 rounded w-full text-lg font-semibold shadow-md hover:bg-[#b31218] transition"
+                        className="bg-[#990e15] text-white p-3 rounded w-full text-sm sm:text-base md:text-lg py-3 px-6 font-semibold shadow-md hover:bg-[#b31218] transition"
                     >
-                        Submit Property
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                            Submit Your Property
+                        </h1>
+
                     </button>
                 </form>
             </div></div>
