@@ -60,7 +60,14 @@ export default function LoanCalculator() {
 
     setMonthlyPayment(totalMonthlyPayment.toFixed(2));
   };
+  const allowOnlyNumericWithDecimal = (value) => {
+    // Only allow digits and one optional dot (decimal)
+    const cleaned = value.replace(/[^\d.]/g, '');
+    const parts = cleaned.split('.');
+    return parts.length > 2 ? parts[0] + '.' + parts.slice(1).join('') : cleaned;
+  };
 
+  
   return (
 
     <div className=" top-0 left-0 w-full z-10 bg-white dark:bg-gray-900">
@@ -68,7 +75,7 @@ export default function LoanCalculator() {
       <Header />
 
       <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md mt-10">
-        <h2 className="text-2xl font-semibold text-center mb-4">🏡 Loan Calculator</h2>
+        <h2 className="text-2xl font-semibold text-center mb-4 mt-6">🏡 Loan Calculator</h2>
 
         <div className="grid grid-cols-2 gap-4">
           {/* ✅ Loan Amount */}
@@ -77,7 +84,7 @@ export default function LoanCalculator() {
             <input
               type="text"
               value={formatNumber(loanAmount)}
-              onChange={(e) => setLoanAmount(parseNumberInput(e.target.value))}
+              onChange={(e) => setLoanAmount(allowOnlyNumericWithDecimal(e.target.value))}
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
@@ -88,7 +95,7 @@ export default function LoanCalculator() {
             <input
               type="text"
               value={interestRate}
-              onChange={(e) => setInterestRate(parseNumberInput(e.target.value))}
+              onChange={(e) => setLoanAmount(allowOnlyNumericWithDecimal(e.target.value))}
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
@@ -131,7 +138,7 @@ export default function LoanCalculator() {
             <input
               type="text"
               value={formatNumber(downPayment)}
-              onChange={(e) => setDownPayment(parseNumberInput(e.target.value))}
+              onChange={(e) => setDownPayment((allowOnlyNumericWithDecimal.target.value))}
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             />
           </div>
@@ -142,7 +149,7 @@ export default function LoanCalculator() {
             <input
               type="text"
               value={discount}
-              onChange={(e) => setDiscount(parseNumberInput(e.target.value))}
+              onChange={(e) => setDiscount(allowOnlyNumericWithDecimal(e.target.value))}
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Enter discount percentage (e.g., 20 for 20%)"
             />
@@ -154,7 +161,7 @@ export default function LoanCalculator() {
             <input
               type="text"
               value={propertyTax}
-              onChange={(e) => setPropertyTax(parseNumberInput(e.target.value))}
+              onChange={(e) => setPropertyTax((allowOnlyNumericWithDecimal.target.value))}
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Default: 1.2%"
             />
@@ -166,7 +173,7 @@ export default function LoanCalculator() {
             <input
               type="text"
               value={formatNumber(insurance)}
-              onChange={(e) => setInsurance(parseNumberInput(e.target.value))}
+              onChange={(e) => setInsurance((allowOnlyNumericWithDecimal.target.value))}
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Optional"
             />
@@ -178,7 +185,7 @@ export default function LoanCalculator() {
             <input
               type="text"
               value={formatNumber(hoaFees)}
-              onChange={(e) => setHoaFees(parseNumberInput(e.target.value))}
+              onChange={(e) => setHoaFees((allowOnlyNumericWithDecimal.target.value))}
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               placeholder="Optional"
             />

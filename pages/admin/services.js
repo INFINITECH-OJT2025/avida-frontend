@@ -24,7 +24,7 @@ export default function Services() {
       setLoading(true);
       const data = await getAllServices(); // ✅ updated
       setServices(data);
-      showToast("Services loaded successfully!", "success");
+      // showToast("Services loaded successfully!", "success");
     } catch (error) {
       console.error("Error fetching services:", error);
       showToast(`Failed to fetch services: ${error.message}`, "error");

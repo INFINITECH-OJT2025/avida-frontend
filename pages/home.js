@@ -117,13 +117,21 @@ export default function LandingPage() {
                   <div className="p-4">
                     <h3 className="text-xl font-semibold truncate">{property.property_name}</h3>
                     <p className="text-gray-700 dark:text-gray-300 truncate">{property.location}</p>
-                    <p>
-                      ₱
-                      {parseFloat(property.price).toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
-                    </p>
+                    <p className="flex justify-between items-center">
+  <span>
+    ₱
+    {parseFloat(property.price).toLocaleString("en-PH", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}
+  </span>
+  {property.square_meter && (
+    <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">
+      {parseFloat(property.square_meter)}sqm.
+    </span>
+  )}
+</p>
+
                   </div>
                 </div>
               ))
@@ -152,7 +160,7 @@ export default function LandingPage() {
 <WhyChooseUs about={{ sustainability: "We are the recognized leader and preferred provider of integrated, master-planned and sustainable communities for middle income Filipino families." }} />
 
       {/* ✅ CALL TO ACTION */}
-      <section className="bg-[#990e15] text-white py-16 text-center">
+      <section className="bg-[#990e15] text-white py-16 mt-10 text-center">
         <h2 className="text-3xl font-extrabold mb-4">Join Our Team & Build Your Career!</h2>
         <p className="text-lg text-gray-200 mb-6">
           Explore exciting job opportunities and grow with us. Your future starts here.

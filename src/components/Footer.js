@@ -4,7 +4,7 @@ import {
   FaFacebookF, FaLinkedin, FaInstagram, FaTiktok, FaYoutube,
   FaPhone, FaEnvelope, FaMobile
 } from "react-icons/fa";
-import { getPublicContacts } from "../../src/utils/api";
+import { getPublicContacts } from "../utils/api";
 
 export default function Footer() {
   const [contacts, setContacts] = useState(null);

@@ -304,3 +304,33 @@ textarea::placeholder {
 .Toastify__toast-body > div > svg {
   color: #fff !important;
 }
+
+/* Assuming this is somewhere in your global CSS or Tailwind config */
+.dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  color: #374151; /* Tailwind gray-700 */
+  text-align: left;
+  background-color: transparent;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6; /* Tailwind gray-100 */
+  color: #111827; /* Tailwind gray-900 */
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
