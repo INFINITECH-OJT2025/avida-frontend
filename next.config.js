@@ -8,7 +8,7 @@ const withPWA = require("next-pwa")({
 const nextConfig = withPWA({
   reactStrictMode: true,
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true, // ✅ useful for production deploys with linting errors
   },
   images: {
     domains: ["infinitech-api3.site"],
@@ -16,7 +16,6 @@ const nextConfig = withPWA({
       {
         protocol: "https",
         hostname: "infinitech-api3.site",
-        // port: "8000",
         pathname: "/storage/**",
       },
     ],
@@ -25,11 +24,11 @@ const nextConfig = withPWA({
     return [
       {
         source: "/api/:path*",
-        destination: "https://infinitech-api3.site/api/:path*", // ✅ Proxy Laravel API
+        destination: "https://infinitech-api3.site/api/:path*",
       },
       {
         source: "/storage/:path*",
-        destination: "https://infinitech-api3.site/storage/:path*", // ✅ Proxy Laravel Storage
+        destination: "https://infinitech-api3.site/storage/:path*",
       },
     ];
   },
@@ -38,7 +37,7 @@ const nextConfig = withPWA({
       {
         source: "/",
         destination: "/home",
-        permanent: true, // Use "true" if this is a permanent redirect (301)
+        permanent: true,
       },
     ];
   },
