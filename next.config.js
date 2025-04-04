@@ -1,14 +1,13 @@
-/** @type {import('next').NextConfig} */
 const withPWA = require("next-pwa")({
-  dest: "public", // Service worker will be stored in "public"
-  register: true, // Auto-register the service worker
-  skipWaiting: true, // Activate new service workers immediately
+  dest: "public",
+  register: true,
+  skipWaiting: true,
 });
 
 const nextConfig = withPWA({
   reactStrictMode: true,
   eslint: {
-    ignoreDuringBuilds: true, // ✅ useful for production deploys with linting errors
+    ignoreDuringBuilds: true,
   },
   images: {
     domains: ["infinitech-api3.site"],
