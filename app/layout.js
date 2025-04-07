@@ -12,7 +12,7 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
-});
+}); // <-- Missing comma here
 
 export const metadata: Metadata = {
   title: "Create Next App",
