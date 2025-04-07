@@ -5,7 +5,7 @@ import "./globals.css";
 import Head from "next/head";
 
 const geistSans = Geist({
-  variable: ["--font-geist-sans"],
+  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{children: React.ReactNode;}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
       <Head>
@@ -29,8 +29,16 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Avida" />
         <meta name="theme-color" content="#990e15" />
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="192x192" href="/web-app-manifest-192x192.png" />
-        <link rel="apple-touch-icon" sizes="512x512" href="/web-app-manifest-512x512.png" />
+        <link
+          rel="apple-touch-icon"
+          sizes="192x192"
+          href="/web-app-manifest-192x192.png"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="512x512"
+          href="/web-app-manifest-512x512.png"
+        />
       </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
