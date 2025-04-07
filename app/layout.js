@@ -1,5 +1,5 @@
 {/* <meta name="apple-mobile-web-app-title" content="Avida Land PWA" /> */}
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Head from "next/head";
