@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+// src\components\admin\job\job-application-form.js
+import { useState } from "react";
 import { useToast } from "../../../context/ToastContext";
 import { callAPI } from "../../../utils/api"; // ✅ Import unified API
 
-const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
+const JobApplicationForm = ({ jobId }) => {
   const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -14,49 +15,10 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
     linkedin: "",
   });
 
-  const [emailValid, setEmailValid] = useState(true);
-  const [phoneValid, setPhoneValid] = useState(true);
-
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
-  const validateEmail = (email) => {
-    const regex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
-    return regex.test(email);
-  };
-
-  const validatePhone = (phone) => {
-    const regex = /^09\d{9}$/;
-    return regex.test(phone);
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  const handleEmailBlur = () => {
-    const valid = validateEmail(formData.email);
-    setEmailValid(valid);
-    if (!valid) {
-      showToast("Please enter a valid email address.", "error");
-    }
-  };
-
-  const handlePhoneBlur = () => {
-    const valid = validatePhone(formData.phone);
-    setPhoneValid(valid);
-    if (!valid) {
-      showToast("Phone number must be numeric, 11 digits, and start with '09'.", "error");
-    }
   };
 
   const handleFileChange = (e) => {
@@ -75,28 +37,22 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
         showToast("Resume file size should not exceed 10MB.", "error");
         return;
       }
+      
+      // ✅ Remove this line (no more `setErrorMessage`)
+      // setErrorMessage(""); ❌
+  
       setFormData({ ...formData, resume: file });
     }
   };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!formData.resume) {
       showToast("Please upload your resume.", "error");
       return;
     }
-
-    if (!emailValid) {
-      showToast("Please enter a valid email address.", "error");
-      return;
-    }
-
-    if (!phoneValid) {
-      showToast("Phone number must be numeric, 11 digits, and start with '09'.", "error");
-      return;
-    }
-
+  
     const applicationData = new FormData();
     applicationData.append("full_name", formData.fullName);
     applicationData.append("email", formData.email);
@@ -105,11 +61,12 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
     applicationData.append("resume", formData.resume);
     applicationData.append("linkedin_url", formData.linkedin);
     applicationData.append("job_id", jobId);
-
+  
     try {
       await callAPI("post", "/job-applications", applicationData, true);
       showToast("Application Submitted Successfully!", "success");
-
+  
+      // Optional: reset form after successful submit
       setFormData({
         fullName: "",
         email: "",
@@ -118,10 +75,9 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
         resume: null,
         linkedin: "",
       });
-      onClose();
     } catch (error) {
       const validationErrors = error?.response?.data?.errors;
-
+  
       if (validationErrors) {
         const firstField = Object.keys(validationErrors)[0];
         const firstError = validationErrors[firstField][0];
@@ -133,128 +89,78 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
       }
     }
   };
-
-  if (!isOpen) return null;
-
+  
   return (
-    <div className="fixed mt-28 inset-0 z-[60] flex justify-end items-start">
-      {/* Overlay */}
-      <div
-        className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm z-40"
-        onClick={onClose}
-      />
+    <div className="w-full lg:w-[400px] bg-white dark:bg-gray-800 dark:text-gray-200 shadow-lg rounded-lg p-4">
+      <h2 className="text-xl font-bold text-[#990e15] mb-3">Apply for this Job</h2>
+      <form onSubmit={handleSubmit}>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Full Name</label>
+        <input
+          type="text"
+          name="fullName"
+          required
+          value={formData.fullName}
+          onChange={handleChange}
+          className="w-full border p-2 rounded-lg mb-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        />
 
-      {/* Sidebar Form */}
-      <div
-        className="relative z-50 h-full w-[360px] bg-white dark:bg-gray-800 dark:text-white shadow-2xl border-l border-gray-200 dark:border-gray-700 overflow-y-auto transition-transform duration-500 ease-in-out transform translate-x-0 rounded-l-xl"
-      >
-        <div className="relative mt-20 w-full h-full p-6 pt-14">
-          <button
-            onClick={onClose}
-            className="absolute top-0 left-4 text-gray-500 hover:text-black dark:hover:text-white text-2xl font-bold"
-          >
-            &times;
-          </button>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Email Address</label>
+        <input
+          type="email"
+          name="email"
+          required
+          value={formData.email}
+          onChange={handleChange}
+          className="w-full border p-2 rounded-lg mb-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        />
 
-          <h2 className="text-xl font-bold text-[#990e15] mt-4 mb-4">Apply for this Job</h2>
-          <form onSubmit={handleSubmit} className="text-sm space-y-3">
-            <div>
-              <label className="block font-semibold mb-1">Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                required
-                value={formData.fullName}
-                onChange={handleChange}
-                className="w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Phone Number</label>
+        <input
+          type="tel"
+          name="phone"
+          maxLength={13}
+          required
+          value={formData.phone}
+          onChange={handleChange}
+          className="w-full border p-2 rounded-lg mb-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        />
 
-            <div>
-              <label className="block font-semibold mb-1">Email Address</label>
-              <input
-                type="email"
-                name="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                onBlur={handleEmailBlur}
-                className={`w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                  !emailValid ? "border-red-500" : ""
-                }`}
-              />
-            </div>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Cover Letter (Optional)</label>
+        <textarea
+          name="coverLetter"
+          rows="3"
+          value={formData.coverLetter}
+          onChange={handleChange}
+          className="w-full border p-2 rounded-lg mb-2 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        />
 
-            <div>
-  <label className="block font-semibold mb-1">Phone Number</label>
-  <input
-    type="text"
-    name="phone"
-    maxLength={11}
-    required
-    value={formData.phone}
-    onChange={(e) => {
-      // Allow only numbers
-      const value = e.target.value.replace(/\D/g, '');
-      setFormData({ ...formData, phone: value });
-    }}
-    onBlur={() => {
-      const isValid = /^09\d{9}$/.test(formData.phone);
-      if (!isValid) {
-        showToast("Phone number must start with '09' and be exactly 11 digits.", "error");
-      }
-    }}
-    className="w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-  />
-</div>
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Resume Upload</label>
+        <input
+          type="file"
+          name="resume"
+          required
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileChange}
+          className="w-full border p-2 rounded-lg mb-1 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        />
+        <p className="text-xs text-gray-500 dark:text-gray-400">.doc, .docx, PDF only. Max 10MB.</p>
 
+        <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">LinkedIn Profile / Portfolio URL (Optional)</label>
+        <input
+          type="url"
+          name="linkedin"
+          value={formData.linkedin}
+          onChange={handleChange}
+          className="w-full border p-2 rounded-lg mb-4 text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+        />
 
-            <div>
-              <label className="block font-semibold mb-1">Cover Letter (Optional)</label>
-              <textarea
-                name="coverLetter"
-                rows="3"
-                value={formData.coverLetter}
-                onChange={handleChange}
-                className="w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label className="block font-semibold mb-1">Resume Upload</label>
-              <input
-                type="file"
-                name="resume"
-                required
-                accept=".pdf,.doc,.docx"
-                onChange={handleFileChange}
-                className="w-full border p-2 rounded-lg text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                .doc, .docx, PDF only. Max 10MB.
-              </p>
-            </div>
-
-            <div>
-              <label className="block font-semibold mb-1">LinkedIn / Portfolio URL (Optional)</label>
-              <input
-                type="url"
-                name="linkedin"
-                value={formData.linkedin}
-                onChange={handleChange}
-                className="w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full mt-2 bg-[#990e15] text-white py-2 rounded-lg hover:bg-red-700 transition font-semibold"
-            >
-              Submit Application
-            </button>
-          </form>
-        </div>
-      </div>
+        <button
+          type="submit"
+          className="w-full bg-[#990e15] text-white py-2 rounded-lg hover:bg-red-700 transition text-sm font-semibold"
+        >
+          Submit Application
+        </button>
+      </form>
     </div>
   );
 };

@@ -55,7 +55,7 @@ const JobDetail = () => {
       <div
         className="relative w-full h-80 bg-cover bg-center flex flex-col items-center justify-center text-white text-center px-6"
         style={{
-          backgroundImage: job.image ? `url('https://infinitech-api3.site/storage/${job.image}' || 'http://localhost:8000/storage/${job.image}')` : "none",
+          backgroundImage: job.image ? `url('https://infinitech-api3.site/storage/${job.image}')` : "none",
         }}
       >
         <div className="absolute inset-0 bg-[#990e15] opacity-85 dark:opacity-90" />

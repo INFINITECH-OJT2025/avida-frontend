@@ -10,13 +10,11 @@ const nextConfig = withPWA({
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ["localhost", "infinitech-api3.site"],
+    domains: ["infinitech-api3.site"],
     remotePatterns: [
       {
-        // protocol: "https",
-        protocol: "http",
-        // hostname: "infinitech-api3.site",
-        hostname: "localhost:8000",
+        protocol: "https",
+        hostname: "infinitech-api3.site",
         pathname: "/storage/**",
       },
     ],
@@ -25,13 +23,11 @@ const nextConfig = withPWA({
     return [
       {
         source: "/api/:path*",
-        // destination: "https://infinitech-api3.site/api/:path*",
-        destination: "http://localhost:8000/api/:path*",
+        destination: "https://infinitech-api3.site/api/:path*",
       },
       {
         source: "/storage/:path*",
-        // destination: "https://infinitech-api3.site/storage/:path*",
-        destination: "http://localhost:8000/storage/:path*",
+        destination: "https://infinitech-api3.site/storage/:path*",
       },
     ];
   },

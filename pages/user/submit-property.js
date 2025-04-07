@@ -508,9 +508,9 @@ export default function SubmitProperty() {
                     </div>
                     <button
                         type="submit"
-                        className="bg-[#990e15] text-white p-3 rounded w-[10%] text-sm sm:text-base md:text-md py-3 px-6 font-semibold shadow-md hover:bg-[#b31218] transition"
+                        className="bg-[#990e15] text-white p-3 rounded w-full text-sm sm:text-base md:text-lg py-3 px-6 font-semibold shadow-md hover:bg-[#b31218] transition"
                     >
-                        <h1 className="text-xl sm:text-sm md:text-lg font-bold">
+                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
                             Submit Your Property
                         </h1>
 
