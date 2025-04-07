@@ -7,9 +7,14 @@ import { XCircle, PlusCircle, X, Loader } from "lucide-react";
 import Image from "next/image";
 import { useToast } from "../../src/context/ToastContext";
 import { callAPI } from "../../src/utils/api"; // ✅ import your shared API handler
+<<<<<<< HEAD
 import React from "react";
 
 const PropertyComparison = () => {
+=======
+
+export default function PropertyComparison() {
+>>>>>>> parent of 3a10bed (Updated Version in User Portal)
   const [properties, setProperties] = useState([]);
   const [selectedProperties, setSelectedProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,6 +89,7 @@ const PropertyComparison = () => {
 
   return (
     <>
+<<<<<<< HEAD
 <SEOComponent
   dynamicData={{
     title: "Compare Properties | Avida Land",
@@ -93,6 +99,9 @@ const PropertyComparison = () => {
   }}
 />
 
+=======
+      <SEOComponent />
+>>>>>>> parent of 3a10bed (Updated Version in User Portal)
       <div className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-200 min-h-screen">
 
         <Header />
@@ -153,7 +162,11 @@ const PropertyComparison = () => {
         </div>
 
         {selectedProperties.length > 0 && (
+<<<<<<< HEAD
           <div className="fixed bottom-5 right-5 z-50 bg-white p-4 shadow-md rounded-lg">
+=======
+          <div className="fixed bottom-5 right-5 bg-white p-4 shadow-md rounded-lg">
+>>>>>>> parent of 3a10bed (Updated Version in User Portal)
             <button className="bg-[#990e15] text-white px-6 py-3 rounded-lg font-bold" onClick={() => setShowComparison(true)}>Compare ({selectedProperties.length})</button>
             <button className="text-gray-600 ml-3" onClick={clearComparison}>Clear</button>
           </div>
@@ -293,4 +306,7 @@ const PropertyComparison = () => {
     </>
   );
 }
+<<<<<<< HEAD
 export default PropertyComparison;
+=======
+>>>>>>> parent of 3a10bed (Updated Version in User Portal)

@@ -7,6 +7,7 @@ import ContactInquiry from "../src/components/user/services/contact-us";
 import WhyChooseUs from "../src/components/user/about/WhyChooseUs";
 import { callAPI } from "../src/utils/api"; // ✅ Import API utility
 import SEOComponent from "../src/hooks/useSEO";
+import { getApprovedProperties } from "../src/utils/api";
 
 export default function LandingPage() {
   const [featuredProperties, setFeaturedProperties] = useState([]);
@@ -20,32 +21,28 @@ export default function LandingPage() {
   useEffect(() => {
     async function fetchProperties() {
       try {
-        const data = await callAPI("get", "/properties");
+        const data = await getApprovedProperties(); // ✅ cleaner call
   
-        const approvedProperties = data.filter(
-          (property) => property.status === "approved"
-        );
+        const approvedProperties = Array.isArray(data)
+          ? data.filter((p) => p.status === "approved" && p.media?.length > 0)
+          : [];
   
         const storedData = JSON.parse(localStorage.getItem("featured_properties"));
         const lastShuffled = localStorage.getItem("shuffle_timestamp");
         const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  
         const now = Date.now();
   
-        // ✅ Reuse cached shuffle if within 1 week
         if (storedData && lastShuffled && now - lastShuffled < oneWeek) {
           setFeaturedProperties(storedData);
         } else {
-          // ✅ Shuffle array
           const shuffled = approvedProperties
-            .map((item) => ({ item, sort: Math.random() })) // assign random sort key
-            .sort((a, b) => a.sort - b.sort) // sort randomly
-            .map(({ item }) => item); // extract back the original array
+            .map((item) => ({ item, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ item }) => item)
+            .slice(0, 3); // ✅ limit to 3
   
-          const limited = shuffled.slice(0, 3); // ✅ Limit to 3
-  
-          setFeaturedProperties(limited);
-          localStorage.setItem("featured_properties", JSON.stringify(limited));
+          setFeaturedProperties(shuffled);
+          localStorage.setItem("featured_properties", JSON.stringify(shuffled));
           localStorage.setItem("shuffle_timestamp", now);
         }
       } catch (error) {
@@ -55,7 +52,6 @@ export default function LandingPage() {
   
     fetchProperties();
   }, []);
-  
 
   const getPropertyImage = (property) => {
     if (property.property_panorama_images?.length > 0) {

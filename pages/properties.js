@@ -11,6 +11,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { exportComparisonToPDF } from "../src/components/pdf/ExportComparisonPDF";
 
+
 export default function PropertiesPage() {
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
@@ -27,7 +28,7 @@ export default function PropertiesPage() {
 
   const { showToast } = useToast();
   const router = useRouter();
-  const API_BASE_URL = "https://infinitech-api3.site";
+  const API_BASE_URL = "http://localhost:8000";
 
   const fetchProperties = useCallback(async () => {
     try {
@@ -38,9 +39,8 @@ export default function PropertiesPage() {
 
       const formattedProperties = data.map((property) => ({
         ...property,
-        images: property.media.map((media) =>
-          media.url.startsWith("https") ? media.url : `${API_BASE_URL}${media.url}`
-        ),
+        images: property.media?.map((media) => media.url) || []
+,
       }));
 
       setProperties(formattedProperties);
@@ -91,21 +91,22 @@ export default function PropertiesPage() {
   const toggleCompare = (property) => {
     setSelectedProperties((prev) => {
       const exists = prev.find((p) => p.id === property.id);
-
+  
       if (exists) {
-        showToast("Removed from comparison", "info");
+        showToast("Removed from comparison", "info", `compare-${property.id}`);
         return prev.filter((p) => p.id !== property.id);
       }
-
+  
       if (prev.length < 4) {
-        showToast("Added to comparison", "success");
+        showToast("Added to comparison", "success", `compare-${property.id}`);
         return [...prev, property];
       }
-
-      showToast("You can only compare up to 4 properties.", "warning");
+  
+      showToast("You can only compare up to 4 properties.", "warning", "compare-limit");
       return prev;
     });
   };
+  
 
   const clearComparison = () => {
     setSelectedProperties([]);
@@ -113,20 +114,20 @@ export default function PropertiesPage() {
     showToast("Comparison list cleared.", "info");
   };
 
-  const exportToPDF = () => {
-    const modalElement = document.getElementById("comparison-modal");
-    if (!modalElement) return;
+  // const exportToPDF = () => {
+  //   const modalElement = document.getElementById("comparison-modal");
+  //   if (!modalElement) return;
 
-    html2canvas(modalElement, { scrollY: -window.scrollY }).then((canvas) => {
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF("l", "pt", "a4");
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-      pdf.save("property-comparison.pdf");
-    });
-  };
+  //   html2canvas(modalElement, { scrollY: -window.scrollY }).then((canvas) => {
+  //     const imgData = canvas.toDataURL("image/png");
+  //     const pdf = new jsPDF("l", "pt", "a4");
+  //     const imgProps = pdf.getImageProperties(imgData);
+  //     const pdfWidth = pdf.internal.pageSize.getWidth();
+  //     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+  //     pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+  //     pdf.save("property-comparison.pdf");
+  //   });
+  // };
 
 
   if (loading) return <p className="text-center text-gray-600 mt-10">Loading properties...</p>;
@@ -139,23 +140,23 @@ export default function PropertiesPage() {
 
       {/* Hero Section */}
       <div className="relative bg-[#990e15] text-white py-12 text-center">
-  <div className="max-w-4xl mx-auto">
-    <h1 className="text-3xl md:text-4xl font-extrabold mt-16 ">Find Your Dream Property</h1>
-    <p className="text-base md:text-lg text-gray-200 mt-2">Search by name, location, price, and more.</p>
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-extrabold mt-16 ">Find Your Dream Property</h1>
+          <p className="text-base md:text-lg text-gray-200 mt-2">Search by name, location, price, and more.</p>
 
-    {/* 🔹 Search Bar with Icon */}
-    <div className="mt-4 flex justify-center gap-2 relative w-full sm:w-2/3 md:w-1/2 mx-auto">
-      <input
-        type="text"
-        placeholder="Search properties..."
-        className="p-2 pl-4 pr-10 w-full border rounded-lg text-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-gray-300 outline-none"
-        value={filters.searchTerm}
-        onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
-      />
-      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-    </div>
-  </div>
-</div>
+          {/* 🔹 Search Bar with Icon */}
+          <div className="mt-4 flex justify-center gap-2 relative w-full sm:w-2/3 md:w-1/2 mx-auto">
+            <input
+              type="text"
+              placeholder="Search properties..."
+              className="p-2 pl-4 pr-10 w-full border rounded-lg text-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-gray-300 outline-none"
+              value={filters.searchTerm}
+              onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
+            />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          </div>
+        </div>
+      </div>
 
       {/* 🔹 Filter Bar (Fixed for Dark Mode) */}
       <div className="bg-white dark:bg-gray-800 shadow-md py-4 px-6 flex flex-wrap justify-center gap-4 border-b dark:border-gray-600">
@@ -270,20 +271,20 @@ export default function PropertiesPage() {
                   </h2>
                   <p className="text-xs text-gray-600 dark:text-gray-300 truncate">{property.location}</p>
                   <p className="text-lg font-semibold text-gray-900 dark:text-white mt-1 flex justify-between items-center">
-  <span>
-    {new Intl.NumberFormat("en-PH", {
-      style: "currency",
-      currency: "PHP",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(property.price)}
-  </span>
-  {property.square_meter && (
-    <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
-      {parseFloat(property.square_meter)} sqm.
-    </span>
-  )}
-</p>
+                    <span>
+                      {new Intl.NumberFormat("en-PH", {
+                        style: "currency",
+                        currency: "PHP",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(property.price)}
+                    </span>
+                    {property.square_meter && (
+                      <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
+                        {parseFloat(property.square_meter)} sqm.
+                      </span>
+                    )}
+                  </p>
 
 
                 </div>
@@ -397,28 +398,28 @@ export default function PropertiesPage() {
                             className={`p-2 border-l ${i !== 0 ? 'border-gray-300 dark:border-gray-700' : ''}`}
                           >
                             {key === "price"
-  ? `₱${Number(p[key]).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
-  : key === "square_meter"
-  ? `${p[key]} sqm.`
-  : key === "floor_number"
-  ? `${p[key]} floor${p[key] > 1 ? "s" : ""}`
+                              ? `₱${Number(p[key]).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
+                              : key === "square_meter"
+                                ? `${p[key]} sqm.`
+                                : key === "floor_number"
+                                  ? `${p[key]} floor${p[key] > 1 ? "s" : ""}`
 
-                              : key === "features_amenities"
-                                ? (() => {
-                                  try {
-                                    const amenities = typeof p[key] === "string" ? JSON.parse(p[key]) : p[key];
-                                    return (
-                                      <ul className="list-disc list-inside">
-                                        {amenities.map((amenity, i) => (
-                                          <li key={i}>{amenity}</li>
-                                        ))}
-                                      </ul>
-                                    );
-                                  } catch (error) {
-                                    return <span className="text-red-500">Invalid Data</span>;
-                                  }
-                                })()
-                                : p[key]}
+                                  : key === "features_amenities"
+                                    ? (() => {
+                                      try {
+                                        const amenities = typeof p[key] === "string" ? JSON.parse(p[key]) : p[key];
+                                        return (
+                                          <ul className="list-disc list-inside">
+                                            {amenities.map((amenity, i) => (
+                                              <li key={i}>{amenity}</li>
+                                            ))}
+                                          </ul>
+                                        );
+                                      } catch (error) {
+                                        return <span className="text-red-500">Invalid Data</span>;
+                                      }
+                                    })()
+                                    : p[key]}
                           </td>
                         ))}
                       </tr>
