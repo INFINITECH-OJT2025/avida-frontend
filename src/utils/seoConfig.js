@@ -12,11 +12,11 @@ const seoConfig = {
     //   description: "Discover full details of this stunning property for sale or rent.",
     //   image: "/default-property.jpg",
     // },
-    "/property/property-comparison": {
-      title: "Property Comparison | Avida Land",
-      description: "Compare up to four properties side by side and make an informed decision.",
-      image: "/property-comparison.jpg",
-    },
+    // "/property/property-comparison": {
+    //   title: "Property Comparison | Avida Land",
+    //   description: "Compare up to four properties side by side and make an informed decision.",
+    //   image: "/property-comparison.jpg",
+    // },
     "/room-planner": {
       title: "Room Planner - Design Your Dream Space",
       description: "Create, customize, and visualize your ideal home layout with our interactive planner.",
