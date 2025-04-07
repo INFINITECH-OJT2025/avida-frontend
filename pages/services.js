@@ -31,8 +31,8 @@ export default function ServicesPage() {
       <Header />
 
       {/* Hero Section */}
-      <div className="text-center mt-6 py-20 bg-gradient-to-r from-[#990e15] to-red-500 dark:from-[#770b12] dark:to-[#990e15] text-white">
-        <h1 className="text-5xl font-extrabold">Our Services</h1>
+      <div className="text-center py-24 bg-gradient-to-r from-[#990e15] to-red-500 dark:from-[#770b12] dark:to-[#990e15] text-white">
+        <h1 className="text-4xl font-extrabold">Our Services</h1>
         <p className="text-lg mt-2 text-gray-200 dark:text-gray-300">
           Experience exceptional real estate services, tailored to meet your needs and exceed expectations.
         </p>
@@ -40,7 +40,13 @@ export default function ServicesPage() {
 
       {/* Service Listings */}
       <div className="container mx-auto px-6 py-12">
-
+        {loading ? (
+          <p className="text-center text-gray-600 dark:text-gray-300">Loading services...</p>
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : services.length === 0 ? (
+          <p className="text-center text-gray-500 dark:text-gray-400">No services available at the moment.</p>
+        ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service) => (
               <Link key={service.id} href={`/services/${service.id}`}>
@@ -62,7 +68,7 @@ export default function ServicesPage() {
               </Link>
             ))}
           </div>
-
+        )}
       </div>
 
       <Footer />

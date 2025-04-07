@@ -45,24 +45,19 @@ export default function NewsPage() {
 
   const filterNews = (query, category) => {
     let filtered = news;
-  
+
     if (category !== "All") {
       filtered = filtered.filter((post) => post.category === category);
     }
-  
+
     if (query) {
-      const lowerQuery = query.toLowerCase();
       filtered = filtered.filter((post) =>
-        post.title.toLowerCase().includes(lowerQuery) ||
-        post.category.toLowerCase().includes(lowerQuery) ||
-        post.created_at.toLowerCase().includes(lowerQuery) ||
-        post.updated_at.toLowerCase().includes(lowerQuery)
+        post.title.toLowerCase().includes(query.toLowerCase())
       );
     }
-  
+
     setFilteredNews(filtered);
   };
-  
 
   if (loading) return <p className="text-center text-gray-600 mt-10">Loading news...</p>;
 
@@ -73,7 +68,7 @@ export default function NewsPage() {
 
       {/* ✅ Hero Section */}
       <section className="relative bg-[#990e15] dark:bg-[#770a10] text-white py-20 text-center">
-        <div className="max-w-3xl mt-6 mx-auto">
+        <div className="max-w-3xl mx-auto">
           <h1 className="text-5xl font-extrabold">What's New</h1>
           <p className="mt-4 text-lg text-gray-200">
             Stay updated with the latest insights, trends, and updates from Avida.
@@ -85,7 +80,7 @@ export default function NewsPage() {
       <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <input
           type="text"
-          placeholder="Search by title or category..."
+          placeholder="Search news..."
           value={searchQuery}
           onChange={handleSearchChange}
           className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#990e15] dark:bg-gray-800 dark:text-white"

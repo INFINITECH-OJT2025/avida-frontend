@@ -15,17 +15,17 @@ export default function LoanGraph({ monthlyPayment }) {
   const COLORS = ["#990e15", "#FF9800"];
 
   return (
-    <div className="mt-6 text-center ml-64">
-      <h3 className="text-lg font-semibold mr-64">📊 Payment Breakdown</h3>
+    <div className="mt-6 text-center">
+      <h3 className="text-lg font-semibold">📊 Payment Breakdown</h3>
 
       {/* Display Results for Readability */}
-      <div className="text-gray-700 mt-2 mr-64">
+      <div className="text-gray-700 mt-2">
         <p><strong>Principal:</strong> ₱{principalAmount}</p>
         <p><strong>Interest:</strong> ₱{interestAmount}</p>
       </div>
 
       {/* Pie Chart with Labels Inside */}
-      <PieChart width={350} height={350}>
+      <PieChart width={320} height={320}>
         <Pie
           data={data}
           dataKey="value"

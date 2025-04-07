@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useToast } from "../../src/context/ToastContext";
 import { callAPI } from "../../src/utils/api"; // ✅ centralized API call
 import SEOComponent from "../../src/hooks/useSEO";
-
 export default function ContactForm() {
   const [activeTab, setActiveTab] = useState("appointment");
   const [loading, setLoading] = useState(false);
@@ -27,71 +26,23 @@ export default function ContactForm() {
     message: "",
   });
 
-  const isValidEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    return emailRegex.test(email);
-  };
-
-  const isValidPhone = (phone) => /^09\d{9}$/.test(phone);
-
   const handleChange = (e, formType) => {
-    const { name, value } = e.target;
-    const isPhoneField = name === "phone" || name === "phone_number";
-    const sanitizedValue = isPhoneField ? value.replace(/\D/g, "") : value;
-
     if (formType === "appointment") {
-      setAppointmentData({ ...appointmentData, [name]: sanitizedValue });
+      setAppointmentData({ ...appointmentData, [e.target.name]: e.target.value });
     } else {
-      setInquiryData({ ...inquiryData, [name]: sanitizedValue });
+      setInquiryData({ ...inquiryData, [e.target.name]: e.target.value });
     }
-  };
-
-  const handleBlur = (e, formType) => {
-    const { name, value } = e.target;
-    const phone = formType === "appointment" ? appointmentData.phone_number : inquiryData.phone;
-
-    if (name === "email" && !isValidEmail(value)) {
-      showToast("Email must include '@' and a valid domain.", "error");
-    }
-
-    if ((name === "phone" || name === "phone_number") && !isValidPhone(value)) {
-      showToast("Phone number must start with '09' and contain exactly 11 digits.", "error");
-    }
-  };
-
-  const validateFields = (formType) => {
-    const data = formType === "appointment" ? appointmentData : inquiryData;
-    const phone = formType === "appointment" ? data.phone_number : data.phone;
-    if (!isValidEmail(data.email)) {
-      showToast("Email must include '@' and a valid domain.", "error");
-      return false;
-    }
-    if (!isValidPhone(phone)) {
-      showToast("Phone number must start with '09' and contain exactly 11 digits.", "error");
-      return false;
-    }
-    return true;
   };
 
   const handleSubmit = async (e, formType) => {
     e.preventDefault();
     setLoading(true);
 
-    if (!validateFields(formType)) {
-      setLoading(false);
-      return;
-    }
-
     const endpoint = formType === "appointment" ? "/appointments" : "/inquiries";
-    const payload = formType === "appointment"
-      ? appointmentData
-      : {
-          ...inquiryData,
-          phone_number: inquiryData.phone,
-        };
+    const payload = formType === "appointment" ? appointmentData : inquiryData;
 
     try {
-      await callAPI("post", endpoint, payload);
+      await callAPI("post", endpoint, payload); // ✅ callAPI used here
 
       showToast(
         formType === "appointment"
@@ -127,10 +78,9 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 shadow-lg rounded-lg">
-      <SEOComponent />
 
-      {/* ✅ Tabs */}
+    <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 shadow-lg rounded-lg">
+      {/* ✅ Tabs */}    <SEOComponent />
       <div className="flex justify-between border-b pb-2 mb-4 dark:border-gray-600">
         <button
           className={`w-1/2 text-center py-2 ${
@@ -164,22 +114,16 @@ export default function ContactForm() {
               name={field}
               value={appointmentData[field]}
               onChange={(e) => handleChange(e, "appointment")}
-              onBlur={(e) => handleBlur(e, "appointment")}
-              placeholder={
-                field === "phone_number"
-                  ? "Phone Number (e.g. 09123456789)"
-                  : field.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())
-              }
+              placeholder={field.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
               className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               required
-              maxLength={field === "phone_number" ? 11 : undefined}
             />
           ))}
           <textarea
             name="message"
             value={appointmentData.message}
             onChange={(e) => handleChange(e, "appointment")}
-            placeholder="Briefly describe your concern or request (e.g. schedule, details, etc.)"
+            placeholder="Leave us a message..."
             rows="3"
             className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
@@ -199,15 +143,9 @@ export default function ContactForm() {
               name={field}
               value={inquiryData[field]}
               onChange={(e) => handleChange(e, "inquiry")}
-              onBlur={(e) => handleBlur(e, "inquiry")}
-              placeholder={
-                field === "phone"
-                  ? "Phone Number (e.g. 09123456789)"
-                  : field.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())
-              }
+              placeholder={field.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
               className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               required
-              maxLength={field === "phone" ? 11 : undefined}
             />
           ))}
           <select
@@ -225,7 +163,7 @@ export default function ContactForm() {
             name="message"
             value={inquiryData.message}
             onChange={(e) => handleChange(e, "inquiry")}
-            placeholder="Briefly describe your concern or request (e.g. unit details, job application, etc.)"
+            placeholder="Leave us a message..."
             rows="3"
             className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />

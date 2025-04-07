@@ -1,35 +1,18 @@
 // src/hooks/useSEO.js
 import Head from "next/head";
 import { useRouter } from "next/router";
-import seoConfig from "../utils/seoConfig";
-
-const normalizePath = (path) => {
-  const dynamicRoutes = [
-    "/property/[id]",
-    "/careers/[id]",
-    "/news/[id]",
-    "/services/[id]",
-  ];
-
-  for (let route of dynamicRoutes) {
-    const base = route.replace("/[id]", "");
-    if (path.startsWith(base)) return route;
-  }
-
-  return path;
-};
+import seoConfig from "../utils/seoConfig"; // Adjust path as needed
 
 const SEOComponent = ({ dynamicData = {} }) => {
   const router = useRouter();
-  const currentPath = normalizePath(router.asPath);
+  const path = router.pathname;
 
-  const defaultSEO = seoConfig[currentPath] || {};
+  const pageSEO = seoConfig[path] || seoConfig[router.asPath] || {};
 
-  // ✅ PRIORITY: Use dynamicData if passed → then defaultSEO → then fallback
-  const title = dynamicData?.title ?? defaultSEO.title ?? "Avida Land";
-  const description = dynamicData?.description ?? defaultSEO.description ?? "Explore top real estate properties.";
-  const image = dynamicData?.image ?? defaultSEO.image ?? "/default-property.jpg";
-  const url = dynamicData?.url ?? `https://avidaland.vercel.app${router.asPath}` ?? `http://localhost:3001${router.asPath}`;
+  const title = dynamicData.title || pageSEO.title || "Avida Land";
+  const description = dynamicData.description || pageSEO.description || "Explore top real estate properties.";
+  const url = dynamicData.url || `https://avidaland.vercel.app${router.asPath}`;
+  const image = dynamicData.image || pageSEO.image || "/default-property.jpg";
 
   return (
     <Head>

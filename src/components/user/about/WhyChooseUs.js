@@ -33,7 +33,7 @@ export default function WhyChooseUs({ about }) {
   ];
 
   return (
-    <section className="py-14 bottom-8 bg-white dark:bg-gray-900">
+    <section className="py-16 bg-white dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-10 text-center">
         <h2 className="text-3xl md:text-4xl font-bold text-[#990e15] dark:text-white mb-12 py-4">
           Why Choose Avida Land?

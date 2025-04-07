@@ -133,7 +133,6 @@ export const deleteNews = (id) => callAPI("delete", `/news/${id}`);
 
 // 🔹 JOBS
 export const getJobs = () => callAPI("get", "/jobs");
-export const fetchJobDetails = () => callAPI("get", `/jobs/public/${id}`);
 export const getPublishedJobs = () => callAPI("get", "/jobs/published");
 export const createJob = (data) => callAPI("post", "/jobs", data, true);
 export const updateJob = (id, data) => callAPI("post", `/jobs/${id}`, data, true);
