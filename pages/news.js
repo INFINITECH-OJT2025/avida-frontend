@@ -45,19 +45,43 @@ export default function NewsPage() {
 
   const filterNews = (query, category) => {
     let filtered = news;
-
+  
     if (category !== "All") {
       filtered = filtered.filter((post) => post.category === category);
     }
-
+  
     if (query) {
-      filtered = filtered.filter((post) =>
-        post.title.toLowerCase().includes(query.toLowerCase())
-      );
+      const lowerQuery = query.toLowerCase();
+  
+      filtered = filtered.filter((post) => {
+        const titleMatch = post.title.toLowerCase().includes(lowerQuery);
+        const categoryMatch = post.category.toLowerCase().includes(lowerQuery);
+  
+        const updatedDate = new Date(post.updated_at);
+        const dateFormatted = updatedDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        });
+        const monthYear = updatedDate.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+        });
+  
+        const dateMatch =
+          dateFormatted.toLowerCase().includes(lowerQuery) ||
+          monthYear.toLowerCase().includes(lowerQuery) ||
+          updatedDate.getFullYear().toString().includes(lowerQuery) ||
+          (updatedDate.getMonth() + 1).toString().padStart(2, "0") === lowerQuery || // Month number
+          updatedDate.getDate().toString().padStart(2, "0") === lowerQuery; // Day number
+  
+        return titleMatch || categoryMatch || dateMatch;
+      });
     }
-
+  
     setFilteredNews(filtered);
   };
+  
 
   if (loading) return <p className="text-center text-gray-600 mt-10">Loading news...</p>;
 
@@ -80,7 +104,7 @@ export default function NewsPage() {
       <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center gap-4">
         <input
           type="text"
-          placeholder="Search news..."
+          placeholder="Search by title, date or category..."
           value={searchQuery}
           onChange={handleSearchChange}
           className="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#990e15] dark:bg-gray-800 dark:text-white"
@@ -135,7 +159,7 @@ export default function NewsPage() {
 
                   <div className="mt-4 flex items-center justify-between">
                     <span className="text-xs text-gray-500">
-                      {new Date(post.created_at).toLocaleDateString("en-US", {
+                      {new Date(post.updated_at).toLocaleDateString("en-US", {
                         year: "numeric",
                         month: "long",
                         day: "numeric",
