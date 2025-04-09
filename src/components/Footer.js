@@ -1,12 +1,19 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
-  FaFacebookF, FaLinkedin, FaInstagram, FaTiktok, FaYoutube,
-  FaPhone, FaEnvelope, FaMobile
+  FaFacebookF,
+  FaLinkedin,
+  FaInstagram,
+  FaTiktok,
+  FaYoutube,
+  FaPhone,
+  FaEnvelope,
+  FaMobile,
+  FaMapMarkerAlt,
 } from "react-icons/fa";
 import { getPublicContacts } from "../../src/utils/api";
 
-export default function Footer() {
+export default function Footer({ companySlogan }) {
   const [contacts, setContacts] = useState(null);
   const [error, setError] = useState(null);
 
@@ -26,12 +33,13 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#990e15] text-white py-12">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+
         {/* Brand Section */}
         <div>
-          <h2 className="text-3xl font-extrabold">AvidaRealEstate</h2>
-          <p className="text-gray-300 mt-3 text-sm leading-relaxed">
-            Helping you find the perfect home with unmatched quality and dedication.
+          <img src="/Avida_dm.svg" alt="AvidaRealEstate Logo" className="w-32 mb-4" />
+          <p className="text-gray-300 text-xsm italic leading-relaxed">
+            {companySlogan || "Helping you find the perfect home with unmatched quality and dedication."}
           </p>
           {contacts && (
             <div className="flex space-x-4 mt-4">
@@ -44,7 +52,7 @@ export default function Footer() {
           )}
         </div>
 
-        {/* Links */}
+        {/* Quick Links */}
         <div>
           <h3 className="text-xl font-semibold mb-4">Quick Links</h3>
           <ul className="space-y-2 text-gray-300">
@@ -67,25 +75,60 @@ export default function Footer() {
           </ul>
         </div>
 
-        {/* Contact Details */}
+        {/* Contact Us */}
         <div>
           <h3 className="text-xl font-semibold mb-4">Contact Us</h3>
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          {contacts ? (
-            <>
-              {contacts.address && <p><strong>📍 Office:</strong> {contacts.address}</p>}
-              {contacts.main_phone && <p><strong><FaPhone /> Hotline:</strong> {contacts.main_phone}</p>}
-              {contacts.email && <p><strong><FaEnvelope /> Email:</strong> {contacts.email}</p>}
-              <hr className="my-3" />
-              <h4 className="text-lg font-semibold mb-2">Other Concerns</h4>
-              {contacts.sales_phone && <p><strong><FaMobile /> Sales:</strong> {contacts.sales_phone}</p>}
-              {contacts.leasing_phone && <p><strong><FaMobile /> Leasing:</strong> {contacts.leasing_phone}</p>}
-              {contacts.employment_phone && <p><strong><FaMobile /> Employment:</strong> {contacts.employment_phone}</p>}
-              {contacts.customer_care_phone && <p><strong><FaPhone /> Customer Care:</strong> {contacts.customer_care_phone}</p>}
-            </>
-          ) : (
-            <p className="text-gray-300">Loading contact details...</p>
-          )}
+          <ul className="space-y-2 text-gray-300 text-sm">
+            {contacts?.address && (
+              <li className="flex items-start gap-3">
+                <FaMapMarkerAlt className="text-2xl mt-[2px] min-w-[1.5rem]" />
+                <span><strong>Office:</strong> {contacts.address}</span>
+              </li>
+            )}
+            {contacts?.main_phone && (
+              <li className="flex items-start gap-3">
+                <FaPhone className="text-xl mt-[2px] min-w-[1.25rem]" />
+                <span><strong>Hotline:</strong> {contacts.main_phone}</span>
+              </li>
+            )}
+            {contacts?.email && (
+              <li className="flex items-start gap-3">
+                <FaEnvelope className="text-xl mt-[2px] min-w-[1.25rem]" />
+                <span><strong>Email:</strong> {contacts.email}</span>
+              </li>
+            )}
+          </ul>
+        </div>
+
+        {/* Other Concerns */}
+        <div>
+          <h3 className="text-xl font-semibold mb-4">Other Concerns</h3>
+          <ul className="space-y-2 text-gray-300 text-sm">
+            {contacts?.sales_phone && (
+              <li className="flex items-start gap-3">
+                <FaMobile className="text-xl mt-[2px] min-w-[1.25rem]" />
+                <span><strong>Sales:</strong> {contacts.sales_phone}</span>
+              </li>
+            )}
+            {contacts?.leasing_phone && (
+              <li className="flex items-start gap-3">
+                <FaMobile className="text-xl mt-[2px] min-w-[1.25rem]" />
+                <span><strong>Leasing:</strong> {contacts.leasing_phone}</span>
+              </li>
+            )}
+            {contacts?.employment_phone && (
+              <li className="flex items-start gap-3">
+                <FaMobile className="text-xl mt-[2px] min-w-[1.25rem]" />
+                <span><strong>Employment:</strong> {contacts.employment_phone}</span>
+              </li>
+            )}
+            {contacts?.customer_care_phone && (
+              <li className="flex items-start gap-3">
+                <FaPhone className="text-xl mt-[2px] min-w-[1.25rem]" />
+                <span><strong>Customer Care:</strong> {contacts.customer_care_phone}</span>
+              </li>
+            )}
+          </ul>
         </div>
       </div>
 
