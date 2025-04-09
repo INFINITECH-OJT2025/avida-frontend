@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import LoanGraph from "./loangraph";
 import LoanTable from "./loantable";
-import Header from "../src/components/Header"; // ✅ Import Header
+import Header from "../src/components/Header";
 import Footer from "../src/components/Footer";
 import SEOComponent from "../src/hooks/useSEO";
+import { useToast } from "../src/context/ToastContext";
 
 export default function LoanCalculator() {
-
-
   const [loanAmount, setLoanAmount] = useState("");
   const [interestRate, setInterestRate] = useState("");
   const [loanTermYears, setLoanTermYears] = useState("");
@@ -18,19 +17,35 @@ export default function LoanCalculator() {
   const [insurance, setInsurance] = useState("");
   const [hoaFees, setHoaFees] = useState("");
   const [monthlyPayment, setMonthlyPayment] = useState(0);
+  const { showToast } = useToast();
 
-  // ✅ Auto-calculate loan whenever inputs change
   useEffect(() => {
     calculateLoan();
   }, [loanAmount, interestRate, loanTermYears, loanTermMonths, downPayment, discount, propertyTax, insurance, hoaFees]);
+const parseNumberInput = (value, label = "Field") => {
+  const cleaned = value.replace(/,/g, "").replace(/ /g, "");
+  if (!/^\d*\.?\d*$/.test(cleaned)) {
+    showToast(`${label} must only contain numbers and at most one decimal.`, "error");
+    return ""; // Clear invalid input
+  }
+  return cleaned;
+};
 
-  // ✅ Function to remove separators before storing the number
-  const parseNumberInput = (value) => value.replace(/,/g, "").replace(/ /g, "");
 
-  // ✅ Function to format numbers with commas or spaces
+  const allowOnlyValidNumeric = (val) => {
+    let clean = val.replace(/[^\d.]/g, "");
+    const parts = clean.split(".");
+    if (parts.length > 2) {
+      clean = parts[0] + "." + parts.slice(1).join("");
+    }
+    return clean;
+  };
+
   const formatNumber = (value, separator = ",") => {
-    if (!value) return "";
-    return parseFloat(value).toLocaleString("en-US").replace(/,/g, separator);
+    if (!value || isNaN(value)) return "";
+    const [whole, decimal] = parseNumberInput(value).split(".");
+    const formattedWhole = whole.replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+    return decimal !== undefined ? `${formattedWhole}.${decimal}` : formattedWhole;
   };
 
   const calculateLoan = () => {
@@ -50,50 +65,51 @@ export default function LoanCalculator() {
     totalMonths = Math.max(totalMonths, 1);
 
     let monthlyInterest = rate / 100 / 12;
-    let payment =
-      (loanPrincipal * monthlyInterest) /
-      (1 - Math.pow(1 + monthlyInterest, -totalMonths));
+    let payment = (loanPrincipal * monthlyInterest) / (1 - Math.pow(1 + monthlyInterest, -totalMonths));
 
     let taxMonthly = (taxRate / 100 / 12) * principal;
     let insuranceMonthly = insuranceCost / 12;
     let totalMonthlyPayment = payment + taxMonthly + insuranceMonthly + hoa;
 
     setMonthlyPayment(totalMonthlyPayment.toFixed(2));
+    
   };
 
   return (
-
     <div className=" top-0 left-0 w-full z-10 bg-white dark:bg-gray-900">
-            <SEOComponent />
+      <SEOComponent />
       <Header />
 
-      <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md mt-10">
-        <h2 className="text-2xl font-semibold text-center mb-4">🏡 Loan Calculator</h2>
+      <div className="max-w-4xl mx-auto p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md mt-20">
+        <h1 className="text-4xl font-semibold text-center mb-4">Loan Calculator</h1>
 
         <div className="grid grid-cols-2 gap-4">
-          {/* ✅ Loan Amount */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Loan Amount (Php)</label>
-            <input
-              type="text"
-              value={formatNumber(loanAmount)}
-              onChange={(e) => setLoanAmount(parseNumberInput(e.target.value))}
-              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
+          {[{
+            label: "Loan Amount (Php)", value: loanAmount, setter: setLoanAmount
+          }, {
+            label: "Interest Rate (%)", value: interestRate, setter: setInterestRate
+          }, {
+            label: "Down Payment (Php)", value: downPayment, setter: setDownPayment
+          }, {
+            label: "Discount (%)", value: discount, setter: setDiscount
+          }, {
+            label: "Property Tax (%)", value: propertyTax, setter: setPropertyTax
+          }, {
+            label: "Home Insurance (Php/Year)", value: insurance, setter: setInsurance
+          }, {
+            label: "HOA Fees (Php/Month)", value: hoaFees, setter: setHoaFees
+          }].map(({ label, value, setter }, i) => (
+            <div key={i}>
+              <label className="block text-gray-700 dark:text-gray-300">{label}</label>
+              <input
+                type="text"
+                value={formatNumber(value)}
+                onChange={(e) => setter(allowOnlyValidNumeric(e.target.value))}
+                className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              />
+            </div>
+          ))}
 
-          {/* ✅ Interest Rate */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Interest Rate (%)</label>
-            <input
-              type="text"
-              value={interestRate}
-              onChange={(e) => setInterestRate(parseNumberInput(e.target.value))}
-              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
-
-          {/* ✅ Loan Term - Years */}
           <div>
             <label className="block text-gray-700 dark:text-gray-300">Loan Term (Years)</label>
             <select
@@ -102,14 +118,11 @@ export default function LoanCalculator() {
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               {[...Array(26).keys()].map((year) => (
-                <option key={year} value={year}>
-                  {year} {year === 1 ? "Year" : "Years"}
-                </option>
+                <option key={year} value={year}>{year} {year >1  ? "Years" : "Year"}</option>
               ))}
             </select>
           </div>
 
-          {/* ✅ Loan Term - Months */}
           <div>
             <label className="block text-gray-700 dark:text-gray-300">Loan Term (Months)</label>
             <select
@@ -118,70 +131,9 @@ export default function LoanCalculator() {
               className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             >
               {[...Array(12).keys()].map((month) => (
-                <option key={month} value={month}>
-                  {month} {month === 1 ? "Month" : "Months"}
-                </option>
+                <option key={month} value={month}>{month} {month > 1 ? "Months" : "Month"}</option>
               ))}
             </select>
-          </div>
-
-          {/* ✅ Down Payment */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Down Payment (Php)</label>
-            <input
-              type="text"
-              value={formatNumber(downPayment)}
-              onChange={(e) => setDownPayment(parseNumberInput(e.target.value))}
-              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-            />
-          </div>
-
-          {/* ✅ Discount */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Discount (%)</label>
-            <input
-              type="text"
-              value={discount}
-              onChange={(e) => setDiscount(parseNumberInput(e.target.value))}
-              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Enter discount percentage (e.g., 20 for 20%)"
-            />
-          </div>
-
-          {/* ✅ Property Tax */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Property Tax (%)</label>
-            <input
-              type="text"
-              value={propertyTax}
-              onChange={(e) => setPropertyTax(parseNumberInput(e.target.value))}
-              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Default: 1.2%"
-            />
-          </div>
-
-          {/* ✅ Home Insurance */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">Home Insurance (Php/Year)</label>
-            <input
-              type="text"
-              value={formatNumber(insurance)}
-              onChange={(e) => setInsurance(parseNumberInput(e.target.value))}
-              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Optional"
-            />
-          </div>
-
-          {/* ✅ HOA Fees */}
-          <div>
-            <label className="block text-gray-700 dark:text-gray-300">HOA Fees (Php/Month)</label>
-            <input
-              type="text"
-              value={formatNumber(hoaFees)}
-              onChange={(e) => setHoaFees(parseNumberInput(e.target.value))}
-              className="w-full p-2 border rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              placeholder="Optional"
-            />
           </div>
         </div>
 
