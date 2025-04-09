@@ -312,7 +312,7 @@ export default function SubmitProperty() {
 
 
                 {/* Banner Section */}
-                <div className="bg-[#990e15] text-white py-10 px-6 rounded-lg text-center shadow-md">
+                <div className="bg-[#990e15] mt-6 text-white py-10 px-6 rounded-lg text-center shadow-md">
                     <h1 className="text-4xl font-bold">Submit Your Property</h1>
                     <p className="mt-2 text-lg">
                         List your property with us and reach thousands of potential buyers and renters.
@@ -323,7 +323,7 @@ export default function SubmitProperty() {
                 <form onSubmit={handleSubmit} className="space-y-8 mt-8">
 
                     {/* Personal Information */}
-                    <div className="px-4 sm:px-6 md:px-10 lg:px-20 py-10 overflow-x-hidden">
+                    <div className="px-2 sm:px-24 md:px-10 lg:px-2 py-10 overflow-x-hidden">
 
                         <h3 className="text-2xl font-semibold text-[#990e15]">Personal Information</h3>
                         <hr className="border-[#990e15] my-3" />
@@ -506,15 +506,15 @@ export default function SubmitProperty() {
                             ))}
                         </div>
                     </div>
-                    <button
-                        type="submit"
-                        className="bg-[#990e15] text-white p-3 rounded w-full text-sm sm:text-base md:text-lg py-3 px-6 font-semibold shadow-md hover:bg-[#b31218] transition"
-                    >
-                        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold">
+                    <div className="flex justify-left mt-6">
+                        <button
+                            type="submit"
+                            className="bg-[#990e15] text-white px-6 py-2 text-sm sm:text-base rounded-lg font-semibold shadow-md hover:bg-[#b31218] transition"
+                        >
                             Submit Your Property
-                        </h1>
+                        </button>
+                    </div>
 
-                    </button>
                 </form>
             </div></div>
     );

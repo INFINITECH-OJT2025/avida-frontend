@@ -31,7 +31,7 @@ export default function ServicesPage() {
       <Header />
 
       {/* Hero Section */}
-      <div className="text-center py-24 bg-gradient-to-r from-[#990e15] to-red-500 dark:from-[#770b12] dark:to-[#990e15] text-white">
+      <div className="text-center mt-6 py-24 bg-gradient-to-r from-[#990e15] to-red-500 dark:from-[#770b12] dark:to-[#990e15] text-white">
         <h1 className="text-4xl font-extrabold">Our Services</h1>
         <p className="text-lg mt-2 text-gray-200 dark:text-gray-300">
           Experience exceptional real estate services, tailored to meet your needs and exceed expectations.

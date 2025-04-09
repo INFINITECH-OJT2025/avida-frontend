@@ -1,6 +1,7 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "geist/font/sans";
+import { Geist_Mono } from "geist/font/mono";
 import "./globals.css";
-import Head from "next/head";
+// import Head from "next/head";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,8 +20,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <Head>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-title" content="Avida" />
         <meta name="theme-color" content="#990e15" />
@@ -35,10 +35,7 @@ export default function RootLayout({ children }) {
           sizes="512x512"
           href="/web-app-manifest-512x512.png"
         />
-      </Head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className="antialiased">
         {children}
       </body>
     </html>

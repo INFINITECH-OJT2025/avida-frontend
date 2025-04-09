@@ -10,6 +10,8 @@
   --background: white;
   --text: black;
   --card: white;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
 }
 
 /* ✅ Dark Mode */
@@ -19,6 +21,8 @@
   --text: white;
   --card: #222222;
 }
+
+
 
 /* ✅ Global Utility Classes */
 .bg-primary {
@@ -66,7 +70,28 @@
 /* ✅ Ensure Dark Mode applies to the full page */
 body {
   @apply bg-white text-gray-900 transition-colors duration-300;
+  font-family: var(--font-sans);
 }
+
+.font-sans {
+  font-family: var(--font-sans);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+}
+ h4, h5 {
+  font-family: var(--font-sans);
+  font-weight: 800;
+}
+p, span, li, div {
+  font-family: var(--font-sans);
+}
+
 
 .dark body {
   @apply bg-gray-900 text-white;
