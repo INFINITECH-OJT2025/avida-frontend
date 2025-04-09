@@ -7,12 +7,15 @@ import { ToastProvider } from "../src/context/ToastContext";
 import { Download } from "lucide-react";
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useRouter } from 'next/router';
 
 export default function MyApp({ Component, pageProps }) {
   const isAdminPage = Component.useAdminLayout || false;
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isPwaInstalled, setIsPwaInstalled] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
+  const router = useRouter();
+  const isRoomPlannerPage = router.pathname === "/room-planner";
 
   // ✅ Mark component as hydrated (client-side)
   useEffect(() => {
@@ -98,16 +101,18 @@ export default function MyApp({ Component, pageProps }) {
           <Component {...pageProps} />
         )}
 
-        {!isPwaInstalled && deferredPrompt && (
-          <button
-            onClick={installPWA}
-            className="fixed bottom-8 right-8 px-6 py-3 flex items-center bg-[#990e15] text-white rounded-full shadow-lg hover:bg-[#7f0c12] transition-all"
-            style={{ minWidth: '160px', borderRadius: '50px', textAlign: 'center' }}
-          >
-            <Download size={22} className="mr-2" />
-            Install App
-          </button>
-        )}
+{!isRoomPlannerPage && !isPwaInstalled && deferredPrompt && (
+  <button
+    onClick={installPWA}
+    className="fixed bottom-8 right-8 px-6 py-3 flex items-center bg-[#990e15] text-white rounded-full shadow-lg hover:bg-[#7f0c12] transition-all"
+    style={{ minWidth: '160px', borderRadius: '50px', textAlign: 'center' }}
+  >
+    <Download size={22} className="mr-2" />
+    Install App
+  </button>
+)}
+
+
       </DndProvider>
     </ToastProvider>
   );

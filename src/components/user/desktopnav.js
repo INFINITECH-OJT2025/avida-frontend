@@ -2,12 +2,13 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Download } from "lucide-react";
+import useConfirmDialog from "../../../src/hooks/useConfirmDialog"; // adjust path if needed
 const DesktopNav = () => {
     const router = useRouter();
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const timeoutRef = useRef(null);
     const [deferredPrompt, setDeferredPrompt] = useState(null);
-
+    const { showConfirm, ConfirmDialog } = useConfirmDialog();
     const isActive = (path) => router.pathname === path;
 
     const handleMouseEnter = () => {
@@ -48,7 +49,21 @@ const DesktopNav = () => {
           });
         }
       };
-    
+      const handleRoomPlannerClick = (e) => {
+        e.preventDefault(); // Prevent default link behavior
+      
+        if (window.innerWidth < 1024) {
+          alert("Room Planner is only available on desktop/laptop screens.");
+          return;
+        }
+      
+        showConfirm(
+          "Room Planner requires a desktop or laptop for full experience. Do you want to open it in a new tab?",
+          () => {
+            window.open("/room-planner", "_blank");
+          }
+        );
+      };
     return (
         <nav className="flex items-center gap-6">
             <Link href="/home" className={`nav-link ${isActive("/home") ? "active-link" : ""}`}>
@@ -89,9 +104,16 @@ const DesktopNav = () => {
                         <Link href="/contact-us" className={`dropdown-item ${isActive("/contact-us") ? "dropdown-active" : ""}`}>
                             Contact Us
                         </Link>
+                        <button
+  onClick={handleRoomPlannerClick}
+  className="dropdown-item text-left w-full px-4 py-2 text-md text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+>
+  Room Planner
+</button>
                     </div>
                 )}
             </div>
+            <ConfirmDialog />
         </nav>
     );
 };

@@ -8,7 +8,7 @@ const IframeViewer = () => {
       className="w-full h-full border-0"
       allowFullScreen
       loading="lazy"
-      sandbox="allow-scripts allow-same-origin allow-forms" // ✅ BLOCKS install prompt
+      sandbox="allow-scripts allow-same-origin allow-forms" 
     />
   );
 };
