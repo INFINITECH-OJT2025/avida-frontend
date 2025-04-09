@@ -1,5 +1,3 @@
-import { Geist } from "geist/font/sans";
-import { Geist_Mono } from "geist/font/mono";
 import "./globals.css";
 // import Head from "next/head";
 
@@ -21,6 +19,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://geistsans.com/font.css" rel="stylesheet" />
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-title" content="Avida" />
         <meta name="theme-color" content="#990e15" />

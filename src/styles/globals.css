@@ -10,8 +10,8 @@
   --background: white;
   --text: black;
   --card: white;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: 'Geist', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
 }
 
 /* ✅ Dark Mode */
@@ -328,4 +328,14 @@ textarea::placeholder {
 }
 .Toastify__toast-body > div > svg {
   color: #fff !important;
+}
+
+
+/* Add this to globals.css or relevant file */
+footer strong {
+  font-weight: 600;
+}
+
+footer p, footer li {
+  line-height: 1.4;
 }

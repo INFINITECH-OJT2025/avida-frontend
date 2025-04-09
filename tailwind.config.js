@@ -14,8 +14,8 @@ module.exports = {
         darkText: "#1a1a1a"
       },
       fontFamily: {
-        sans: ['var(--font-sans)', 'sans-serif'],
-        mono: ['var(--font-mono)', 'monospace'],
+        sans: ['"Geist"', 'sans-serif'],
+        mono: ['"Geist Mono"', 'monospace'],
       },
     },
   },
