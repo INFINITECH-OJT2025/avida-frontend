@@ -67,7 +67,7 @@ export default function NewsPage() {
       <Header />
 
       {/* ✅ Hero Section */}
-      <section className="relative bg-[#990e15] dark:bg-[#770a10] text-white py-20 text-center">
+      <section className="relative bg-[#990e15] dark:bg-[#770a10] text-white py-20 text-center"> 
         <div className="max-w-3xl mt-10 mx-auto">
           <h1 className="text-5xl font-extrabold">What's New</h1>
           <p className="mt-4 text-lg text-gray-200">

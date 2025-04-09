@@ -279,8 +279,8 @@ export default function SubmitProperty() {
     };
 
     const handlePriceChange = (e) => {
-        let value = e.target.value.replace(/,/g, ""); // Remove existing commas
-        value = value.replace(/[^0-9.]/g, ""); // Allow only numbers and decimal
+        let value = e.target.value.replace(/,/g, ""); 
+        value = value.replace(/[^0-9.]/g, ""); 
 
         // Prevent multiple decimals
         const parts = value.split(".");

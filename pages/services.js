@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Header from "../src/components/Header";
 import Footer from "../src/components/Footer";
-import { fetchServices } from "../src/utils/api"; // ✅ callAPI wrapper
+import { fetchServices } from "../src/utils/api";
 import SEOComponent from "../src/hooks/useSEO";
 export default function ServicesPage() {
   const [services, setServices] = useState([]);
@@ -12,7 +12,7 @@ export default function ServicesPage() {
   useEffect(() => {
     const loadServices = async () => {
       try {
-        const data = await fetchServices(); // ✅ Already fetches status: 1 only
+        const data = await fetchServices();
         setServices(data);
       } catch (err) {
         console.error("Error fetching services:", err);
