@@ -13,7 +13,7 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { getSingleProperty, callAPI } from "../../src/utils/api";
 
-export default function PropertyPage() {
+export default function PropertyPage({ recommended }) {
   const router = useRouter();
   const { id } = router.query;
 
@@ -157,24 +157,29 @@ export default function PropertyPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-md text-gray-700 dark:text-gray-300">
               <div className="space-y-2">
-                <p><strong>Type:</strong> {property.unit_type}</p>
-                <p><strong>Status:</strong> {property.unit_status}</p>
+                <p><strong>Unit Type:</strong> {property.unit_type}</p>
+                <p><strong>Unit Status:</strong> {property.unit_status}</p>
                 <p><strong>Price:</strong> {formatCurrency(property.price)}</p>
-                <p><strong>Size:</strong> {property.square_meter} sqm</p>
-                <p><strong>Floor Number:</strong> {property.floor_number}</p>
+                <p><strong>Size:</strong> {property.square_meter} sqm.</p>
+                <p><strong>Floor Number:</strong> {property.floor_number} floor/s</p>
                 <p><strong>Parking:</strong> {property.parking}</p>
                 <p><strong>Property Status:</strong> {property.property_status}</p>
-                <p><strong>Features & Amenities:</strong> {
-                  (() => {
-                    try {
-                      return property.features_amenities
-                        ? JSON.parse(property.features_amenities).join(", ")
-                        : "None";
-                    } catch {
-                      return "Invalid format";
-                    }
-                  })()
-                }</p>
+                <div>
+                  <strong>Features & Amenities:</strong>
+                  <ul className="list-disc list-inside mt-1 text-gray-700 dark:text-gray-300">
+                    {(() => {
+                      try {
+                        const amenities = property.features_amenities ? JSON.parse(property.features_amenities) : [];
+                        return amenities.length > 0
+                          ? amenities.map((item, i) => <li key={i}>{item}</li>)
+                          : <li>None</li>;
+                      } catch {
+                        return <li>Invalid format</li>;
+                      }
+                    })()}
+                  </ul>
+                </div>
+
               </div>
 
               <div className="border-l pl-6">
@@ -194,55 +199,40 @@ export default function PropertyPage() {
             Explore a wide range of premium properties suited for your lifestyle.
             Find your dream home today!
           </p>
-          {/* 🔽 RECOMMENDED PROPERTIES SECTION */}
-          <div className="max-w-7xl mx-auto px-6 pt-8 pb-20">
-            <h3 className="text-xl font-bold text-[#990e15] text-center mb-6">
-              Recommended Properties
-            </h3>
+          {/* Recommended Properties */}
+          <h2 className="text-3xl font-bold text-[#990e15] text-center">Recommended Properties</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
+            {property?.recommended?.map((rec) => (
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {property.recommended?.length > 0 ? (
-                property.recommended.map((rec) => (
-                  <div
-                    key={rec.id}
-                    className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
-                    onClick={() => router.push(`/property/${rec.id}`)}
-                  >
-                    <div className="w-full h-[180px] overflow-hidden">
-                      <img
-                        src={
-                          rec.media?.length > 0
-                            ? rec.media[0].url
-                            : "/default-property.jpg"
-                        }
-                        alt={rec.property_name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="text-lg font-semibold text-[#990e15] truncate">
-                        {rec.unit_type} | {rec.property_name}
-                      </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 truncate">
-                        {rec.location}
-                      </p>
-                      <p className="text-base font-bold text-gray-900 dark:text-white mt-1">
-                        {formatCurrency(rec.price)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center text-gray-600 dark:text-gray-300 col-span-3">
-                  No recommended properties available.
-                </p>
-              )}
-            </div>
+              <div
+                key={rec.id}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+                onClick={() => router.push(`/property/${rec.id}`)}
+              >
+                <img
+                  src={rec.media?.[0]?.url ?? "/default-property.jpg"}
+                  alt={rec.property_name}
+                  className="w-full h-[180px] object-cover"
+                />
+                <div className="p-4">
+                  <h3 className="text-lg text-left font-semibold text-[#990e15] truncate">
+                    {rec.unit_type} | {rec.property_name}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 text-left truncate">{rec.location}</p>
+                  <p className="text-base font-bold text-gray-900 dark:text-white mt-1 flex justify-between items-center">
+                    <span>{formatCurrency(rec.price)}</span>
+                    {rec.square_meter && (
+                      <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
+                        {parseFloat(rec.square_meter)} sqm.
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
-
-
       <Footer />
     </div>
   );
