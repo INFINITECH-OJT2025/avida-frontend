@@ -253,7 +253,7 @@ export default function ContactForm() {
             placeholder="Phone Number (e.g. 09123456789)"
             className="input-field"
             required
-            maxLength="13"
+            maxLength="11"
           />
           <textarea name="message" value={formData.message} onChange={handleChange} placeholder="Your message..." className="input-field" rows="3" required></textarea>
           <button type="submit" className="submit-btn">{loading ? "Sending..." : "Send Inquiry"}</button>
