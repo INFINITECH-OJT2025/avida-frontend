@@ -23,7 +23,6 @@ export default function AboutUsPage() {
             <Header/>
 
             <div className="bg-white text-gray-900 dark:bg-gray-900 dark:text-white"><Head>
-                <title>{about?.company_name || "About Us"} - Avida Land</title>
                 <meta name="description" content={about?.brief_intro || "Learn about our company"} />
             </Head>
                 {/* 🔹 Hero Section */}
