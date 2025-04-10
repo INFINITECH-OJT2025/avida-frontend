@@ -5,7 +5,6 @@ import Header from "../../src/components/Header";
 import Footer from "../../src/components/Footer";
 import MainMediaDisplay from "../../src/components/user/properties/MainMediaDisplay";
 import Appointment from "../appointment";
-// import { getSingleProperty } from "../../src/utils/api";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/css";
@@ -19,7 +18,6 @@ export default function PropertyPage({ recommended }) {
 
   const [property, setProperty] = useState(null);
   const [error, setError] = useState(null);
- 
   const [isClient, setIsClient] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
 
@@ -31,9 +29,7 @@ export default function PropertyPage({ recommended }) {
     if (!id || !isClient) return;
 
     const fetchProperty = async () => {
-       
       try {
-        // ✅ Get current property by ID
         const data = await getSingleProperty(id);
         if (!data || Object.keys(data).length === 0) {
           throw new Error("Property not found.");
@@ -41,28 +37,23 @@ export default function PropertyPage({ recommended }) {
 
         data.media = Array.isArray(data.media) ? data.media : [];
 
-        // ✅ Use callAPI to fetch all properties for recommendations
         const all = await callAPI("get", "/properties");
-
-        const recommended = all
-          .filter((p) => p.id !== data.id && p.status === "approved")
-          .slice(0, 3); // Limit to 3 recommendations
+        const recommended = Array.isArray(all)
+          ? all.filter((p) => p.id !== data.id && p.status === "approved").slice(0, 3)
+          : [];
 
         data.recommended = recommended;
 
         setProperty(data);
 
-        // ✅ Set default preview image
         if (data.media.length > 0) {
           setSelectedMedia(data.media[0]);
         }
       } catch (err) {
         setError(err.message || "Failed to fetch property details.");
-      } finally {
- 
       }
     };
-    fetchProperty(); // ✅ CALL the function
+    fetchProperty();
   }, [id, isClient]);
 
   const formatCurrency = (amount) => {
@@ -74,43 +65,39 @@ export default function PropertyPage({ recommended }) {
   };
 
   if (error) return <p className="text-center text-red-600 mt-10">{error}</p>;
+  if (!property) return <p className="text-center mt-10">Loading...</p>;
 
   return (
-
     <div className="dark:bg-gray-900">
       <SEOComponent />
       <Header />
 
       <div className="max-w-7xl mx-auto px-6 py-20 bg-gray-100 dark:bg-gray-900">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-          {/* Left: Property Media & Title */}
           <div>
-          <h1 className="text-4xl font-extrabold text-[#990e15]">
-  {property?.property_name || 'N/A'}
-</h1>
-            <p className="text-lg text-gray-500 mt-2">{property?.location}</p>
+            <h1 className="text-4xl font-extrabold text-[#990e15]">
+              {property.property_name || 'N/A'}
+            </h1>
+            <p className="text-lg text-gray-500 mt-2">{property.location || 'Unknown location'}</p>
 
             <div className="mt-6 grid grid-cols-1 gap-4">
-              {/* Interactive Preview */}
               <div className="w-full">
-                {/* Large Preview */}
                 <div className="w-full h-[400px] rounded-xl overflow-hidden shadow-md bg-black mb-4">
                   {selectedMedia?.type === "video" ? (
                     <video
-                      src={selectedMedia.url}
+                      src={selectedMedia?.url}
                       controls
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <img
-                      src={selectedMedia.url}
-                      alt={`${property.property_name} Preview`}
+                      src={selectedMedia?.url}
+                      alt={`${property.property_name || 'Property'} Preview`}
                       className="w-full h-full object-cover"
                     />
                   )}
                 </div>
 
-                {/* Thumbnail Swiper */}
                 <Swiper
                   modules={[Navigation, Pagination]}
                   spaceBetween={12}
@@ -119,11 +106,11 @@ export default function PropertyPage({ recommended }) {
                   pagination={{ clickable: true }}
                   className="rounded-md"
                 >
-                  {property.media.map((media, index) => (
+                  {Array.isArray(property.media) && property.media.map((media, index) => (
                     <SwiperSlide key={index}>
                       <div
                         onClick={() => setSelectedMedia(media)}
-                        className={`cursor-pointer rounded-md overflow-hidden border-2 ${selectedMedia.url === media.url
+                        className={`cursor-pointer rounded-md overflow-hidden border-2 ${selectedMedia?.url === media.url
                           ? "border-[#990e15]"
                           : "border-transparent"
                           }`}
@@ -146,24 +133,21 @@ export default function PropertyPage({ recommended }) {
                   ))}
                 </Swiper>
               </div>
-
-
             </div>
           </div>
 
-          {/* Right: Property Details + Appointment */}
           <div className="bg-white dark:bg-gray-800 dark:text-white p-6 rounded-lg shadow-md flex flex-col space-y-6 w-full">
             <h2 className="text-2xl font-semibold text-[#990e15]">Property Details</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-md text-gray-700 dark:text-gray-300">
               <div className="space-y-2">
-                <p><strong>Unit Type:</strong> {property.unit_type}</p>
-                <p><strong>Unit Status:</strong> {property.unit_status}</p>
+                <p><strong>Unit Type:</strong> {property.unit_type || 'N/A'}</p>
+                <p><strong>Unit Status:</strong> {property.unit_status || 'N/A'}</p>
                 <p><strong>Price:</strong> {formatCurrency(property.price)}</p>
-                <p><strong>Size:</strong> {property.square_meter} sqm.</p>
-                <p><strong>Floor Number:</strong> {property.floor_number} floor/s</p>
-                <p><strong>Parking:</strong> {property.parking}</p>
-                <p><strong>Property Status:</strong> {property.property_status}</p>
+                <p><strong>Size:</strong> {property.square_meter || 0} sqm.</p>
+                <p><strong>Floor Number:</strong> {property.floor_number || 'N/A'} floor/s</p>
+                <p><strong>Parking:</strong> {property.parking || 'None'}</p>
+                <p><strong>Property Status:</strong> {property.property_status || 'N/A'}</p>
                 <div>
                   <strong>Features & Amenities:</strong>
                   <ul className="list-disc list-inside mt-1 text-gray-700 dark:text-gray-300">
@@ -179,7 +163,6 @@ export default function PropertyPage({ recommended }) {
                     })()}
                   </ul>
                 </div>
-
               </div>
 
               <div className="border-l pl-6">
@@ -187,11 +170,8 @@ export default function PropertyPage({ recommended }) {
                 <Appointment />
               </div>
             </div>
-
-
           </div>
         </div>
-
 
         <div className="mt-6 text-center bg-gray-100 p-5 rounded-lg shadow-md dark:bg-gray-900">
           <h2 className="text-3xl font-bold text-[#990e15]">Looking for More Options?</h2>
@@ -199,26 +179,24 @@ export default function PropertyPage({ recommended }) {
             Explore a wide range of premium properties suited for your lifestyle.
             Find your dream home today!
           </p>
-          {/* Recommended Properties */}
           <h2 className="text-3xl font-bold text-[#990e15] text-center">Recommended Properties</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
-            {property?.recommended?.map((rec) => (
-
+            {Array.isArray(property.recommended) && property.recommended.map((rec) => (
               <div
                 key={rec.id}
                 className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
                 onClick={() => router.push(`/property/${rec.id}`)}
               >
                 <img
-                  src={rec.media?.[0]?.url ?? "/default-property.jpg"}
-                  alt={rec.property_name}
+                  src={rec.media?.[0]?.url || "/default-property.jpg"}
+                  alt={rec.property_name || "Recommended Property"}
                   className="w-full h-[180px] object-cover"
                 />
                 <div className="p-4">
                   <h3 className="text-lg text-left font-semibold text-[#990e15] truncate">
-                    {rec.unit_type} | {rec.property_name}
+                    {rec.unit_type || "Unit"} | {rec.property_name || "Property"}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 text-left truncate">{rec?.location}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 text-left truncate">{rec.location || 'Unknown'}</p>
                   <p className="text-base font-bold text-gray-900 dark:text-white mt-1 flex justify-between items-center">
                     <span>{formatCurrency(rec.price)}</span>
                     {rec.square_meter && (
