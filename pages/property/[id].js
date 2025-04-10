@@ -174,12 +174,11 @@ export default function PropertyPage({ recommended }) {
         </div>
 
         <div className="mt-6 text-center bg-gray-100 p-5 rounded-lg shadow-md dark:bg-gray-900">
-          <h2 className="text-3xl font-bold text-[#990e15]">Looking for More Options?</h2>
-          <p className="text-gray-600 dark:text-gray-300 mt-2">
+          <h2 className="text-3xl font-bold text-[#990e15] text-center">Recommended Properties</h2>
+                    <p className="text-gray-600 dark:text-gray-300 mt-2">
             Explore a wide range of premium properties suited for your lifestyle.
             Find your dream home today!
           </p>
-          <h2 className="text-3xl font-bold text-[#990e15] text-center">Recommended Properties</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-8">
             {Array.isArray(property.recommended) && property.recommended.map((rec) => (
               <div
