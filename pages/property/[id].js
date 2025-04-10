@@ -85,7 +85,9 @@ export default function PropertyPage({ recommended }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           {/* Left: Property Media & Title */}
           <div>
-            <h1 className="text-4xl font-extrabold text-[#990e15]">{property.property_name}</h1>
+          <h1 className="text-4xl font-extrabold text-[#990e15]">
+  {property?.property_name || 'N/A'}
+</h1>
             <p className="text-lg text-gray-500 mt-2">{property.location}</p>
 
             <div className="mt-6 grid grid-cols-1 gap-4">
