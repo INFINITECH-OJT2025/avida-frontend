@@ -1,6 +1,6 @@
 // File: C:/laragon/www/real-estate-frontend/utils/auth.js
 
-const API_URL = "http://localhost:8000/api";
+const API_URL = "https://infinitech-api3.site/api";
 const TOKEN_KEY = "jwt"; // Unified token key for consistency
 
 // 🟢 Decode JWT Token to check expiration

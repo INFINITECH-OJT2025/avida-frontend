@@ -56,7 +56,7 @@ const JobListings = () => {
 >
   {heroImage && (
     <img
-      src={`http://localhost:8000/storage/${heroImage}`}
+      src={`https://infinitech-api3.site/storage/${heroImage}`}
       alt="Hero Background"
       className="absolute inset-0 w-full h-full object-cover"
     />

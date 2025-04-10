@@ -46,7 +46,7 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
 
         setImagePreviews(
           existingImages.map((img) => ({
-            src: img.startsWith("http") ? img : `http://localhost:8000/storage/${img}`,
+            src: img.startsWith("http") ? img : `https://infinitech-api3.site/storage/${img}`,
             title: img,
             isExisting: true,
           }))
