@@ -7,6 +7,7 @@ import ContactInquiry from "../src/components/user/services/contact-us";
 import WhyChooseUs from "../src/components/user/about/WhyChooseUs";
 import { callAPI } from "../src/utils/api"; // ✅ Import API utility
 import SEOComponent from "../src/hooks/useSEO";
+import { getApprovedProperties } from "../src/utils/api";
 
 export default function LandingPage() {
   const [featuredProperties, setFeaturedProperties] = useState([]);
@@ -20,42 +21,42 @@ export default function LandingPage() {
   useEffect(() => {
     async function fetchProperties() {
       try {
-        const data = await callAPI("get", "/properties");
-  
-        const approvedProperties = data.filter(
-          (property) => property.status === "approved"
-        );
-  
+        const data = await getApprovedProperties(); // ✅ cleaner call
+
+        const approvedProperties = Array.isArray(data)
+          ? data.filter((p) => p.status === "approved" && p.media?.length > 0)
+          : [];
+
         const storedData = JSON.parse(localStorage.getItem("featured_properties"));
         const lastShuffled = localStorage.getItem("shuffle_timestamp");
         const oneWeek = 7 * 24 * 60 * 60 * 1000;
-  
+
         const now = Date.now();
-  
-        // ✅ Reuse cached shuffle if within 1 week
+
+
         if (storedData && lastShuffled && now - lastShuffled < oneWeek) {
           setFeaturedProperties(storedData);
         } else {
-          // ✅ Shuffle array
+
           const shuffled = approvedProperties
-            .map((item) => ({ item, sort: Math.random() })) // assign random sort key
-            .sort((a, b) => a.sort - b.sort) // sort randomly
-            .map(({ item }) => item); // extract back the original array
-  
-          const limited = shuffled.slice(0, 3); // ✅ Limit to 3
-  
-          setFeaturedProperties(limited);
-          localStorage.setItem("featured_properties", JSON.stringify(limited));
+            .map((item) => ({ item, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map(({ item }) => item)
+            .slice(0, 3); // ✅ limit to 3
+
+
+          setFeaturedProperties(shuffled);
+          localStorage.setItem("featured_properties", JSON.stringify(shuffled));
           localStorage.setItem("shuffle_timestamp", now);
         }
       } catch (error) {
         console.error("Error fetching properties:", error);
       }
     }
-  
+
     fetchProperties();
   }, []);
-  
+
 
   const getPropertyImage = (property) => {
     if (property.property_panorama_images?.length > 0) {
@@ -64,6 +65,14 @@ export default function LandingPage() {
       return property.property_lightbox_media[0];
     }
     return "/default-property.jpg";
+  };
+  const getImageUrl = (mediaArray) => {
+    if (!mediaArray || mediaArray.length === 0 || !mediaArray[0]?.url) {
+      return "/default-property.jpg";
+    }
+
+    const url = mediaArray[0].url;
+    return url.startsWith("http") ? url : `http://localhost:8000${url}`;
   };
 
   return (
@@ -106,24 +115,31 @@ export default function LandingPage() {
               featuredProperties.map((property, index) => (
                 <div key={index} className="bg-card text-text rounded-lg shadow-md overflow-hidden">
                   <img
-                    src={
-                      property.media?.length > 0
-                        ? property.media[0].url
-                        : "/default-property.jpg"
-                    }
+                    src={getImageUrl(property.media)}
                     alt={property.property_name || "Property Image"}
                     className="w-full h-60 object-cover"
+                    onError={(e) => { e.target.src = "/default-property.jpg"; }}
+                    loading="lazy"
                   />
+
                   <div className="p-4">
                     <h3 className="text-xl font-semibold truncate">{property.property_name}</h3>
                     <p className="text-gray-700 dark:text-gray-300 truncate">{property.location}</p>
-                    <p>
-                      ₱
-                      {parseFloat(property.price).toLocaleString("en-PH", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                    <p className="flex justify-between items-center">
+                      <span>
+                        ₱
+                        {parseFloat(property.price).toLocaleString("en-PH", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                      {property.square_meter && (
+                        <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">
+                          {parseFloat(property.square_meter)}sqm.
+                        </span>
+                      )}
                     </p>
+
                   </div>
                 </div>
               ))
@@ -148,8 +164,8 @@ export default function LandingPage() {
           </button>
         </div>
       </section>
-{/* ✅ WHY CHOOSE US SECTION */}
-<WhyChooseUs about={{ sustainability: "We are the recognized leader and preferred provider of integrated, master-planned and sustainable communities for middle income Filipino families." }} />
+      {/* ✅ WHY CHOOSE US SECTION */}
+      <WhyChooseUs about={{ sustainability: "We are the recognized leader and preferred provider of integrated, master-planned and sustainable communities for middle income Filipino families." }} />
 
       {/* ✅ CALL TO ACTION */}
       <section className="bg-[#990e15] text-white py-16 text-center">
@@ -167,9 +183,9 @@ export default function LandingPage() {
 
       {/* ✅ CONTACT INQUIRY */}
       <section className="bg-gray-100 dark:bg-gray-900 py-16 px-4 max-w-5xl mx-auto">
-  <h2 className="text-3xl md:text-4xl font-bold text-primary text-center mb-8">Contact us</h2>
-  <ContactInquiry />
-</section>
+        <h2 className="text-3xl md:text-4xl font-bold text-primary text-center mb-8">Contact us</h2>
+        <ContactInquiry />
+      </section>
 
 
       <Footer />

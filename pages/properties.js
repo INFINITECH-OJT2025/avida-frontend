@@ -14,7 +14,6 @@ import { exportComparisonToPDF } from "../src/components/pdf/ExportComparisonPDF
 export default function PropertiesPage() {
   const [properties, setProperties] = useState([]);
   const [filteredProperties, setFilteredProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({
     searchTerm: "",
@@ -38,9 +37,7 @@ export default function PropertiesPage() {
 
       const formattedProperties = data.map((property) => ({
         ...property,
-        images: property.media.map((media) =>
-          media.url.startsWith("https") ? media.url : `${API_BASE_URL}${media.url}`
-        ),
+        images: property.media.map((media) => media.url)
       }));
 
       setProperties(formattedProperties);
@@ -49,7 +46,7 @@ export default function PropertiesPage() {
       console.error("Error fetching properties:", error);
       setError(error.message);
     } finally {
-      setLoading(false);
+       
     }
   }, []);
 
@@ -129,7 +126,6 @@ export default function PropertiesPage() {
   };
 
 
-  if (loading) return <p className="text-center text-gray-600 mt-10">Loading properties...</p>;
   if (error) return <p className="text-center text-red-600 mt-10">{error}</p>;
 
   return (
@@ -139,23 +135,23 @@ export default function PropertiesPage() {
 
       {/* Hero Section */}
       <div className="relative bg-[#990e15] text-white py-12 text-center">
-  <div className="max-w-4xl mx-auto">
-    <h1 className="text-3xl md:text-4xl font-extrabold mt-16 ">Find Your Dream Property</h1>
-    <p className="text-base md:text-lg text-gray-200 mt-2">Search by name, location, price, and more.</p>
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-extrabold mt-16 ">Find Your Dream Property</h1>
+          <p className="text-base md:text-lg text-gray-200 mt-2">Search by name, location, price, and more.</p>
 
-    {/* 🔹 Search Bar with Icon */}
-    <div className="mt-4 flex justify-center gap-2 relative w-full sm:w-2/3 md:w-1/2 mx-auto">
-      <input
-        type="text"
-        placeholder="Search properties..."
-        className="p-2 pl-4 pr-10 w-full border rounded-lg text-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-gray-300 outline-none"
-        value={filters.searchTerm}
-        onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
-      />
-      <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-    </div>
-  </div>
-</div>
+          {/* 🔹 Search Bar with Icon */}
+          <div className="mt-4 flex justify-center gap-2 relative w-full sm:w-2/3 md:w-1/2 mx-auto">
+            <input
+              type="text"
+              placeholder="Search properties..."
+              className="p-2 pl-4 pr-10 w-full border rounded-lg text-gray-700 dark:bg-gray-800 dark:text-white focus:ring-2 focus:ring-gray-300 outline-none"
+              value={filters.searchTerm}
+              onChange={(e) => handleFilterChange("searchTerm", e.target.value)}
+            />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+          </div>
+        </div>
+      </div>
 
       {/* 🔹 Filter Bar (Fixed for Dark Mode) */}
       <div className="bg-white dark:bg-gray-800 shadow-md py-4 px-6 flex flex-wrap justify-center gap-4 border-b dark:border-gray-600">
@@ -214,21 +210,17 @@ export default function PropertiesPage() {
                 onClick={() => router.push(`/property/${property.id}`)}
               >
                 <div className="relative w-full h-[220px] overflow-hidden">
-                  {property.images && property.images.length > 0 && property.images[0] ? (
-                    <Image
-                      src={property.images[0]}
-                      alt={property.property_name || "Property Image"}
-                      width={350}
-                      height={220}
-                      className="w-full h-full object-cover rounded-t-lg"
-                      priority
-                      quality={85}
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-300 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300">
-                      No Image Available
-                    </div>
-                  )}
+                <Image
+src={property.media[0].url}
+  alt={property.property_name || "Property Image"}
+  width={350}
+  height={220}
+  className="w-full h-full object-cover rounded-t-lg"
+  onError={(e) => {
+    e.target.src = "/fallback.jpg"; // Add a fallback image in /public
+  }}
+/>
+
 
                   {/* ✅ Updated Comparison Button with X icon */}
                   <div className="absolute top-2 right-2 z-10">
@@ -270,20 +262,20 @@ export default function PropertiesPage() {
                   </h2>
                   <p className="text-xs text-gray-600 dark:text-gray-300 truncate">{property.location}</p>
                   <p className="text-lg font-semibold text-gray-900 dark:text-white mt-1 flex justify-between items-center">
-  <span>
-    {new Intl.NumberFormat("en-PH", {
-      style: "currency",
-      currency: "PHP",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(property.price)}
-  </span>
-  {property.square_meter && (
-    <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
-      {parseFloat(property.square_meter)} sqm.
-    </span>
-  )}
-</p>
+                    <span>
+                      {new Intl.NumberFormat("en-PH", {
+                        style: "currency",
+                        currency: "PHP",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(property.price)}
+                    </span>
+                    {property.square_meter && (
+                      <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">
+                        {parseFloat(property.square_meter)} sqm.
+                      </span>
+                    )}
+                  </p>
 
 
                 </div>
@@ -363,19 +355,17 @@ export default function PropertiesPage() {
                                 .filter((media) => media.type === "image")
                                 .slice(0, 3)
                                 .map((media, idx) => (
-                                  <a
-                                    key={idx}
-                                    href={media.url}
-                                    data-lightbox={`property-gallery-${p.id}`}
-                                  >
+                                  <a href={media.url} data-lightbox={`property-gallery-${p.id}`}>
                                     <Image
                                       src={media.url}
                                       alt={`Image ${idx + 1}`}
                                       width={80}
                                       height={80}
                                       className="rounded-md object-cover border w-[80px] h-[80px] cursor-pointer"
+                                      loading="lazy"
                                     />
                                   </a>
+
                                 ))}
                             </div>
                           </td>
@@ -397,28 +387,28 @@ export default function PropertiesPage() {
                             className={`p-2 border-l ${i !== 0 ? 'border-gray-300 dark:border-gray-700' : ''}`}
                           >
                             {key === "price"
-  ? `₱${Number(p[key]).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
-  : key === "square_meter"
-  ? `${p[key]} sqm.`
-  : key === "floor_number"
-  ? `${p[key]} floor${p[key] > 1 ? "s" : ""}`
+                              ? `₱${Number(p[key]).toLocaleString("en-PH", { minimumFractionDigits: 2 })}`
+                              : key === "square_meter"
+                                ? `${p[key]} sqm.`
+                                : key === "floor_number"
+                                  ? `${p[key]} floor${p[key] > 1 ? "s" : ""}`
 
-                              : key === "features_amenities"
-                                ? (() => {
-                                  try {
-                                    const amenities = typeof p[key] === "string" ? JSON.parse(p[key]) : p[key];
-                                    return (
-                                      <ul className="list-disc list-inside">
-                                        {amenities.map((amenity, i) => (
-                                          <li key={i}>{amenity}</li>
-                                        ))}
-                                      </ul>
-                                    );
-                                  } catch (error) {
-                                    return <span className="text-red-500">Invalid Data</span>;
-                                  }
-                                })()
-                                : p[key]}
+                                  : key === "features_amenities"
+                                    ? (() => {
+                                      try {
+                                        const amenities = typeof p[key] === "string" ? JSON.parse(p[key]) : p[key];
+                                        return (
+                                          <ul className="list-disc list-inside">
+                                            {amenities.map((amenity, i) => (
+                                              <li key={i}>{amenity}</li>
+                                            ))}
+                                          </ul>
+                                        );
+                                      } catch (error) {
+                                        return <span className="text-red-500">Invalid Data</span>;
+                                      }
+                                    })()
+                                    : p[key]}
                           </td>
                         ))}
                       </tr>
