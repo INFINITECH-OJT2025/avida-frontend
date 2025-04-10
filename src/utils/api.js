@@ -3,7 +3,7 @@ import axios from "axios";
 import { useToast } from "../context/ToastContext"; // adjust the relative path as needed
 
 // ✅ Load API Base URL from Environment Variables
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://infinitech-api3.site/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://infinitech-api3.site/';
 
 const API = axios.create({
   baseURL: API_BASE_URL,
@@ -157,5 +157,6 @@ export const getProperties = () => callAPI("get", "/admin/properties");
 export const updatePropertyStatus = (id, status) => callAPI("patch", `/admin/property/${id}`, { status });
 export const deletePropertyById = (id) =>callAPI("delete", `/admin/property/${id}`);
 export const getSingleProperty = (id) => callAPI("get", `/properties/${id}`);
+export const getApprovedProperties = () => callAPI("get", "/properties");
 
 export default API;
