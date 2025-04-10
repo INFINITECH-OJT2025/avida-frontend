@@ -12,7 +12,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pd
 
 const JobApplicationsTable = () => {
   const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
+ 
   const [error, setError] = useState("");
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [resumeFile, setResumeFile] = useState(null);
@@ -27,15 +27,15 @@ const JobApplicationsTable = () => {
 
   
   useEffect(() => {
-    setLoading(true);
+     
     callAPI("get", "/admin/job-applications")
       .then((data) => {
         setApplications(data);
-        setLoading(false);
+ 
       })
       .catch(() => {
         showToast("Failed to load applications");
-        setLoading(false);
+ 
       });
       const handleClickOutside = (e) => {
         if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -128,9 +128,7 @@ const JobApplicationsTable = () => {
 
   return (
     <div className="max-w-full ml-auto py-12 px-10 relative">
-      {loading ? (
-        <p className="text-center text-gray-500">Loading job applications...</p>
-      ) : (
+      {(
         <>
           <h1 className="text-3xl font-bold text-[#990e15] mb-6">Job Applications</h1>
 

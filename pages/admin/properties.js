@@ -67,7 +67,7 @@ export function MediaDisplay({ viewProperty }) {
 
 export default function AdminProperties() {
   const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
+ 
   const [viewProperty, setViewProperty] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,7 +80,7 @@ export default function AdminProperties() {
   }, []);
 
   const fetchProperties = async () => {
-    setLoading(true);
+     
     try {
       const data = await getProperties();
       setProperties(data);
@@ -89,7 +89,7 @@ export default function AdminProperties() {
       console.error("Error fetching properties:", error);
       showToast("Failed to load properties.", "error");
     } finally {
-      setLoading(false);
+       
     }
   };
 
@@ -131,9 +131,7 @@ export default function AdminProperties() {
       <div className="p-8 max-w-7xl ml-auto mr-10 bg-white rounded-lg shadow-lg">
         <h2 className="text-5xl font-bold text-[#990e15] mb-6">Property Management</h2>
 
-        {loading ? (
-          <p className="text-gray-600">Loading properties...</p>
-        ) : (
+        { (
           <>
             <table className="w-full border border-gray-200 rounded-lg shadow-md">
               <thead>

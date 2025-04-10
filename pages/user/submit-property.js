@@ -8,7 +8,6 @@ export default function SubmitProperty() {
     const [fileCount, setFileCount] = useState(0); // Track number of files
     const [fileNames, setFileNames] = useState([]); // Optional: track file names
     const { showToast } = useToast(); // ✅ Use global toast
-    const [loading, setLoading] = useState(false); // ✅ Loading state
     const [form, setForm] = useState({
         first_name: "",
         last_name: "",
@@ -210,7 +209,7 @@ export default function SubmitProperty() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true);
+ 
 
         const validationErrors = {};
         Object.keys(form).forEach((key) => {
@@ -222,7 +221,7 @@ export default function SubmitProperty() {
         setErrors(validationErrors);
         if (Object.keys(validationErrors).length > 0) {
             showToast("Please fill in all required fields.", "error");
-            setLoading(false);
+     
             return;
         }
 
@@ -264,7 +263,7 @@ export default function SubmitProperty() {
             setPreviewMedia({ panolens: [], lightbox2: [] });
             if (form.lightbox2_media.length === 0) {
                 showToast("Please upload at least one image or video.", "error");
-                setLoading(false);
+         
                 return;
             }
 
@@ -274,7 +273,7 @@ export default function SubmitProperty() {
         } catch (err) {
             showToast("Submission failed. Please try again.", "error");
         } finally {
-            setLoading(false);
+     
         }
     };
 

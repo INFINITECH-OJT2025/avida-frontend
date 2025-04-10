@@ -4,9 +4,9 @@ import Header from "../src/components/Header";
 import Footer from "../src/components/Footer";
 import { fetchServices } from "../src/utils/api";
 import SEOComponent from "../src/hooks/useSEO";
+
 export default function ServicesPage() {
   const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -17,8 +17,6 @@ export default function ServicesPage() {
       } catch (err) {
         console.error("Error fetching services:", err);
         setError("Failed to load services. Please try again later.");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -27,7 +25,7 @@ export default function ServicesPage() {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
-            <SEOComponent />
+      <SEOComponent />
       <Header />
 
       {/* Hero Section */}
@@ -40,9 +38,7 @@ export default function ServicesPage() {
 
       {/* Service Listings */}
       <div className="container mx-auto px-6 py-12">
-        {loading ? (
-          <p className="text-center text-gray-600 dark:text-gray-300">Loading services...</p>
-        ) : error ? (
+        {error ? (
           <p className="text-center text-red-500">{error}</p>
         ) : services.length === 0 ? (
           <p className="text-center text-gray-500 dark:text-gray-400">No services available at the moment.</p>

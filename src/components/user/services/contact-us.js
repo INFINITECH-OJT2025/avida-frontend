@@ -17,7 +17,6 @@ import { fetchContacts, submitInquiry } from "../../../utils/api";
 export default function ContactForm() {
   const { showToast } = useToast();
   const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -85,10 +84,10 @@ export default function ContactForm() {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+     
     if (!isValidPhoneNumber(formData.phone)) {
       showToast("Invalid phone number. Please enter a valid 11-digit number starting with '09'.", "error");
-      setLoading(false);
+       
       return;
     }
     
@@ -128,7 +127,7 @@ export default function ContactForm() {
         showToast("Something went wrong. Please try again later.", "error");
       }
     } finally {
-      setLoading(false);
+       
     }
   };
 
@@ -256,7 +255,7 @@ export default function ContactForm() {
             maxLength="11"
           />
           <textarea name="message" value={formData.message} onChange={handleChange} placeholder="Your message..." className="input-field" rows="3" required></textarea>
-          <button type="submit" className="submit-btn">{loading ? "Sending..." : "Send Inquiry"}</button>
+          <button type="submit" className="submit-btn">Send Inquiry</button>
         </form>
       </div>
     </div>

@@ -19,7 +19,7 @@ export default function PropertyPage({ recommended }) {
 
   const [property, setProperty] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
+ 
   const [isClient, setIsClient] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState(null);
 
@@ -31,7 +31,7 @@ export default function PropertyPage({ recommended }) {
     if (!id || !isClient) return;
 
     const fetchProperty = async () => {
-      setLoading(true);
+       
       try {
         // ✅ Get current property by ID
         const data = await getSingleProperty(id);
@@ -59,7 +59,7 @@ export default function PropertyPage({ recommended }) {
       } catch (err) {
         setError(err.message || "Failed to fetch property details.");
       } finally {
-        setLoading(false);
+ 
       }
     };
     fetchProperty(); // ✅ CALL the function
@@ -73,8 +73,6 @@ export default function PropertyPage({ recommended }) {
     })}`;
   };
 
-  if (!isClient) return <p className="text-center text-gray-600 mt-10">Initializing...</p>;
-  if (loading) return <p className="text-center text-gray-600 mt-10">Loading property details...</p>;
   if (error) return <p className="text-center text-red-600 mt-10">{error}</p>;
 
   return (

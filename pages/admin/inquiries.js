@@ -7,7 +7,6 @@ export default function AdminInquiries() {
     const [inquiries, setInquiries] = useState([]);
     const [selectedInquiry, setSelectedInquiry] = useState(null);
     const [replyInquiry, setReplyInquiry] = useState(null);
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [replyMessage, setReplyMessage] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
@@ -46,7 +45,6 @@ export default function AdminInquiries() {
             setError("Reply message cannot be empty!");
             return;
         }
-        setLoading(true);
         try {
             await replyToInquiry(replyInquiry.id, { message: replyMessage });
             setReplyMessage("");
@@ -55,7 +53,6 @@ export default function AdminInquiries() {
         } catch (error) {
             setError(error.message);
         }
-        setLoading(false);
     };
 
     const updateStatus = async (id, newStatus) => {
@@ -161,8 +158,8 @@ export default function AdminInquiries() {
                         <div className="bg-white p-4 rounded-lg shadow-lg w-[320px]">
                             <h3 className="text-md font-semibold text-[#990e15]">Reply to Inquiry</h3>
                             <textarea className="w-full p-2 border rounded mt-2 text-xs focus:ring-2 focus:ring-[#990e15]" rows="3" placeholder="Type your reply..." value={replyMessage} onChange={(e) => setReplyMessage(e.target.value)}></textarea>
-                            <button className="mt-2 bg-[#990e15] text-white px-3 py-1 text-xs rounded hover:bg-red-800" onClick={sendReply} disabled={loading}>
-                                {loading ? "Sending..." : "Send"}
+                            <button className="mt-2 bg-[#990e15] text-white px-3 py-1 text-xs rounded hover:bg-red-800" onClick={sendReply}>
+                               Send
                             </button>
                             <button className="mt-2 bg-gray-500 text-white px-3 py-1 text-xs rounded ml-2" onClick={() => setReplyInquiry(null)}>Close</button>
                         </div>

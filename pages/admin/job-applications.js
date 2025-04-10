@@ -7,7 +7,7 @@ import { useToast } from "../../src/context/ToastContext";
 import SEOComponent from "../../src/hooks/useSEO";
 const JobApplicationsAdmin = () => {
   const [applications, setApplications] = useState([]);
-  const [loading, setLoading] = useState(true);
+ 
   const { showToast } = useToast(); // ✅ Toast for errors
 
   useEffect(() => {
@@ -19,14 +19,13 @@ const JobApplicationsAdmin = () => {
         console.error("Failed to load applications:", err);
         showToast("Failed to load job applications", "error");
       } finally {
-        setLoading(false);
+ 
       }
     };
 
     fetchApplications();
   }, []);
 
-  if (loading) return <p className="text-center text-gray-500">Loading applications...</p>;
 
   return (
     <AdminLayout><SEOComponent />

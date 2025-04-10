@@ -5,7 +5,6 @@ import SEOComponent from "../../src/hooks/useSEO";
 
 export default function ContactForm() {
   const [activeTab, setActiveTab] = useState("appointment");
-  const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
 
   const [appointmentData, setAppointmentData] = useState({
@@ -75,7 +74,7 @@ export default function ContactForm() {
   // ✅ Submit Handler
   const handleSubmit = async (e, formType) => {
     e.preventDefault();
-    setLoading(true);
+     
 
     const payload = formType === "appointment" ? appointmentData : inquiryData;
     const endpoint = formType === "appointment" ? "/appointments" : "/inquiries";
@@ -86,13 +85,13 @@ export default function ContactForm() {
 
     if (!emailValid) {
       showToast("Invalid email format.", "error");
-      setLoading(false);
+       
       return;
     }
 
     if (!phoneValid) {
       showToast("Invalid phone number. It must start with 09 and be 11 digits.", "error");
-      setLoading(false);
+       
       return;
     }
 
@@ -127,7 +126,7 @@ export default function ContactForm() {
       showToast("Something went wrong. Please try again.", "error");
     }
 
-    setLoading(false);
+     
   };
 
   return (
@@ -185,7 +184,7 @@ export default function ContactForm() {
             className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <button type="submit" className="submit-btn dark:bg-[#990e15] dark:hover:bg-red-700">
-            {loading ? "Booking..." : "Submit Appointment"}
+            Submit Appointment
           </button>
         </form>
       )}
@@ -226,7 +225,7 @@ export default function ContactForm() {
             className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
           <button type="submit" className="submit-btn dark:bg-[#990e15] dark:hover:bg-red-700">
-            {loading ? "Sending..." : "Submit Inquiry"}
+            Submit Inquiry
           </button>
         </form>
       )}

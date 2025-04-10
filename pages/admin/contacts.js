@@ -20,7 +20,6 @@ import SEOComponent from "../../src/hooks/useSEO";
 
 export default function AdminContacts() {
   const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -63,7 +62,7 @@ export default function AdminContacts() {
 
   const handleAddContact = async (e) => {
     e.preventDefault();
-    setLoading(true);
+
     try {
       const addedContact = await addContact(newContact);
       setContacts([...contacts, addedContact]);
@@ -72,13 +71,11 @@ export default function AdminContacts() {
     } catch (error) {
       showToast("Failed to add contact. Try again.", "error");
     } finally {
-      setLoading(false);
     }
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
       await updateContact(selectedContact.id, selectedContact);
       setContacts(
@@ -91,7 +88,6 @@ export default function AdminContacts() {
     } catch (error) {
       showToast("Failed to update contact. Try again.", "error");
     } finally {
-      setLoading(false);
     }
   };
 

@@ -7,7 +7,6 @@ import SEOComponent from "../src/hooks/useSEO";
 
 export default function ContactForm() {
   const [activeTab, setActiveTab] = useState("appointment"); // Default to Appointment tab
-  const [loading, setLoading] = useState(false);
   const { showToast } = useToast();
   const { showConfirm, ConfirmDialog } = useConfirmDialog();
 
@@ -52,7 +51,6 @@ export default function ContactForm() {
   // ✅ Handle Form Submission with Toast Confirmation
   const handleSubmit = (e, formType) => {
     e.preventDefault();
-    setLoading(true);
 
     showConfirm(
       `Are you sure you want to submit this ${formType}?`,
@@ -64,7 +62,6 @@ export default function ContactForm() {
 
   // ✅ Function to Send Data to Backend After Confirmation
   const confirmSubmit = async (formType) => {
-    setLoading(true);
   
     const endpoint =
       formType === "appointment"
@@ -112,7 +109,6 @@ export default function ContactForm() {
       }
     }
   
-    setLoading(false);
   };
   const isValidEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
@@ -170,7 +166,7 @@ export default function ContactForm() {
           <input type="time" name="appointment_time" value={appointmentData.appointment_time} onChange={(e) => handleChange(e, "appointment")} className="input-field" required />
           <textarea name="message" value={appointmentData.message} onChange={(e) => handleChange(e, "appointment")}  placeholder="Briefly describe your concern or question (e.g. unit details, job inquiry, schedule)"
  className="input-field" rows="3"></textarea>
-          <button type="submit" className="submit-btn">{loading ? "Booking..." : "Submit Appointment"}</button>
+          <button type="submit" className="submit-btn">Submit Appointment"</button>
         </form>
       )}
 
@@ -189,7 +185,7 @@ export default function ContactForm() {
           </select>
           <textarea name="message" value={inquiryData.message} onChange={(e) => handleChange(e, "inquiry")}  placeholder="Briefly describe your concern or question (e.g. unit details, job inquiry, schedule)"
  className="input-field" rows="3"></textarea>
-          <button type="submit" className="submit-btn">{loading ? "Sending..." : "Submit Inquiry"}</button>
+          <button type="submit" className="submit-btn">Submit Inquiry"</button>
         </form>
       )}
       <ConfirmDialog />

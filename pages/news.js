@@ -11,7 +11,6 @@ export default function NewsPage() {
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -26,7 +25,6 @@ export default function NewsPage() {
       } catch (error) {
         console.error("❌ Error fetching news:", error);
       } finally {
-        setLoading(false);
       }
     };
     fetchNews();
@@ -82,8 +80,6 @@ export default function NewsPage() {
     setFilteredNews(filtered);
   };
   
-
-  if (loading) return <p className="text-center text-gray-600 mt-10">Loading news...</p>;
 
   return (
     <>

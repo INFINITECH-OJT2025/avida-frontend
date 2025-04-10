@@ -13,7 +13,6 @@ import { callAPI } from "../../src/utils/api"; // ✅ Reuse API call utility
 
 export default function NewsDetails({ post }) {
   const router = useRouter();
-  if (router.isFallback) return <p className="text-center text-gray-600 mt-10">Loading...</p>;
   if (!post) return <p className="text-center text-gray-600 mt-10">Post not found</p>;
 
   return (

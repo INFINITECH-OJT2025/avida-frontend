@@ -17,11 +17,10 @@ export default function Services() {
   const itemsPerPage = 5;
   const { showToast } = useToast();
   const { showConfirm, ConfirmDialog } = useConfirmDialog();
-  const [loading, setLoading] = useState(true); // ✅ loading indicator
 
   const fetchServices = async () => {
     try {
-      setLoading(true);
+       
       const data = await getAllServices(); // ✅ updated
       setServices(data);
       showToast("Services loaded successfully!", "success");
@@ -29,7 +28,7 @@ export default function Services() {
       console.error("Error fetching services:", error);
       showToast(`Failed to fetch services: ${error.message}`, "error");
     } finally {
-      setLoading(false);
+       
     }
   };
 

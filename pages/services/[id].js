@@ -10,7 +10,7 @@ export default function ServiceDetailsPage() {
   const { id } = router.query;
 
   const [service, setService] = useState(null);
-  const [loading, setLoading] = useState(true);
+ 
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -23,14 +23,13 @@ export default function ServiceDetailsPage() {
       } catch (err) {
         setError(err.response?.data?.message || "Failed to fetch service details");
       } finally {
-        setLoading(false);
+ 
       }
     };
 
     fetchServiceDetails();
   }, [id]);
 
-  if (loading) return <p className="text-center text-gray-500">Loading...</p>;
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
   if (!service) {
     return (

@@ -7,7 +7,7 @@ export default function ServiceDetailsPage() {
   const { id } = router.query; // ✅ Use ID, not title
 
   const [service, setService] = useState(null);
-  const [loading, setLoading] = useState(true);
+ 
   const [error, setError] = useState(null);
 
   useEffect(() => {
@@ -28,14 +28,13 @@ export default function ServiceDetailsPage() {
       } catch (err) {
         setError(err.message);
       } finally {
-        setLoading(false);
+ 
       }
     };
 
     fetchServiceDetails();
   }, [id]);
 
-  if (loading) return <p className="text-center text-gray-500 mt-10">Loading service details...</p>;
   if (error) return <p className="text-center text-red-500 mt-10">Error: {error}</p>;
 
   return (

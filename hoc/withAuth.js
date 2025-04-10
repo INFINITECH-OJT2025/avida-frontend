@@ -6,7 +6,6 @@ import { fetchUser } from "../src/utils/api";
 
 const withAuth = (WrappedComponent) => {
   return function ProtectedPage(props) {
-    const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null); // Optional: Store user info
     const router = useRouter();
 
@@ -26,7 +25,6 @@ const withAuth = (WrappedComponent) => {
             throw new Error("User not found");
           }
           setUser(fetchedUser);
-          setLoading(false);
         } catch (error) {
           localStorage.removeItem("jwt");
           router.push("/auth/login");
@@ -36,9 +34,6 @@ const withAuth = (WrappedComponent) => {
       checkAuth();
     }, [router]);
 
-    if (loading) {
-      return <p className="text-center mt-20">🔒 Checking authentication...</p>;
-    }
 
     return <WrappedComponent {...props} user={user} />; // ✅ Pass user as prop if needed
   };
