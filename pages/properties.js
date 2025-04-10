@@ -26,7 +26,7 @@ export default function PropertiesPage() {
 
   const { showToast } = useToast();
   const router = useRouter();
-  const API_BASE_URL = "https://infinitech-api3.site";
+  // const API_BASE_URL = "https://infinitech-api3.site";
 
   const fetchProperties = useCallback(async () => {
     try {
