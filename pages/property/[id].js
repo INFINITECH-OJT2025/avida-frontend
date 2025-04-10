@@ -65,7 +65,6 @@ export default function PropertyPage({ recommended }) {
   };
 
   if (error) return <p className="text-center text-red-600 mt-10">{error}</p>;
-  if (!property) return <p className="text-center mt-10">Loading...</p>;
 
   return (
     <div className="dark:bg-gray-900">
