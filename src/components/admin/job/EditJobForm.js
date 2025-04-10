@@ -148,12 +148,12 @@ const EditJobForm = ({ job, onClose, onJobUpdated }) => {
             {formData.image && !formData.newImage && (
               <>
                 <img
-                  src={`https://infinitech-api3.site/storage/${formData.image}`}
+                  src={`http://localhost:8000/storage/${formData.image}`}
                   alt="Job Image"
                   className="mt-2 w-32 h-32 object-cover rounded-lg shadow-lg cursor-pointer"
                   onClick={() => setLightboxOpen(true)}
                 />
-                <Lightbox open={lightboxOpen} close={() => setLightboxOpen(false)} slides={[{ src: `https://infinitech-api3.site/storage/${formData.image}` }]} />
+                <Lightbox open={lightboxOpen} close={() => setLightboxOpen(false)} slides={[{ src: `http://localhost:8000/storage/${formData.image}` }]} />
               </>
             )}
           </div>

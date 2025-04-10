@@ -18,7 +18,6 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
     images: [],
   });
 
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [imagePreviews, setImagePreviews] = useState([]);
 
@@ -47,7 +46,7 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
 
         setImagePreviews(
           existingImages.map((img) => ({
-            src: img.startsWith("http") ? img : `https://infinitech-api3.site/storage/${img}`,
+            src: img.startsWith("http") ? img : `http://localhost:8000/storage/${img}`,
             title: img,
             isExisting: true,
           }))
@@ -84,7 +83,7 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+     
     setError(null);
   
     const token = localStorage.getItem("jwt");
@@ -121,7 +120,7 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
       console.error("Submission failed:", error.response?.data || error.message);
       setError(error.response?.data?.errors || {});
     } finally {
-      setLoading(false);
+       
     }
   };
   
@@ -174,11 +173,11 @@ export default function NewsForm({ closeModal, selectedNews, fetchNews }) {
       {error && <p className="text-red-500 text-sm">{Object.values(error).join(", ")}</p>}
 
       <div className="flex justify-end space-x-4">
-        <Button type="button" onClick={closeModal} className="border border-gray-500 text-gray-700 px-4 py-2 rounded" disabled={loading}>
+        <Button type="button" onClick={closeModal} className="border border-gray-500 text-gray-700 px-4 py-2 rounded" >
           Cancel
         </Button>
-        <Button type="submit" className="bg-[#990e15] text-white px-6 py-2 rounded" disabled={loading}>
-          {loading ? "Saving..." : selectedNews ? "Update" : "Publish"}
+        <Button type="submit" className="bg-[#990e15] text-white px-6 py-2 rounded" >
+          {selectedNews ? "Update" : "Publish"}
         </Button>
       </div>
     </form>
