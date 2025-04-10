@@ -88,7 +88,7 @@ export default function PropertyPage({ recommended }) {
           <h1 className="text-4xl font-extrabold text-[#990e15]">
   {property?.property_name || 'N/A'}
 </h1>
-            <p className="text-lg text-gray-500 mt-2">{property.location}</p>
+            <p className="text-lg text-gray-500 mt-2">{property?.location}</p>
 
             <div className="mt-6 grid grid-cols-1 gap-4">
               {/* Interactive Preview */}
@@ -218,7 +218,7 @@ export default function PropertyPage({ recommended }) {
                   <h3 className="text-lg text-left font-semibold text-[#990e15] truncate">
                     {rec.unit_type} | {rec.property_name}
                   </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 text-left truncate">{rec.location}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 text-left truncate">{rec?.location}</p>
                   <p className="text-base font-bold text-gray-900 dark:text-white mt-1 flex justify-between items-center">
                     <span>{formatCurrency(rec.price)}</span>
                     {rec.square_meter && (
