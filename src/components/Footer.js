@@ -81,7 +81,7 @@ export default function Footer({ companySlogan }) {
           <ul className="space-y-2 text-gray-300 text-sm">
             {contacts?.address && (
               <li className="flex items-start gap-3">
-                <FaMapMarkerAlt className="text-2xl mt-[2px] min-w-[1.5rem]" />
+                <FaMapMarkerAlt className="text-5xl mt-[2px] min-w-[1.5rem]" />
                 <span><strong>Office:</strong> {contacts.address}</span>
               </li>
             )}
