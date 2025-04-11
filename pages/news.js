@@ -127,49 +127,55 @@ export default function NewsPage() {
       <div className="max-w-6xl mx-auto px-6 py-8 bg-gray-100 dark:bg-gray-900">
         {filteredNews.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredNews.map((post) => (
-              <div
-                key={post.id}
-                className="bg-white dark:bg-gray-800 dark:text-white rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl"
-              >
-                {/* ✅ News Image */}
-                {post.images && post.images.length > 0 ? (
-                  <img
-                    src={Array.isArray(post.images) ? post.images[0] : JSON.parse(post.images)[0]}
-                    alt={post.title}
-                    className="w-full h-56 object-cover rounded-t-xl"
-                  />
-                ) : (
-                  <div className="w-full h-56 bg-gray-300 flex items-center justify-center text-gray-500 rounded-t-xl">
-                    No Image Available
-                  </div>
-                )}
+            {filteredNews.map((post) => {
+  const postImage = Array.isArray(post.images)
+    ? post.images[0]
+    : JSON.parse(post.images || "[]")[0];
 
-                {/* ✅ News Content */}
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">{post.title}</h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">{post.category}</p>
-                  <p className="mt-3 text-gray-700 dark:text-gray-400 text-sm line-clamp-2">
-                    {post.content.substring(0, 100)}...
-                  </p>
+  return (
+    <Link key={post.id} href={`/news/${post.id}`} passHref>
+      <div className="cursor-pointer bg-white dark:bg-gray-800 dark:text-white rounded-xl shadow-lg overflow-hidden transition-transform transform hover:scale-105 hover:shadow-xl">
+        {/* ✅ News Image */}
+        {postImage ? (
+          <img
+            src={postImage}
+            alt={post.title}
+            className="w-full h-56 object-cover rounded-t-xl"
+          />
+        ) : (
+          <div className="w-full h-56 bg-gray-300 flex items-center justify-center text-gray-500 rounded-t-xl">
+            No Image Available
+          </div>
+        )}
 
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {new Date(post.updated_at).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
-                    </span>
-                    <Link href={`/news/${post.id}`}>
-                      <span className="text-[#990e15] font-semibold hover:underline">
-                        Read More →
-                      </span>
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
+        {/* ✅ News Content */}
+        <div className="p-5">
+          <h3 className="text-lg font-bold text-gray-900 dark:text-white truncate">
+            {post.title}
+          </h3>
+          <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">{post.category}</p>
+          <p className="mt-3 text-gray-700 dark:text-gray-400 text-sm line-clamp-2">
+            {post.content.substring(0, 100)}...
+          </p>
+
+          <div className="mt-4 flex items-center justify-between">
+            <span className="text-xs text-gray-500">
+              {new Date(post.updated_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </span>
+            <span className="text-[#990e15] font-semibold hover:underline">
+              Read More →
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  );
+})}
+
           </div>
         ) : (
           <p className="text-center text-gray-600 mt-10">No news available for this category.</p>
