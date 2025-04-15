@@ -144,7 +144,10 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
       images.forEach(({ file }) => {
         payload.append("lightbox2_media[]", file);
       });
-  
+      console.log("Submitting payload to:", initialData ? "UPDATE" : "ADD");
+for (let pair of payload.entries()) {
+  console.log(pair[0], pair[1]);
+}
       if (!initialData) {
         if (!/^09\d{9}$/.test(formData.phone_number)) {
           showToast("Phone number must start with 09 and be 11 digits.", "error");
@@ -175,10 +178,7 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
     } finally {
       setLoading(false); // 🔴 End loader
     }
-    console.log("Submitting payload to:", initialData ? "UPDATE" : "ADD");
-for (let pair of payload.entries()) {
-  console.log(pair[0], pair[1]);
-}
+
 
   };
   
