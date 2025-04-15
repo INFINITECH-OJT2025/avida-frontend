@@ -135,7 +135,7 @@ export default function AdminLayout({ children }) {
         <div className="p-5">
           <button
             onClick={toggleDarkMode}
-            className="flex items-center justify-between w-full p-2 rounded-md bg-gray-700 text-white hover:bg-gray-600 transition mb-4"
+            className="flex items-center justify-start w-full p-2 rounded-md bg-gray-700 text-white hover:bg-gray-600 transition mb-4"
           >
             {darkMode ? <Sun size={18} /> : <Moon size={18} />}
             <span className="ml-2">{darkMode ? "Light Mode" : "Dark Mode"}</span>

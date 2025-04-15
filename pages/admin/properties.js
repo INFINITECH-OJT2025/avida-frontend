@@ -73,6 +73,7 @@ const handleEdit = (property) => {
     <AdminLayout>
       <SEOComponent />
       <div className="p-6 max-w-7xl mx-auto">
+
       <PropertiesTable
   properties={properties}
   onUpdateStatus={handleUpdateStatus}
