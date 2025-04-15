@@ -175,6 +175,11 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
     } finally {
       setLoading(false); // 🔴 End loader
     }
+    console.log("Submitting payload to:", initialData ? "UPDATE" : "ADD");
+for (let pair of payload.entries()) {
+  console.log(pair[0], pair[1]);
+}
+
   };
   
   
