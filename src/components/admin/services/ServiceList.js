@@ -47,7 +47,7 @@ export default function ServiceList({ services, refreshServices }) {
   };
 
   return (
-    <div className="overflow-visible">
+    <div className="overflow-visible ">
       <table className="w-full border bg-white shadow-sm rounded-lg">
         <thead>
           <tr className="bg-[#990e15] text-white text-left">

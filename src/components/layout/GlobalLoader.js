@@ -1,4 +1,4 @@
-// components/GlobalLoader.js
+// src\components\layout\GlobalLoader.js
 import { useEffect, useState } from 'react';
 
 const GlobalLoader = ({ show }) => {

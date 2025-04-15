@@ -24,8 +24,8 @@ export default function SubmitProperty() {
         parking: "",
         property_status: "",
         features_amenities: [],
-        panolens_images: [],
-        lightbox2_media: [],
+        lightbox2_media: [], 
+       panolens_images: [],
     });
 
     const [errors, setErrors] = useState({});
@@ -439,12 +439,6 @@ export default function SubmitProperty() {
                             ))}
                         </div></div>
 
-
-                    {/* <div>
-                    <label className="text-[#990e15]">Upload Panorama Images (Optional)</label>
-                    <input type="file" multiple accept="image/*" onChange={handlePanolensUpload}  className="p-2 border rounded w-full dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
-                </div> */}
-
                     {/* ✅ Upload Normal Images & Videos for Lightbox2 */}
                     <div>
                         <label className="text-[#990e15]">Upload Images & Videos</label>
@@ -478,15 +472,6 @@ export default function SubmitProperty() {
                                     >
                                         ✕
                                     </button>
-                                    {/* Preview 360° Images */}
-                                    {/* {previewMedia.panolens.length > 0 && (
-                        <div>
-                            <h4 className="text-lg font-semibold text-[#990e15]">Panorama Images (Optional)</h4>
-                            {previewMedia.panolens.map((media, index) => (
-                                <iframe key={index} src={media.url} className="w-full h-40 rounded-lg shadow-md" allowFullScreen></iframe>
-                            ))}
-                        </div>
-                    )} */}
                                     {/* 📸 Image or 🎞️ Video Preview */}
                                     {media.type === "image" ? (
                                         <img

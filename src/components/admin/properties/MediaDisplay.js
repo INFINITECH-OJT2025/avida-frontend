@@ -1,8 +1,5 @@
-// components/admin/properties/MediaDisplay.jsx
-"use client";
-
-import { PhotoProvider, PhotoView } from "react-photo-view";
-import "react-photo-view/dist/react-photo-view.css";
+import { PhotoProvider, PhotoView } from 'react-photo-view';
+import 'react-photo-view/dist/react-photo-view.css';
 
 export default function MediaDisplay({ media = [], propertyName = "Property" }) {
   if (!media.length) {
@@ -17,7 +14,7 @@ export default function MediaDisplay({ media = [], propertyName = "Property" }) 
             <video
               key={index}
               src={item.url}
-              className="w-10 h-10 object-cover rounded"
+              className="w-40 h-40 object-cover rounded"
               controls
             />
           ) : (
