@@ -160,6 +160,8 @@ export const deletePropertyById = (id) =>callAPI("delete", `/admin/property/${id
 export const getSingleProperty = (id) => callAPI("get", `/properties/${id}`);
 export const getApprovedProperties = () => callAPI("get", "/properties");
 export const adminAddProperty = (data) => callAPI("post", "/admin/property-add", data, true);
-export const adminUpdateProperty = (id, data) => callAPI("put", `/admin/property-update/${id}`, data, true);
+export const adminUpdateProperty = (id, data) =>
+  callAPI("post", `/admin/property-update/${id}`, data, true); // Just POST
+
 
 export default API;

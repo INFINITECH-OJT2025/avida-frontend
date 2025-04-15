@@ -160,12 +160,14 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
       }
   
       if (initialData) {
+        payload.append('_method', 'PUT'); // 🔥 This makes Laravel treat it as a PUT
         await adminUpdateProperty(initialData.id, payload);
         showToast("Property updated successfully!", "success");
       } else {
         await adminAddProperty(payload);
         showToast("Property added successfully!", "success");
       }
+      
   
       onClose();
       onSuccess();
