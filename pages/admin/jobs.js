@@ -1,4 +1,4 @@
-// pages\admin\jobs.js
+// pages/admin/jobs.js
 
 import { useState } from "react";
 import JobTable from "../../src/components/admin/job/JobTable";
@@ -9,6 +9,7 @@ import AdminLayout from "../../src/components/layout/AdminLayout";
 import { useToast } from "../../src/context/ToastContext"; // ✅ Import ToastContext
 import { callAPI } from "../../src/utils/api"; // ✅ Import callAPI
 import SEOComponent from "../../src/hooks/useSEO";
+
 const JobPage = () => {
   const { showToast } = useToast();
 
@@ -27,40 +28,44 @@ const JobPage = () => {
       console.error("Error deleting job:", error);
     }
   };
-  
+
   return (
-    <AdminLayout> <SEOComponent />
-      <div className="flex flex-col items-center space-y-6 p-6">
-        <JobTable 
-          key={refresh} 
-          onView={setSelectedJob} 
-          onEdit={setEditingJob} 
-          onDelete={handleDelete} 
-          onAdd={() => setShowAddModal(true)} 
-        />
-
-        {/* Add Job Modal */}
-        {showAddModal && (
-          <AddJobForm 
-            onClose={() => setShowAddModal(false)} 
-            onJobAdded={() => setRefresh(!refresh)} 
+    <AdminLayout>
+      <SEOComponent />
+      <div className="flex justify-center w-full px-8 py-10">
+        <div className="flex flex-col w-full max-w-[90rem] space-y-10">
+          
+          <JobTable
+            key={refresh}
+            onView={setSelectedJob}
+            onEdit={setEditingJob}
+            onDelete={handleDelete}
+            onAdd={() => setShowAddModal(true)}
           />
-        )}
 
-        {/* Job Details Modal */}
-        <JobModal 
-          job={selectedJob} 
-          onClose={() => setSelectedJob(null)} 
-        />
+          {/* Add Job Modal */}
+          {showAddModal && (
+            <AddJobForm
+              onClose={() => setShowAddModal(false)}
+              onJobAdded={() => setRefresh(!refresh)}
+            />
+          )}
 
-        {/* Edit Job Modal */}
-        {editingJob && (
-          <EditJobForm 
-            job={editingJob} 
-            onClose={() => setEditingJob(null)} 
-            onJobUpdated={() => setRefresh(!refresh)} 
+          {/* Job Details Modal */}
+          <JobModal
+            job={selectedJob}
+            onClose={() => setSelectedJob(null)}
           />
-        )}
+
+          {/* Edit Job Modal */}
+          {editingJob && (
+            <EditJobForm
+              job={editingJob}
+              onClose={() => setEditingJob(null)}
+              onJobUpdated={() => setRefresh(!refresh)}
+            />
+          )}
+        </div>
       </div>
     </AdminLayout>
   );
