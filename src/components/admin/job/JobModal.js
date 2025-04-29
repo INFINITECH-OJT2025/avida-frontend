@@ -27,14 +27,14 @@ const JobModal = ({ job, onClose }) => {
   return (
     <div className="fixed inset-0 flex justify-center items-center z-50 p-4">
       <div ref={modalRef} className="bg-white p-5 rounded-xl shadow-lg w-full max-w-2xl relative border">
-
+        
         {/* Close Button */}
         <button
-          onClick={onClose}
-          className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-500 shadow-md flex items-center justify-center text-black hover:text-red-600 hover:scale-110 transition-all duration-200 z-50"
-        >
-          <span className="text-2xl leading-none">&times;</span>
-        </button>
+  onClick={onClose}
+  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-500 shadow-md flex items-center justify-center text-black hover:text-red-600 hover:scale-110 transition-all duration-200 z-50"
+>
+  <span className="text-2xl leading-none">&times;</span>
+</button>
 
         {/* Job Image (Click to Open in Lightbox) */}
         {job.image && (
@@ -53,8 +53,9 @@ const JobModal = ({ job, onClose }) => {
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-lg font-bold text-[#990e15]">{job.title}</h2>
           <span
-            className={`px-3 py-1 text-xs font-medium rounded-lg ${job.status === "Published" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-700"
-              }`}
+            className={`px-3 py-1 text-xs font-medium rounded-lg ${
+              job.status === "Published" ? "bg-green-100 text-green-700" : "bg-gray-200 text-gray-700"
+            }`}
           >
             {job.status}
           </span>
@@ -87,11 +88,11 @@ const JobModal = ({ job, onClose }) => {
         </div>
 
         {/* Close Button */}
-        {/* <div className="mt-4 flex justify-end">
+        <div className="mt-4 flex justify-end">
           <button className="bg-red-600 text-white px-3 py-1.5 rounded-lg hover:bg-red-700 text-xs transition" onClick={onClose}>
             Close
           </button>
-        </div> */}
+        </div>
       </div>
     </div>
   );

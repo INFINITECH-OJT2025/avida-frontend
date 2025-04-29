@@ -13,7 +13,6 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
     coverLetter: "",
     resume: null,
     linkedin: "",
-    accepted_terms: false,
   });
 
   const [emailValid, setEmailValid] = useState(true);
@@ -41,9 +40,8 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
   };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    const newValue = type === "checkbox" ? checked : value;
-    setFormData({ ...formData, [name]: newValue });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleEmailBlur = () => {
@@ -78,6 +76,10 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
         showToast("Resume file size should not exceed 10MB.", "error");
         return;
       }
+
+
+
+
       setFormData({ ...formData, resume: file });
     }
   };
@@ -99,10 +101,7 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
       showToast("Phone number must be numeric, 11 digits, and start with '09'.", "error");
       return;
     }
-    if (!formData.accepted_terms) {
-      showToast("You must accept the Terms and Privacy Notice to continue.", "error");
-      return;
-    }
+
     const applicationData = new FormData();
     applicationData.append("full_name", formData.fullName);
     applicationData.append("email", formData.email);
@@ -110,8 +109,6 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
     applicationData.append("cover_letter", formData.coverLetter);
     applicationData.append("resume", formData.resume);
     applicationData.append("linkedin_url", formData.linkedin);
-    applicationData.append("accepted_terms", formData.accepted_terms ? "1" : "0");
-
     applicationData.append("job_id", jobId);
 
     try {
@@ -126,7 +123,6 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
         coverLetter: "",
         resume: null,
         linkedin: "",
-        accepted_terms: false,
       });
       onClose();
     } catch (error) {
@@ -189,33 +185,34 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={handleEmailBlur}
-                className={`w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${!emailValid ? "border-red-500" : ""
-                  }`}
+                className={`w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                  !emailValid ? "border-red-500" : ""
+                }`}
               />
             </div>
 
             <div>
-              <label className="block font-semibold mb-1">Phone Number</label>
-              <input
-                type="text"
-                name="phone"
-                maxLength={11}
-                required
-                value={formData.phone}
-                onChange={(e) => {
-                  // Allow only numbers
-                  const value = e.target.value.replace(/\D/g, '');
-                  setFormData({ ...formData, phone: value });
-                }}
-                onBlur={() => {
-                  const isValid = /^09\d{9}$/.test(formData.phone);
-                  if (!isValid) {
-                    showToast("Phone number must start with '09' and be exactly 11 digits.", "error");
-                  }
-                }}
-                className="w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              />
-            </div>
+  <label className="block font-semibold mb-1">Phone Number</label>
+  <input
+    type="text"
+    name="phone"
+    maxLength={11}
+    required
+    value={formData.phone}
+    onChange={(e) => {
+      // Allow only numbers
+      const value = e.target.value.replace(/\D/g, '');
+      setFormData({ ...formData, phone: value });
+    }}
+    onBlur={() => {
+      const isValid = /^09\d{9}$/.test(formData.phone);
+      if (!isValid) {
+        showToast("Phone number must start with '09' and be exactly 11 digits.", "error");
+      }
+    }}
+    className="w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+  />
+</div>
 
 
             <div>
@@ -254,21 +251,7 @@ const JobApplicationForm = ({ jobId, isOpen, onClose }) => {
                 className="w-full border p-2 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
-            <div className="flex items-start gap-2 text-sm">
-              <input
-                type="checkbox"
-                name="accepted_terms"
-                checked={formData.accepted_terms}
-                onChange={handleChange}
-                className="mt-1"
-              />
-              <p className="leading-tight">
-                I agree to the {" "}
-                <a href="/terms" target="_blank" className="underline text-blue-600">Terms</a>{" "}
-                and {" "}
-                <a href="/privacy" target="_blank" className="underline text-blue-600">Privacy Notice</a>.
-              </p>
-            </div>
+
             <button
               type="submit"
               className="w-full mt-2 bg-[#990e15] text-white py-2 rounded-lg hover:bg-red-700 transition font-semibold"
