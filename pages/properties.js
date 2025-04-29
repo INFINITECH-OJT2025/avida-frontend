@@ -46,7 +46,7 @@ export default function PropertiesPage() {
       console.error("Error fetching properties:", error);
       setError(error.message);
     } finally {
-       
+
     }
   }, []);
 
@@ -210,16 +210,13 @@ export default function PropertiesPage() {
                 onClick={() => router.push(`/property/${property.id}`)}
               >
                 <div className="relative w-full h-[220px] overflow-hidden">
-                <Image
-src={property.media[0].url}
-  alt={property.property_name || "Property Image"}
-  width={350}
-  height={220}
-  className="w-full h-full object-cover rounded-t-lg"
-  onError={(e) => {
-    e.target.src = "/fallback.jpg"; // Add a fallback image in /public
-  }}
-/>
+                  <Image
+                    src={property.media?.[0]?.url || "/fallback.jpg"} // ✅ Use fallback if undefined
+                    alt={property.property_name || "Property Image"}
+                    width={350}
+                    height={220}
+                    className="w-full h-full object-cover rounded-t-lg"
+                  />
 
 
                   {/* ✅ Updated Comparison Button with X icon */}

@@ -1,19 +1,16 @@
 // utils/api.js
 import axios from "axios";
-import { useToast } from "../context/ToastContext"; // adjust the relative path as needed
 
-// ✅ Load API Base URL from Environment Variables
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://infinitech-api3.site/api';
-
 
 const API = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     Accept: "application/json",
-  },
+  },  
+  withCredentials: true,
 });
 
-// ✅ Automatically Attach Token to Requests
 API.interceptors.request.use((config) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("jwt") : null;
   if (token) {
@@ -22,7 +19,6 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ Handle API Errors Globally
 API.interceptors.response.use(
   response => response,
   error => {
@@ -34,13 +30,10 @@ API.interceptors.response.use(
         window.dispatchEvent(event);
       }
     }
-
     return Promise.reject(error);
   }
 );
 
-
-// ✅ Reusable API Wrapper
 export const callAPI = async (method, endpoint, data = null, isFormData = false) => {
   try {
     const config = {
@@ -49,11 +42,7 @@ export const callAPI = async (method, endpoint, data = null, isFormData = false)
       ...(method.toLowerCase() === "get" ? {} : { data }),
     };
 
-    if (isFormData) {
-      // Let the browser set the proper multipart boundary
-      // config.headers = { ...config.headers };
-      // delete config.headers["Content-Type"];
-    } else {
+    if (!isFormData) {
       config.headers = {
         "Content-Type": "application/json",
       };
@@ -66,6 +55,7 @@ export const callAPI = async (method, endpoint, data = null, isFormData = false)
     throw err;
   }
 };
+
 // 🔹 ADMIN DASHBOARD ANALYTICS API CALLS
 export const fetchDashboardStats = () => callAPI("get", "/admin/dashboard/stats");
 export const fetchPropertyTrends = () => callAPI("get", "/admin/dashboard/property-trends");
@@ -96,19 +86,16 @@ export const sendAppointmentMessage = (id, data) => callAPI("post", `/admin/appo
 export const createProperty = (data) => callAPI("post", "/submit-property", data, true);
 export const updateProperty = (id, data) => callAPI("post", `/properties/${id}?_method=PUT`, data, true);
 
-
 // 🔹 CONTACTS
-// 🌐 Public: For Footer or any non-authenticated user
 export const getPublicContacts = () => callAPI("get", "/contacts");
 
 // 🔐 Admin: Authenticated view in dashboard
 export const getAdminContacts = () => callAPI("get", "/admin/contacts");
-
-
 export const addContact = (data) => callAPI("post", "/admin/contacts", data);
 export const updateContact = (id, data) => callAPI("put", `/admin/contacts/${id}`, data);
 export const deleteContact = (id) => callAPI("delete", `/admin/contacts/${id}`);
 export const fetchContacts = () => callAPI("get", "/contacts");
+
 // 🔹 INQUIRIES
 export const submitInquiry = (data) => callAPI("post", "/inquiries", data);
 export const getInquiries = () => callAPI("get", "/admin/inquiries");
@@ -124,7 +111,6 @@ export const createService = (data) => callAPI("post", "/admin/services", data, 
 export const updateService = (id, data) => callAPI("put", `/admin/services/${id}`, data, true);
 export const updateServiceStatus = (id, status) => callAPI("patch", `/admin/services/${id}/status`, { status }); // ✅ PATCH status only
 export const deleteService = (id) => callAPI("delete", `/admin/services/${id}`);
-
 
 // 🔹 NEWS
 export const getNewsList = () => callAPI("get", "/news");
@@ -151,7 +137,7 @@ export const updateAboutDetails = (data) => callAPI("put", "/admin/about-us/upda
 export const updateAboutStatus = (data) => callAPI("put", "/admin/about-us/update-status", data);
 export const updateAboutImages = (data) => callAPI("post", "/admin/about-us/update", data, true);
 export const fetchAboutUs = () => callAPI("get", "/admin/about-us");
-
+export const createAboutUs = (data) => callAPI("post", "/admin/about-create", data); 
 
 // 🔹 PROPERTIES
 export const getProperties = () => callAPI("get", "/admin/properties");
@@ -160,8 +146,14 @@ export const deletePropertyById = (id) =>callAPI("delete", `/admin/property/${id
 export const getSingleProperty = (id) => callAPI("get", `/properties/${id}`);
 export const getApprovedProperties = () => callAPI("get", "/properties");
 export const adminAddProperty = (data) => callAPI("post", "/admin/property-add", data, true);
-export const adminUpdateProperty = (id, data) =>
-  callAPI("post", `/admin/property-update/${id}`, data, true); // Just POST
+export const adminUpdateProperty = (id, data) =>callAPI("post", `/admin/property-update/${id}`, data, true); // Just POST
 
+// 🔹 POLICIES CRUD
+export const getPolicies = () => callAPI("get", "/admin/policies");
+export const addPolicy = (data) => callAPI("post", "/admin/policies", data);
+export const updatePolicy = (id, data) => callAPI("put", `/admin/policies/${id}`, data);
+export const deletePolicy = (id) => callAPI("delete", `/admin/policies/${id}`);
+export const getPublicTerms = () => callAPI("get", "/terms");
+export const getPublicPrivacy = () => callAPI("get", "/privacy");
 
 export default API;

@@ -72,7 +72,7 @@ export default function LandingPage() {
     }
 
     const url = mediaArray[0].url;
-    return url.startsWith("http") ? url : `http://localhost:8000${url}`;
+    return url.startsWith("http") ? url : `https://infinitech-api3.site${url}`;
   };
 
   return (

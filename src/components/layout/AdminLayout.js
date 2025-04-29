@@ -66,6 +66,7 @@ export default function AdminLayout({ children }) {
               <li><Link href="/admin/properties" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><Building size={18} /> <span>Properties</span></Link></li>
               <li><Link href="/admin/services" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><Briefcase size={18} /> <span>Services</span></Link></li>
               <li><Link href="/admin/news" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><FileText size={18} /> <span>News</span></Link></li>
+              <li><Link href="/admin/policies" className="flex items-center space-x-2 hover:bg-red-700 p-2 rounded-md"><FileText size={18} /> <span>Policies</span></Link></li>
 
               {/* Job Listings Dropdown */}
               <li>

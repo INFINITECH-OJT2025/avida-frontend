@@ -26,6 +26,7 @@ export default function SubmitProperty() {
         features_amenities: [],
         lightbox2_media: [], 
        panolens_images: [],
+       accepted_terms: false,
     });
 
     const [errors, setErrors] = useState({});
@@ -224,7 +225,11 @@ export default function SubmitProperty() {
      
             return;
         }
-
+        if (!form.accepted_terms) {
+            showToast("You must accept the Terms and Privacy Notice to continue.", "error");
+            return;
+          }
+          
         const formData = new FormData();
         Object.entries(form).forEach(([key, value]) => {
             if (Array.isArray(value) && (key === "panolens_images" || key === "lightbox2_media")) {
@@ -233,6 +238,9 @@ export default function SubmitProperty() {
                 formData.append(key, JSON.stringify(value));
             } else if (key === "price") {
                 formData.append(key, parseFloat(value.replace(/,/g, "")));
+            } else if (key === "accepted_terms") {
+                formData.append(key, value ? "1" : "0");
+              
             } else {
                 formData.append(key, value);
             }
@@ -490,6 +498,29 @@ export default function SubmitProperty() {
                             ))}
                         </div>
                     </div>
+
+                    <div className="flex items-start gap-2 text-sm">
+  <input
+    type="checkbox"
+    name="accepted_terms"
+    checked={form.accepted_terms}
+    onChange={(e) =>
+      setForm((prev) => ({ ...prev, accepted_terms: e.target.checked }))
+    }
+    className="mt-1"
+  />
+  <p className="leading-tight">
+    I agree to the{" "}
+    <a href="/terms" target="_blank" className="underline text-blue-600">
+      Terms
+    </a>{" "}
+    and{" "}
+    <a href="/privacy" target="_blank" className="underline text-blue-600">
+      Privacy Notice
+    </a>.
+  </p>
+</div>
+
                     <div className="flex justify-left mt-6">
                         <button
                             type="submit"

@@ -15,6 +15,7 @@ export default function ContactForm() {
     appointment_date: "",
     appointment_time: "",
     message: "",
+    accepted_terms: false,
   });
 
   const [inquiryData, setInquiryData] = useState({
@@ -24,79 +25,66 @@ export default function ContactForm() {
     phone: "",
     inquiry_type: "",
     message: "",
+    accepted_terms: false,
   });
 
-  // ✅ Email Validation
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-  // ✅ Phone Validation (numeric, starts with 09, 11 digits)
   const validatePhone = (phone) => /^09\d{9}$/.test(phone);
 
-  // ✅ Handle value change
   const handleChange = (e, formType) => {
-    const { name, value } = e.target;
-  
-    let cleanValue = value;
-  
+    const { name, value, type, checked } = e.target;
+    let newValue = type === "checkbox" ? checked : value;
+
     if (name.includes("phone")) {
-      // ✅ Remove non-digits
-      cleanValue = value.replace(/\D/g, "");
-  
-      // ✅ Limit to 11 digits max
-      if (cleanValue.length > 11) {
-        cleanValue = cleanValue.slice(0, 11);
-      }
+      newValue = value.replace(/\D/g, "");
+      if (newValue.length > 11) newValue = newValue.slice(0, 11);
     }
-  
+
     if (formType === "appointment") {
-      setAppointmentData((prev) => ({ ...prev, [name]: cleanValue }));
+      setAppointmentData((prev) => ({ ...prev, [name]: newValue }));
     } else {
-      setInquiryData((prev) => ({ ...prev, [name]: cleanValue }));
+      setInquiryData((prev) => ({ ...prev, [name]: newValue }));
     }
   };
-  
 
-  // ✅ On Blur Validation
   const handleBlur = (e, formType) => {
     const { name, value } = e.target;
-
     if (name.includes("email") && !validateEmail(value)) {
       showToast("Please enter a valid email address.", "error");
     }
-
-    if (name.includes("phone")) {
-      if (!validatePhone(value)) {
-        showToast("Phone number must start with 09 and be 11 digits long.", "error");
-      }
+    if (name.includes("phone") && !validatePhone(value)) {
+      showToast("Phone number must start with 09 and be 11 digits long.", "error");
     }
   };
 
-  // ✅ Submit Handler
   const handleSubmit = async (e, formType) => {
     e.preventDefault();
-     
 
     const payload = formType === "appointment" ? appointmentData : inquiryData;
     const endpoint = formType === "appointment" ? "/appointments" : "/inquiries";
-
-    // Final validation check
     const emailValid = validateEmail(payload.email);
     const phoneValid = validatePhone(payload.phone_number || payload.phone);
 
     if (!emailValid) {
       showToast("Invalid email format.", "error");
-       
       return;
     }
-
     if (!phoneValid) {
       showToast("Invalid phone number. It must start with 09 and be 11 digits.", "error");
-       
+      return;
+    }
+    if (!payload.accepted_terms) {
+      showToast("You must accept the Terms and Privacy Notice to continue.", "error");
       return;
     }
 
+    const finalPayload = {
+      ...payload,
+      accepted_terms: payload.accepted_terms ? "1" : "0",
+    };
+
     try {
-      await callAPI("post", endpoint, payload);
+      await callAPI("post", endpoint, finalPayload);
       showToast(
         formType === "appointment"
           ? "Appointment booked successfully!"
@@ -113,6 +101,7 @@ export default function ContactForm() {
             appointment_date: "",
             appointment_time: "",
             message: "",
+            accepted_terms: false,
           })
         : setInquiryData({
             first_name: "",
@@ -121,19 +110,17 @@ export default function ContactForm() {
             phone: "",
             inquiry_type: "",
             message: "",
+            accepted_terms: false,
           });
     } catch (err) {
       showToast("Something went wrong. Please try again.", "error");
     }
-
-     
   };
 
   return (
     <div className="max-w-md mx-auto bg-white dark:bg-gray-800 p-6 shadow-lg rounded-lg">
       <SEOComponent />
 
-      {/* Tabs */}
       <div className="flex justify-between border-b pb-2 mb-4 dark:border-gray-600">
         {["appointment", "inquiry"].map((tab) => (
           <button
@@ -150,7 +137,6 @@ export default function ContactForm() {
         ))}
       </div>
 
-      {/* Appointment Form */}
       {activeTab === "appointment" && (
         <form onSubmit={(e) => handleSubmit(e, "appointment")} className="grid gap-3">
           {["first_name", "last_name", "email", "phone_number", "appointment_date", "appointment_time"].map((field) => (
@@ -183,15 +169,29 @@ export default function ContactForm() {
             rows="3"
             className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
+          <div className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="accepted_terms"
+              checked={appointmentData.accepted_terms}
+              onChange={(e) => handleChange(e, "appointment")}
+              className="mt-1"
+            />
+            <p className="leading-tight">
+              I agree to the {" "}
+              <a href="/terms" target="_blank" className="underline text-blue-600">Terms</a>{" "}
+              and {" "}
+              <a href="/privacy" target="_blank" className="underline text-blue-600">Privacy Notice</a>.
+            </p>
+          </div>
           <button type="submit" className="submit-btn dark:bg-[#990e15] dark:hover:bg-red-700">
             Submit Appointment
           </button>
         </form>
       )}
 
-      {/* Inquiry Form */}
       {activeTab === "inquiry" && (
-        <form onSubmit={(e) => handleSubmit(e, "inquiry")} className="grid gap-3">
+        <form onSubmit={(e) => handleSubmit(e, "inquiry") } className="grid gap-3">
           {["first_name", "last_name", "email", "phone"].map((field) => (
             <input
               key={field}
@@ -224,6 +224,21 @@ export default function ContactForm() {
             rows="3"
             className="input-field dark:bg-gray-700 dark:border-gray-600 dark:text-white"
           />
+          <div className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="accepted_terms"
+              checked={inquiryData.accepted_terms}
+              onChange={(e) => handleChange(e, "inquiry")}
+              className="mt-1"
+            />
+            <p className="leading-tight">
+              I agree to the {" "}
+              <a href="/terms" target="_blank" className="underline text-blue-600">Terms</a>{" "}
+              and {" "}
+              <a href="/privacy" target="_blank" className="underline text-blue-600">Privacy Notice</a>.
+            </p>
+          </div>
           <button type="submit" className="submit-btn dark:bg-[#990e15] dark:hover:bg-red-700">
             Submit Inquiry
           </button>

@@ -25,6 +25,7 @@ export default function ContactForm() {
     phone: "",
     inquiryType: "",
     message: "",
+    accepted_terms: false,
   });
 
   useEffect(() => {
@@ -91,6 +92,12 @@ export default function ContactForm() {
       return;
     }
     
+    if (!formData.accepted_terms) {
+      showToast("You must accept the Terms and Privacy Notice to continue.", "error");
+      return;
+    }
+
+
     const payload = {
       first_name: formData.firstName,
       last_name: formData.lastName,
@@ -98,6 +105,7 @@ export default function ContactForm() {
       phone: formData.phone,
       inquiry_type: formData.inquiryType,
       message: formData.message,
+      accepted_terms: formData.accepted_terms ? "1" : "0",
     };
 
     try {
@@ -112,6 +120,7 @@ export default function ContactForm() {
           phone: "",
           inquiryType: "",
           message: "",
+          accepted_terms: false,
         });
       } else {
         showToast(response?.message || "Unexpected response from server.", "error");
@@ -229,7 +238,7 @@ export default function ContactForm() {
 
 
 
-      {/* Right - Inquiry Form */}
+      {/* Right Inquiry Form */}
       <div className="bg-gray-100 dark:bg-gray-700 p-6 rounded-lg text-sm">
         <h2 className="text-xl font-bold text-[#990e15] dark:text-white text-center">Send an Inquiry</h2>
         <p className="text-gray-600 dark:text-gray-300 text-center mb-4">Fill out the form and we'll get back to you.</p>
@@ -242,19 +251,26 @@ export default function ContactForm() {
           </select>
           <input type="text" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="First Name" className="input-field" required />
           <input type="text" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Last Name" className="input-field" required />
-          <input type="email" name="email" value={formData.email} onChange={handleChange}  onBlur={handleBlur} placeholder="Email" className="input-field" required />
-          <input
-            type="tel"
-            name="phone"
-            value={formData.phone}
-            onChange={handleChange}
-            onBlur={handleBlur}
-            placeholder="Phone Number (e.g. 09123456789)"
-            className="input-field"
-            required
-            maxLength="11"
-          />
+          <input type="email" name="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} placeholder="Email" className="input-field" required />
+          <input type="tel" name="phone" value={formData.phone} onChange={handleChange} onBlur={handleBlur} placeholder="Phone Number (e.g. 09123456789)" className="input-field" required maxLength="11" />
           <textarea name="message" value={formData.message} onChange={handleChange} placeholder="Your message..." className="input-field" rows="3" required></textarea>
+
+          <div className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="accepted_terms"
+              checked={formData.accepted_terms}
+              onChange={handleChange}
+              className="mt-1"
+            />
+            <p className="leading-tight">
+              I agree to the {" "}
+              <a href="/terms" target="_blank" className="underline text-blue-600">Terms</a>{" "}
+              and {" "}
+              <a href="/privacy" target="_blank" className="underline text-blue-600">Privacy Notice</a>.
+            </p>
+          </div>
+
           <button type="submit" className="submit-btn">Send Inquiry</button>
         </form>
       </div>
