@@ -134,18 +134,26 @@ export default function ProfileSettings() {
         </div>
 
         <div>
-          <label className="text-gray-700 font-medium text-sm">Email</label>
-          <div className="relative">
-            <input
-              type="email"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-300 pr-10 outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-            <Mail className="absolute right-3 top-3 text-gray-400" size={18} />
-          </div>
-        </div>
+  <label className="text-gray-700 font-medium text-sm">Email</label>
+  <div className="relative">
+    <input
+      type="email"
+      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-300 pr-10 outline-none"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      onBlur={() => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailRegex.test(email)) {
+          showToast("Please enter a valid email address and must contains @.", "error");
+        }
+      }}
+      placeholder="example@email.com"
+      required
+    />
+    <Mail className="absolute right-3 top-3 text-gray-400" size={18} />
+  </div>
+</div>
+
 
         <div>
           <label className="text-gray-700 font-medium text-sm">New Password</label>
@@ -161,17 +169,28 @@ export default function ProfileSettings() {
         </div>
 
         <div>
-          <label className="text-gray-700 font-medium text-sm">Phone Number</label>
-          <div className="relative">
-            <input
-              type="tel"
-              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-300 pr-10 outline-none"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-            <Phone className="absolute right-3 top-3 text-gray-400" size={18} />
-          </div>
-        </div>
+  <label className="text-gray-700 font-medium text-sm">Phone Number</label>
+  <div className="relative">
+    <input
+      type="tel"
+      className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-gray-300 pr-10 outline-none"
+      value={phone}
+      onChange={(e) => {
+        const value = e.target.value.replace(/[^0-9]/g, ""); // ✅ Allow only digits
+        if (value.length <= 11) setPhone(value);
+      }}
+      onBlur={() => {
+        const phoneRegex = /^09\d{9}$/;
+        if (phone && !phoneRegex.test(phone)) {
+          showToast("Phone number must start with 09 and be exactly 11 digits.", "error");
+        }
+      }}
+      placeholder="e.g. 09123456789"
+    />
+    <Phone className="absolute right-3 top-3 text-gray-400" size={18} />
+  </div>
+</div>
+
 
         <div>
           <label className="text-gray-700 font-medium text-sm">Address</label>

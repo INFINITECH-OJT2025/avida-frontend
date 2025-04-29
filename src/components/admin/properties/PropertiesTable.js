@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import TablePagination from "../../shared/TablePagination";
 import { formatPrice } from "@/utils/formatPrice";
+import { MoreHorizontal } from "lucide-react";
 
 export default function PropertiesTable({ properties, onDelete, onUpdateStatus, onView, onEdit, onAdd }) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -68,8 +69,8 @@ export default function PropertiesTable({ properties, onDelete, onUpdateStatus, 
                                         <TableCell>
                                             <DropdownMenu>
                                                 <DropdownMenuTrigger asChild>
-                                                    <Button variant="outline" size="sm">
-                                                        Actions ▼
+                                                    <Button variant="outline" size="icon">
+                                                        <MoreHorizontal />
                                                     </Button>
                                                 </DropdownMenuTrigger>
 

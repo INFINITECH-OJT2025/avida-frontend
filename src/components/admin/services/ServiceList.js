@@ -2,10 +2,18 @@ import { useState, Fragment } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import { Menu, Transition } from "@headlessui/react";
-import { ChevronDown, X } from "lucide-react";
+import { MoreHorizontal, X } from "lucide-react";
 import ServiceForm from "./ServiceForm"; 
 import { useToast } from "../../../context/ToastContext";
 import { callAPI } from "../../../utils/api";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 export default function ServiceList({ services, refreshServices }) {
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -86,12 +94,10 @@ export default function ServiceList({ services, refreshServices }) {
                   </span>
                 </td>
 
-                {/* ✅ Fix: Dropdown Menu fully visible */}
                 <td className="p-3 text-center relative">
                   <Menu as="div" className="relative inline-block text-left">
-                    <Menu.Button className="px-3 py-1 border rounded-md bg-white flex items-center space-x-1 hover:bg-gray-100">
-                      <span>Actions</span>
-                      <ChevronDown size={16} />
+                    <Menu.Button variant="outline" size="icon">
+                      <MoreHorizontal />
                     </Menu.Button>
 
                     <Transition
@@ -167,51 +173,34 @@ export default function ServiceList({ services, refreshServices }) {
         </tbody>
       </table>
 
-      {/* Lightbox for Viewing Image */}
       {lightboxOpen && selectedImage && (
         <Lightbox open={lightboxOpen} close={() => setLightboxOpen(false)} slides={[{ src: selectedImage }]} />
       )}
 
-      {/* ✅ View Details Modal (Now properly implemented) */}
-      {detailModalOpen && selectedService && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white w-96 p-6 rounded-lg shadow-lg relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setDetailModalOpen(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
-            >
-              <X size={20} />
-            </button>
+      <Dialog open={detailModalOpen} onOpenChange={setDetailModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{selectedService?.title}</DialogTitle>
+          </DialogHeader>
 
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">{selectedService.title}</h2>
-
-            <div className="mb-4">
-              <img
-                src={selectedService.image ? `/storage/${selectedService.image}` : "/images/placeholder.png"}
-                alt="Service"
-                className="w-full h-48 object-cover rounded-md"
-              />
-            </div>
-
-            <p className="text-gray-700 mb-4">{selectedService.description}</p>
-
-            <div className="flex justify-between items-center">
-              <span className="px-3 py-1 rounded border text-gray-700">
-                {selectedService.status ? "Active" : "Inactive"}
-              </span>
-              <button
-                onClick={() => setDetailModalOpen(false)}
-                className="px-4 py-2 rounded-md border hover:bg-gray-100"
-              >
-                Close
-              </button>
-            </div>
+          <div className="mb-4">
+            <img
+              src={selectedService?.image ? `/storage/${selectedService.image}` : "/images/placeholder.png"}
+              alt="Service"
+              className="w-[40] h-[40] object-cover rounded-md"
+            />
           </div>
-        </div>
-      )}
 
-      {/* Edit Service Modal (Now opens only when clicking "Edit") */}
+          <p className="text-gray-700 mb-4">{selectedService?.description}</p>
+
+          <div className="flex justify-between items-center">
+            <span className="px-3 py-1 rounded border text-gray-700">
+              {selectedService?.status ? "Active" : "Inactive"}
+            </span>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <ServiceForm
         isOpen={editModalOpen}
         setIsOpen={setEditModalOpen}

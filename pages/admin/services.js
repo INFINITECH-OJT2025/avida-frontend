@@ -23,7 +23,6 @@ export default function Services() {
        
       const data = await getAllServices(); // ✅ updated
       setServices(data);
-      showToast("Services loaded successfully!", "success");
     } catch (error) {
       console.error("Error fetching services:", error);
       showToast(`Failed to fetch services: ${error.message}`, "error");
@@ -42,15 +41,15 @@ export default function Services() {
   return (
     <AdminLayout>
       <SEOComponent />
-      <div className="lg:ml-64 p-6 min-h-screen">
-        <div className="bg-white shadow-md rounded-lg p-6">
+      <div className="flex justify-end pl-40">
+      <div className="bg-white p-10 rounded-2xl shadow-xl w-full max-w-7xl">
           <div className="flex justify-between items-center mb-10">
-            <h1 className="text-3xl font-bold text-gray-800">Manage Services</h1>
+            <h1 className="text-3xl font-bold text-primary">Manage Services</h1>
             <button
               onClick={() => setIsFormOpen(true)}
               className="bg-[#990e15] text-white px-4 py-2 rounded-md hover:bg-red-700"
             >
-              Add New Service
+              Add New
             </button>
           </div>
 

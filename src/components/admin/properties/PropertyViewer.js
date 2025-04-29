@@ -1,3 +1,4 @@
+// src\components\admin\properties\PropertyViewer.js
 import {
   Dialog,
   DialogContent,

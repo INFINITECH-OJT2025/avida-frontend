@@ -11,6 +11,7 @@ import { Navigation } from "swiper/modules";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import "react-photo-view/dist/react-photo-view.css";
 import GlobalLoader from "@/components/layout/GlobalLoader";
+import { formatPrice, sanitizeCurrencyInput } from "@/utils/formatPrice";
 
 const unitTypes = ["Studio Room", "1BR", "2BR", "3BR", "Loft", "Penthouse"];
 const unitStatus = ["Bare", "Semi-Furnished", "Fully-Furnished", "Interiored"];
@@ -35,6 +36,9 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
   const fileInputRef = useRef();
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [displayPrice, setDisplayPrice] = useState("");
+  const [deletedMediaUrls, setDeletedMediaUrls] = useState([]);
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -55,16 +59,57 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
   });
 
   useEffect(() => {
-    if (initialData) {
-      setFormData({
-        ...initialData,
-        features_amenities: Array.isArray(initialData.features_amenities)
-          ? initialData.features_amenities
-          : JSON.parse(initialData.features_amenities || "[]"),
-      });
+    if (isOpen) {
+      if (initialData) {
+        // ✅ EDIT MODE
+        const mediaPaths = Array.isArray(initialData.lightbox2_media)
+          ? initialData.lightbox2_media
+          : initialData.lightbox2_media?.split(",") || [];
+  
+        const existingMedia = mediaPaths.map((path) => ({
+          url: path.startsWith("http")
+            ? path
+            : `${process.env.NEXT_PUBLIC_API_BASE_URL}/storage/${path}`,
+          type: path.match(/\.(mp4|mov)$/i) ? "video" : "image",
+          isExisting: true,
+        }));
+  
+        setFormData({
+          ...initialData,
+          features_amenities: Array.isArray(initialData.features_amenities)
+            ? initialData.features_amenities
+            : JSON.parse(initialData.features_amenities || "[]"),
+        });
+        setImages(existingMedia); // ✅ Show in preview
+        setDisplayPrice(formatPrice(initialData.price || ""));
+        setDeletedMediaUrls([]);
+      } else {
+        // 🔄 ADD MODE - reset all
+        setFormData({
+          first_name: "",
+          last_name: "",
+          email: "",
+          phone_number: "",
+          type: "Owner",
+          property_name: "",
+          location: "",
+          unit_type: "Studio Room",
+          unit_status: "Bare",
+          price: "",
+          square_meter: "",
+          floor_number: "",
+          parking: "No Parking",
+          property_status: "For Rent",
+          features_amenities: [],
+          lightbox2_media: [],
+        });
+        setImages([]);
+        setDisplayPrice("");
+        setDeletedMediaUrls([]);
+      }
     }
-  }, [initialData]);
-
+  }, [isOpen, initialData]);
+  
   const handleChange = (e) => {
     const { name, value } = e.target;
     // Add phone validation on input
@@ -82,6 +127,20 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
         [name]: value,
       }));
     }
+
+    if (name === "price") {
+        // Just store raw typed value (even if has ₱, commas, dots)
+        setDisplayPrice(value);
+      
+        const cleaned = sanitizeCurrencyInput(value);
+        const floatValue = parseFloat(cleaned);
+        setFormData((prev) => ({
+          ...prev,
+          price: isNaN(floatValue) ? "" : floatValue,
+        }));
+        return;
+      }
+      
   };
 
   const handleBlur = (e) => {
@@ -120,13 +179,21 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
       file,
       url: URL.createObjectURL(file),
       type: file.type.includes("image") ? "image" : "video",
+      isExisting: false,
     }));
     setImages(previews);
   };
 
   const removeImage = (index) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
+    setImages((prev) => {
+      const toRemove = prev[index];
+      if (toRemove.isExisting) {
+        setDeletedMediaUrls((prevDeleted) => [...prevDeleted, toRemove.url]);
+      }
+      return prev.filter((_, i) => i !== index);
+    });
   };
+  
 
   const handleSubmit = async () => {
     try {
@@ -141,9 +208,12 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
         }
       }
   
-      images.forEach(({ file }) => {
-        payload.append("lightbox2_media[]", file);
+      images.forEach((media) => {
+        if (!media.isExisting && media.file) {
+          payload.append("lightbox2_media[]", media.file);
+        }
       });
+      
   
       if (!initialData) {
         if (!/^09\d{9}$/.test(formData.phone_number)) {
@@ -224,7 +294,20 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
             </select>
           </div>
 
-          <div><label className="text-sm font-semibold">Price</label><Input name="price" type="number" value={formData.price} onChange={handleChange} /></div>
+          <div><label className="text-sm font-semibold">Price</label><Input
+  name="price"
+  value={displayPrice}
+  onChange={handleChange}
+  onBlur={(e) => {
+    const cleaned = sanitizeCurrencyInput(e.target.value);
+    const formatted = cleaned ? formatPrice(cleaned) : "";
+    setDisplayPrice(formatted);
+  }}
+  inputMode="decimal"
+  placeholder="₱0.00"
+/>
+
+</div>
           <div><label className="text-sm font-semibold">Square Meter</label><Input name="square_meter" type="number" value={formData.square_meter} onChange={handleChange} /></div>
           <div><label className="text-sm font-semibold">Floor Number</label><Input name="floor_number" type="number" value={formData.floor_number} onChange={handleChange} /></div>
 {/* Parking */}
@@ -273,33 +356,34 @@ export default function PropertyFormModal({ isOpen, onClose, initialData = null,
                   className="w-full max-w-xs"
                 >
                   {images.map((img, index) => (
-                    <SwiperSlide key={index}>
-                      <div className="relative group rounded overflow-hidden border border-gray-300 w-full h-[120px]">
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full p-1 text-xs hidden group-hover:block"
-                        >
-                          ✕
-                        </button>
-                        {img.type === "image" ? (
-                          <PhotoView src={img.url}>
-                            <img
-                              src={img.url}
-                              alt="Preview"
-                              className="w-full h-full object-cover cursor-pointer"
-                            />
-                          </PhotoView>
-                        ) : (
-                          <video
-                            src={img.url}
-                            controls
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-                    </SwiperSlide>
-                  ))}
+  <SwiperSlide key={index}>
+    <div className="relative group rounded overflow-hidden border border-gray-300 w-full h-[120px]">
+      <button
+        type="button"
+        onClick={() => removeImage(index)}
+        className="absolute top-1 right-1 bg-black bg-opacity-60 text-white rounded-full p-1 text-xs hidden group-hover:block"
+      >
+        ✕
+      </button>
+      {img.type === "image" ? (
+        <PhotoView src={img.url}>
+          <img
+            src={img.url}
+            alt="Preview"
+            className="w-full h-full object-cover cursor-pointer"
+          />
+        </PhotoView>
+      ) : (
+        <video
+          src={img.url}
+          controls
+          className="w-full h-full object-cover"
+        />
+      )}
+    </div>
+  </SwiperSlide>
+))}
+
                 </Swiper>
               </PhotoProvider>
             </div>
